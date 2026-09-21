@@ -15,6 +15,7 @@ import {
 import { useQuote } from '../context/QuoteContext';
 import { generateWhatsAppQuoteUrl } from '../services/quoteService';
 import { useToast } from '../context/ToastContext';
+import { SEOHead } from '../components/common/SEOHead';
 
 export const QuotePage: React.FC = () => {
   const { items, removeItem, updateQuantity, clearQuote, subtotal, gstAmount, grandTotal } = useQuote();
@@ -43,6 +44,11 @@ export const QuotePage: React.FC = () => {
 
   return (
     <div className="pt-24 pb-28 min-h-screen bg-cream-50 text-charcoal-800">
+      <SEOHead
+        title="Instant Turnkey Cost Estimator & Quote Sheet | Sikar"
+        description="Calculate estimated costs for home interior design, modular kitchens, wardrobes, and materials in Sikar, Rajasthan. Instant BOQ with GST breakdown."
+        canonicalPath="/quote"
+      />
       {/* Printable Quote Sheet Header */}
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 py-8 border-b border-cream-200">

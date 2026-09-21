@@ -5,6 +5,7 @@ import projectsData from '../data/projects.json';
 import { Project } from '../types/project';
 import { ImageViewer } from '../components/common/ImageViewer';
 import { onImageErrorWithFallback } from '../utils/imageFallback';
+import { SEOHead } from '../components/common/SEOHead';
 
 export const ProjectsPage: React.FC = () => {
   const [activeCategory, setActiveCategory] = useState<'All' | 'Home' | 'Office' | 'Commercial' | 'Renovation'>('All');
@@ -19,6 +20,12 @@ export const ProjectsPage: React.FC = () => {
 
   return (
     <div className="pt-24 pb-28 min-h-screen bg-cream-50 text-charcoal-800">
+      <SEOHead
+        title="Interior Design Projects in Sikar & Rajasthan | Turnkey Portfolio"
+        description="Explore completed residential and commercial interior design projects in Sikar, Rajasthan: luxury living rooms, German modular kitchens, master bedroom suites & boutique showrooms."
+        keywords="Interior Design Projects in Sikar, Interior Design Portfolio Sikar, Home Interior Sikar, Modular Kitchen Projects Sikar"
+        canonicalPath="/projects"
+      />
       {/* Header Banner */}
       <div className="bg-forest-950 text-cream-100 py-12 sm:py-16 border-b border-cream-200/10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

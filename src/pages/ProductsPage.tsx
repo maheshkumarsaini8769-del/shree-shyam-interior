@@ -8,6 +8,7 @@ import { apiService } from '../services/apiService';
 import { useQuote } from '../context/QuoteContext';
 import { ImageViewer } from '../components/common/ImageViewer';
 import { onImageErrorWithFallback } from '../utils/imageFallback';
+import { SEOHead } from '../components/common/SEOHead';
 
 export const ProductsPage: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -138,6 +139,12 @@ export const ProductsPage: React.FC = () => {
 
   return (
     <div className="pt-24 pb-28 min-h-screen bg-cream-50 dark:bg-forest-950 text-charcoal-800 dark:text-cream-100 transition-colors duration-300">
+      <SEOHead
+        title="Interior Architectural Materials Catalog | Sikar, Rajasthan"
+        description="Shop 100% genuine Century Marine Plywood, Greenlam Laminates, Häfele & Hettich Hardware, Philips Track Lighting, Charcoal Louvers, and Asian Paints in Sikar."
+        keywords="Century Plywood Sikar, Greenlam Laminates Sikar, Häfele Hardware Sikar, Interior Materials Sikar Rajasthan"
+        canonicalPath="/products"
+      />
       {/* Top Banner */}
       <div className="bg-forest-950 text-cream-100 py-12 sm:py-16 border-b border-cream-200/10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

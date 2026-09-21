@@ -40,6 +40,7 @@ export const Header: React.FC = () => {
   // Streamlined, elegant labels for a clean, spacious luxury navbar
   const navLinks: { label: string; path: string; badge?: string }[] = [
     { label: 'Home', path: '/' },
+    { label: 'Services', path: '/services' },
     { label: 'Products', path: '/products' },
     { label: 'Projects', path: '/projects' },
     { label: 'Design AI', path: '/design-ai' },
@@ -275,7 +276,7 @@ export const Header: React.FC = () => {
                 Book Free Site Visit
               </Link>
               <div className="text-center text-xs text-charcoal-400 dark:text-charcoal-300">
-                Showroom: Station Road, Sikar, Rajasthan
+                Showroom: Piprali Road, Near Railway Overbridge, Sikar, Rajasthan - 332001
               </div>
             </div>
           </div>

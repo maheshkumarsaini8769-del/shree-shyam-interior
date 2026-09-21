@@ -17,6 +17,7 @@ import { Project } from '../types/project';
 import { BeforeAfterSlider } from '../components/common/BeforeAfterSlider';
 import { ImageViewer } from '../components/common/ImageViewer';
 import { onImageErrorWithFallback } from '../utils/imageFallback';
+import { SEOHead } from '../components/common/SEOHead';
 
 export const ProjectDetailPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -28,6 +29,11 @@ export const ProjectDetailPage: React.FC = () => {
   if (!project) {
     return (
       <div className="min-h-screen pt-32 pb-16 flex flex-col items-center justify-center text-center px-4">
+        <SEOHead
+          title="Project Not Found"
+          description="The requested project study could not be located."
+          noindex={true}
+        />
         <h2 className="font-serif text-3xl font-bold text-forest-950">Project Not Found</h2>
         <p className="text-sm text-charcoal-400 mt-2">The requested project study could not be located.</p>
         <Link
@@ -42,8 +48,58 @@ export const ProjectDetailPage: React.FC = () => {
 
   const galleryImages = project.gallery && project.gallery.length > 0 ? project.gallery : [project.heroImage];
 
+  const projectJsonLd = [
+    {
+      '@context': 'https://schema.org',
+      '@type': 'CreativeWork',
+      name: project.title,
+      description: project.overview,
+      image: project.heroImage,
+      creator: {
+        '@type': 'HomeAndConstructionBusiness',
+        name: 'Shree Shyam Interior',
+        url: 'https://wooden-five.vercel.app/'
+      },
+      locationCreated: {
+        '@type': 'Place',
+        name: project.location
+      }
+    },
+    {
+      '@context': 'https://schema.org',
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        {
+          '@type': 'ListItem',
+          position: 1,
+          name: 'Home',
+          item: 'https://wooden-five.vercel.app/'
+        },
+        {
+          '@type': 'ListItem',
+          position: 2,
+          name: 'Projects',
+          item: 'https://wooden-five.vercel.app/projects'
+        },
+        {
+          '@type': 'ListItem',
+          position: 3,
+          name: project.title,
+          item: `https://wooden-five.vercel.app/projects/${project.slug}`
+        }
+      ]
+    }
+  ];
+
   return (
     <div className="pt-20 pb-28 min-h-screen bg-cream-50 text-charcoal-800">
+      <SEOHead
+        title={`${project.title} - ${project.location}`}
+        description={`${project.overview.slice(0, 150)}... Turnkey interior case study in ${project.location} by Shree Shyam Interior.`}
+        canonicalPath={`/projects/${project.slug}`}
+        ogImage={project.heroImage}
+        jsonLd={projectJsonLd}
+      />
       {/* Back Button Bar */}
       <div className="bg-forest-950/90 border-b border-cream-200/10 py-3.5 px-4 sm:px-8">
         <div className="max-w-7xl mx-auto flex items-center justify-between">

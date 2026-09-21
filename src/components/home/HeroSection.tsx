@@ -6,11 +6,11 @@ import { apiService } from '../../services/apiService';
 
 export const HeroSection: React.FC = () => {
   const [heroData, setHeroData] = useState({
-    badge: 'DREAM • DESIGN • BUILD',
-    titlePrefix: 'Transforming Spaces Into',
-    titleHighlight: 'Better Living',
-    subtitle: 'Premium interior materials, modern designs and complete turnkey solutions for your home, office or commercial space.',
-    primaryCtaText: 'Get Free Consultation',
+    badge: "SIKAR'S PREMIER INTERIOR ARCHITECTURE STUDIO",
+    titlePrefix: 'Premium Interior Design',
+    titleHighlight: 'Services in Sikar',
+    subtitle: 'Award-winning turnkey interior designer in Sikar, Rajasthan. Bespoke home interiors, modular kitchens, luxury bedroom suites & commercial spaces with 10-year warranty.',
+    primaryCtaText: 'Book Free Site Visit',
     primaryCtaLink: '/site-visit',
     secondaryCtaText: 'Explore 3D Studio',
     secondaryCtaLink: '/design-ai',
@@ -21,11 +21,11 @@ export const HeroSection: React.FC = () => {
     apiService.getSiteContent().then((content) => {
       if (content?.hero) {
         setHeroData({
-          badge: content.hero.badge || 'DREAM • DESIGN • BUILD',
-          titlePrefix: content.hero.titlePrefix || 'Transforming Spaces Into',
-          titleHighlight: content.hero.titleHighlight || 'Better Living',
-          subtitle: content.hero.subtitle || 'Premium interior materials, modern designs and complete turnkey solutions.',
-          primaryCtaText: content.hero.primaryCtaText || 'Get Free Consultation',
+          badge: content.hero.badge || "SIKAR'S PREMIER INTERIOR ARCHITECTURE STUDIO",
+          titlePrefix: content.hero.titlePrefix || 'Premium Interior Design',
+          titleHighlight: content.hero.titleHighlight || 'Services in Sikar',
+          subtitle: content.hero.subtitle || 'Award-winning turnkey interior designer in Sikar, Rajasthan. Bespoke home interiors, modular kitchens, luxury bedroom suites & commercial spaces with 10-year warranty.',
+          primaryCtaText: content.hero.primaryCtaText || 'Book Free Site Visit',
           primaryCtaLink: content.hero.primaryCtaLink || '/site-visit',
           secondaryCtaText: content.hero.secondaryCtaText || 'Explore 3D Studio',
           secondaryCtaLink: content.hero.secondaryCtaLink || '/design-ai',

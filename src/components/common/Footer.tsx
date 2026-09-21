@@ -148,13 +148,13 @@ export const Footer: React.FC = () => {
               <div className="flex items-start gap-2">
                 <MapPin className="w-4 h-4 text-copper-400 shrink-0 mt-0.5" />
                 <span>
-                  {branding?.footer?.address || 'Station Road / Piprali Road Crossing, Sikar, Rajasthan - 332001'}
+                  {branding?.footer?.address || 'Piprali Road, Near Railway Overbridge, Sikar, Rajasthan - 332001'}
                 </span>
               </div>
               <div className="flex items-center gap-2">
                 <Phone className="w-4 h-4 text-copper-400 shrink-0" />
                 <a href="tel:+919876543210" className="hover:text-copper-400 transition-colors">
-                  +91 98765 43210 / +91 94140 12345
+                  +91 98765 43210
                 </a>
               </div>
               <div className="flex items-center gap-2">
@@ -165,12 +165,32 @@ export const Footer: React.FC = () => {
               </div>
               <div className="flex items-center gap-2">
                 <Clock className="w-4 h-4 text-copper-400 shrink-0" />
-                <span>Monday - Sunday: 10:00 AM – 8:30 PM (Open All 7 Days)</span>
+                <span>Monday - Sunday: 9:30 AM – 8:30 PM (Open All 7 Days)</span>
+              </div>
+              <div className="pt-2 text-[11px] text-charcoal-400">
+                <span>Serving: Sikar, Nawalgarh, Fatehpur, Laxmangarh, Jhunjhunu & Jaipur</span>
               </div>
             </div>
           </div>
 
-          {/* Material Categories */}
+          {/* Interior Services in Sikar (Primary SEO Silo) */}
+          <div>
+            <h4 className="text-xs font-bold uppercase tracking-widest text-copper-400 mb-4">
+              Services in Sikar
+            </h4>
+            <ul className="space-y-2 text-sm text-charcoal-300">
+              <li><Link to="/services/home-interior" className="hover:text-cream-50 transition-colors">Home Interior Designer</Link></li>
+              <li><Link to="/services/modular-kitchen" className="hover:text-cream-50 transition-colors">Modular Kitchen in Sikar</Link></li>
+              <li><Link to="/services/bedroom-interior" className="hover:text-cream-50 transition-colors">Bedroom Interior Design</Link></li>
+              <li><Link to="/services/living-room-interior" className="hover:text-cream-50 transition-colors">Living Room & TV Units</Link></li>
+              <li><Link to="/services/wardrobe" className="hover:text-cream-50 transition-colors">Modern Wardrobe Design</Link></li>
+              <li><Link to="/services/office-interior" className="hover:text-cream-50 transition-colors">Office & Commercial Design</Link></li>
+              <li><Link to="/services/false-ceiling" className="hover:text-cream-50 transition-colors">Designer False Ceiling</Link></li>
+              <li><Link to="/services" className="text-copper-400 hover:underline text-xs font-semibold block pt-1">View All Services →</Link></li>
+            </ul>
+          </div>
+
+          {/* Material Catalog */}
           <div>
             <h4 className="text-xs font-bold uppercase tracking-widest text-copper-400 mb-4">
               Material Catalog
@@ -182,36 +202,20 @@ export const Footer: React.FC = () => {
               <li><Link to="/products?category=lighting" className="hover:text-cream-50 transition-colors">Philips Magnetic 48V Tracks</Link></li>
               <li><Link to="/products?category=wall-panels" className="hover:text-cream-50 transition-colors">Charcoal Acoustic Louvers</Link></li>
               <li><Link to="/products?category=paint" className="hover:text-cream-50 transition-colors">Asian Paints Italian Stucco</Link></li>
-              <li><Link to="/products?category=glass-aluminium" className="hover:text-cream-50 transition-colors">Saint-Gobain Fluted Glass</Link></li>
             </ul>
           </div>
 
-          {/* Turnkey Solutions */}
+          {/* Quick Tools & Portfolios */}
           <div>
             <h4 className="text-xs font-bold uppercase tracking-widest text-copper-400 mb-4">
-              Turnkey Studios
+              Studio & Tools
             </h4>
             <ul className="space-y-2 text-sm text-charcoal-300">
-              <li><Link to="/projects?category=Home" className="hover:text-cream-50 transition-colors">Modular German Kitchens</Link></li>
-              <li><Link to="/projects?category=Home" className="hover:text-cream-50 transition-colors">Master Bedroom Suites</Link></li>
-              <li><Link to="/projects?category=Office" className="hover:text-cream-50 transition-colors">Corporate Law Chambers</Link></li>
-              <li><Link to="/projects?category=Commercial" className="hover:text-cream-50 transition-colors">Boutique Retail Showrooms</Link></li>
-              <li><Link to="/projects?category=Renovation" className="hover:text-cream-50 transition-colors">Duplex Heritage Overhaul</Link></li>
-              <li><Link to="/design-ai" className="hover:text-cream-50 transition-colors">AI 3D Room Visualizer</Link></li>
-            </ul>
-          </div>
-
-          {/* Quick Tools */}
-          <div>
-            <h4 className="text-xs font-bold uppercase tracking-widest text-copper-400 mb-4">
-              Quick Tools
-            </h4>
-            <ul className="space-y-2 text-sm text-charcoal-300">
-              <li><Link to="/quote" className="hover:text-cream-50 transition-colors">Instant Cost Calculator</Link></li>
+              <li><Link to="/projects" className="hover:text-cream-50 transition-colors">Completed Projects</Link></li>
+              <li><Link to="/design-ai" className="hover:text-cream-50 transition-colors">3D Room Configurator</Link></li>
+              <li><Link to="/quote" className="hover:text-cream-50 transition-colors">Instant Cost Estimator</Link></li>
               <li><Link to="/site-visit" className="hover:text-cream-50 transition-colors">Book Free Site Visit</Link></li>
-              <li><Link to="/quote" className="hover:text-cream-50 transition-colors">Request Materials Quote</Link></li>
-              <li><Link to="/profile" className="hover:text-cream-50 transition-colors">Client Project Dashboard</Link></li>
-              <li><a href="https://maps.google.com/?q=Shree+Shyam+Interior+Sikar" target="_blank" rel="noreferrer" className="hover:text-cream-50 transition-colors">Get Showroom Directions</a></li>
+              <li><a href="https://maps.google.com/?q=Shree+Shyam+Interior+Sikar" target="_blank" rel="noreferrer" className="hover:text-cream-50 transition-colors">Showroom Directions</a></li>
             </ul>
           </div>
         </div>

@@ -39,6 +39,9 @@ const DesignAIPage = lazyWithRetry(() => import('./pages/DesignAIPage').then((m)
 const QuotePage = lazyWithRetry(() => import('./pages/QuotePage').then((m) => ({ default: m.QuotePage })));
 const SiteVisitPage = lazyWithRetry(() => import('./pages/SiteVisitPage').then((m) => ({ default: m.SiteVisitPage })));
 const ProfilePage = lazyWithRetry(() => import('./pages/ProfilePage').then((m) => ({ default: m.ProfilePage })));
+const ServicesHubPage = lazyWithRetry(() => import('./pages/ServicesHubPage').then((m) => ({ default: m.ServicesHubPage })));
+const ServiceDetailPage = lazyWithRetry(() => import('./pages/ServiceDetailPage').then((m) => ({ default: m.ServiceDetailPage })));
+const NotFoundPage = lazyWithRetry(() => import('./pages/NotFoundPage').then((m) => ({ default: m.NotFoundPage })));
 
 // Admin Pages Lazy Loading
 const AdminLayout = lazyWithRetry(() => import('./pages/admin/AdminLayout').then((m) => ({ default: m.AdminLayout })));
@@ -174,6 +177,8 @@ const AppContent: React.FC = () => {
           <Suspense fallback={<PageSkeleton />}>
             <Routes>
               <Route path="/" element={<HomePage />} />
+              <Route path="/services" element={<ServicesHubPage />} />
+              <Route path="/services/:slug" element={<ServiceDetailPage />} />
               <Route path="/products" element={<ProductsPage />} />
               <Route path="/projects" element={<ProjectsPage />} />
               <Route path="/projects/:slug" element={<ProjectDetailPage />} />
@@ -181,6 +186,7 @@ const AppContent: React.FC = () => {
               <Route path="/quote" element={<QuotePage />} />
               <Route path="/site-visit" element={<SiteVisitPage />} />
               <Route path="/profile" element={<ProfilePage />} />
+              <Route path="*" element={<NotFoundPage />} />
             </Routes>
           </Suspense>
         </ChunkErrorBoundary>

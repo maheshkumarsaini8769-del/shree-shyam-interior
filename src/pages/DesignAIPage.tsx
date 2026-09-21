@@ -29,6 +29,7 @@ import { compressImageFile } from '../utils/imageCompressor';
 import productsData from '../data/products.json';
 import { Product } from '../types/product';
 import { Link } from 'react-router-dom';
+import { SEOHead } from '../components/common/SEOHead';
 
 export const DesignAIPage: React.FC = () => {
   // Top-Level Studio Mode: Interactive 3D Customizer vs AI Photo Makeover
@@ -259,6 +260,11 @@ export const DesignAIPage: React.FC = () => {
 
   return (
     <div className="pt-24 pb-28 min-h-screen bg-cream-50 dark:bg-forest-950 text-charcoal-800 dark:text-cream-100 relative transition-colors duration-300">
+      <SEOHead
+        title="Interactive 3D Room Studio & Visualizer | Sikar"
+        description="Experience realistic 3D room styling, custom furniture configurations, and photorealistic finishes for your living room, kitchen, or bedroom in Sikar."
+        canonicalPath="/design-ai"
+      />
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         {/* Wizard Header */}
         <div className="text-center mb-8">

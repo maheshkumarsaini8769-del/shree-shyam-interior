@@ -4,6 +4,7 @@ import { saveSiteVisit } from '../services/bookingService';
 import { SiteVisitRequest } from '../types/quote';
 import { useToast } from '../context/ToastContext';
 import { Link } from 'react-router-dom';
+import { SEOHead } from '../components/common/SEOHead';
 
 export const SiteVisitPage: React.FC = () => {
   const { showToast } = useToast();
@@ -36,6 +37,12 @@ export const SiteVisitPage: React.FC = () => {
 
   return (
     <div className="pt-24 pb-28 min-h-screen bg-cream-50 text-charcoal-800">
+      <SEOHead
+        title="Book Free Site Visit & Consultation in Sikar | Shree Shyam Interior"
+        description="Book a 100% free site consultation in Sikar & Rajasthan. Our interior architect visits your property with laser measurement tools, physical material swatches, and 3D estimates."
+        keywords="Interior Designer Site Visit Sikar, Free Interior Consultation Sikar, Turnkey Estimation Sikar Rajasthan"
+        canonicalPath="/site-visit"
+      />
       {/* Top Banner */}
       <div className="bg-forest-950 text-cream-100 py-12 sm:py-16 border-b border-cream-200/10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
