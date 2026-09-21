@@ -1,0 +1,219 @@
+[
+  {
+    "id": "proj-1",
+    "slug": "modern-luxury-living-room-sikar",
+    "title": "Modern Luxury Living Room",
+    "client": "Rajeshwar Sharma Residence",
+    "category": "Home",
+    "location": "Piprali Road, Sikar",
+    "area": "780 sq ft",
+    "year": "2024",
+    "duration": "6 Weeks",
+    "budgetRange": "₹7.5L - ₹9.0L",
+    "heroImage": "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=1600&q=85",
+    "beforeImage": "https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=1200&q=80",
+    "afterImage": "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=1200&q=85",
+    "gallery": [
+      "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=1600&q=85",
+      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1600&q=85",
+      "https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&w=1600&q=85",
+      "https://images.unsplash.com/photo-1600566753376-12c8ab7fb75b?auto=format&fit=crop&w=1600&q=85"
+    ],
+    "overview": "A complete bespoke transformation of a spacious living pavilion featuring fluted charcoal louvers, custom Italian marble TV backdrop, warm recessed 48V magnetic track lighting, and CenturyPly Club Prime cabinetry.",
+    "challenge": "The space had uneven natural lighting and exposed columns that interrupted sightlines. The client desired a grand hotel-suite ambience with low-maintenance materials.",
+    "solution": "We concealed the structural columns behind acoustic wood-fluted panelling with integrated bronze LED channels and installed seamless marble acrylics with concealed Häfele hardware.",
+    "materialsUsed": [
+      "CenturyPly Club Prime BWP 710",
+      "Greenlam HD High-Gloss Acrylics",
+      "Häfele Slim Concealed Soft-Close Channels",
+      "Philips 48V Magnetic Architectural Profile Lighting",
+      "Italian Stucco Texture Paint"
+    ],
+    "designStyle": "Contemporary Indian Luxury",
+    "testimonial": {
+      "quote": "Shree Shyam Interior transformed our raw house into a magazine-worthy haven. The attention to detail in the fluted wood and lighting is exceptional.",
+      "author": "Er. Rajeshwar Sharma",
+      "designation": "Civil Consultant, Sikar",
+      "avatar": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80"
+    }
+  },
+  {
+    "id": "proj-2",
+    "slug": "contemporary-modular-kitchen-sikar",
+    "title": "Minimalist High-Gloss Modular Kitchen",
+    "client": "Singhal Villa",
+    "category": "Home",
+    "location": "Bajaj Road, Sikar",
+    "area": "320 sq ft",
+    "year": "2024",
+    "duration": "4 Weeks",
+    "budgetRange": "₹4.8L - ₹5.6L",
+    "heroImage": "https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=1600&q=85",
+    "beforeImage": "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=1200&q=80",
+    "afterImage": "https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=1200&q=85",
+    "gallery": [
+      "https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=1600&q=85",
+      "https://images.unsplash.com/photo-1600585154526-990dced4db0d?auto=format&fit=crop&w=1600&q=85",
+      "https://images.unsplash.com/photo-1507089947368-19c1da9775ae?auto=format&fit=crop&w=1600&q=85"
+    ],
+    "overview": "German-standard ergonomic kitchen with anti-fingerprint charcoal acrylic finishes, quartz countertop, Häfele Matrix Box drawer runners, and touch sensor LED cabinet lighting.",
+    "challenge": "Maximum storage was required for Indian spice jars, heavy cookware, and dedicated appliance garages without cluttering the island counter.",
+    "solution": "Custom tall pantry unit with dual soft-closing pullouts, blind corner magic carousels, and 100% boiling waterproof marine plywood fabrication.",
+    "materialsUsed": [
+      "Century Marine Plywood IS:710",
+      "Hettich Sensys Obsidian Black Hinges",
+      "KalingaStone Pure White Quartz",
+      "Häfele Matrix Box Drawer Inserts",
+      "Saint-Gobain Lacquered Bronze Glass Dado"
+    ],
+    "designStyle": "European Minimalist",
+    "testimonial": {
+      "quote": "Working in this kitchen is pure joy. Every drawer glides effortlessly, and the surface wipes clean with a damp cloth in seconds.",
+      "author": "Dr. Sunita Singhal",
+      "designation": "Homeowner, Sikar",
+      "avatar": "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=200&q=80"
+    }
+  },
+  {
+    "id": "proj-3",
+    "slug": "executive-law-chamber-delhi",
+    "title": "Corporate Law Chambers & Suite",
+    "client": "Vanguard Legal Associates",
+    "category": "Office",
+    "location": "Barakhamba Road, Connaught Place, Delhi",
+    "area": "1,450 sq ft",
+    "year": "2023",
+    "duration": "8 Weeks",
+    "budgetRange": "₹16.0L - ₹19.5L",
+    "heroImage": "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=1600&q=85",
+    "beforeImage": "https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&w=1200&q=80",
+    "afterImage": "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=1200&q=85",
+    "gallery": [
+      "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=1600&q=85",
+      "https://images.unsplash.com/photo-1497215728101-856f4ea42174?auto=format&fit=crop&w=1600&q=85",
+      "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=1600&q=85"
+    ],
+    "overview": "Prestigious executive corporate chambers designed with dark walnut fluted acoustics, slim aluminium glass partitions, conference automation, and bespoke credenzas.",
+    "challenge": "Client needed strict soundproofing (STC 45+) between client consultation rooms while maintaining an open, sunlit contemporary aesthetic.",
+    "solution": "Engineered double-glazed Saint-Gobain acoustic acoustic glass with concealed drop seals and acoustic wall paneling calibrated for speech clarity.",
+    "materialsUsed": [
+      "Natural American Walnut Wood Veneer",
+      "Saint-Gobain Acoustic Laminate Glass",
+      "Dormakaba Sliding Hardware",
+      "Modular Acoustic Baffles"
+    ],
+    "designStyle": "Modern Corporate Luxury",
+    "testimonial": {
+      "quote": "The acoustic privacy and dignified elegance achieved by the Shree Shyam team exceeded all partner expectations. Truly world class.",
+      "author": "Adv. Vikramjit Singh",
+      "designation": "Managing Partner, Delhi",
+      "avatar": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=200&q=80"
+    }
+  },
+  {
+    "id": "proj-4",
+    "slug": "royal-heritage-bedroom-jaipur",
+    "title": "Royal Heritage Master Bedroom Suite",
+    "client": "Shekhawat Palace Penthouse",
+    "category": "Home",
+    "location": "C-Scheme, Jaipur",
+    "area": "620 sq ft",
+    "year": "2024",
+    "duration": "5 Weeks",
+    "budgetRange": "₹6.8L - ₹8.0L",
+    "heroImage": "https://images.unsplash.com/photo-1616594039964-ae9021a400a0?auto=format&fit=crop&w=1600&q=85",
+    "beforeImage": "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=1200&q=80",
+    "afterImage": "https://images.unsplash.com/photo-1616594039964-ae9021a400a0?auto=format&fit=crop&w=1200&q=85",
+    "gallery": [
+      "https://images.unsplash.com/photo-1616594039964-ae9021a400a0?auto=format&fit=crop&w=1600&q=85",
+      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=1600&q=85",
+      "https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?auto=format&fit=crop&w=1600&q=85"
+    ],
+    "overview": "A warm blend of Rajasthani architectural motifs with Italian minimalism: handcrafted jali lattice backlit with 3000K warm LEDs, fluted velvet headboard, and floor-to-ceiling tinted glass walk-in wardrobe.",
+    "challenge": "Balancing heritage Rajput craftsmanship with contemporary sleek lines and modern smart lighting automation.",
+    "solution": "CNC-routed teak wood jali panels framed in brushed champagne gold aluminium, paired with silent soft-close sliding wardrobe systems.",
+    "materialsUsed": [
+      "CenturyPly Fire-Retardant Marine Plywood",
+      "Handcrafted Teak Wood Louvers",
+      "Brushed Champagne Anodized Profiles",
+      "Warm White Ambient Strip Lighting"
+    ],
+    "designStyle": "Royal Contemporary",
+    "testimonial": {
+      "quote": "They blended our traditional Rajasthani roots with sleek modern storage in the most breathtaking way imaginable.",
+      "author": "Meenakshi Shekhawat",
+      "designation": "Art Connoisseur, Jaipur",
+      "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80"
+    }
+  },
+  {
+    "id": "proj-5",
+    "slug": "luxury-boutique-showroom-renovation",
+    "title": "Designer Jewelry & Textile Boutique",
+    "client": "Kalyan Heritage Jewels",
+    "category": "Commercial",
+    "location": "Station Road, Sikar",
+    "area": "1,800 sq ft",
+    "year": "2024",
+    "duration": "7 Weeks",
+    "budgetRange": "₹18.5L - ₹22.0L",
+    "heroImage": "https://images.unsplash.com/photo-1567401893414-76b7b1e5a7a5?auto=format&fit=crop&w=1600&q=85",
+    "beforeImage": "https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=1200&q=80",
+    "afterImage": "https://images.unsplash.com/photo-1567401893414-76b7b1e5a7a5?auto=format&fit=crop&w=1200&q=85",
+    "gallery": [
+      "https://images.unsplash.com/photo-1567401893414-76b7b1e5a7a5?auto=format&fit=crop&w=1600&q=85",
+      "https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=1600&q=85"
+    ],
+    "overview": "High-security commercial renovation with custom velvet display vitrines, ultra-clear low-iron anti-reflective glass, and custom fluted copper ceiling canopies.",
+    "challenge": "Renovation had to be executed without shutting down adjacent operations, adhering to strict dust barriers and rapid structural turnaround.",
+    "solution": "Off-site CNC prefabrication at our Sikar workshop followed by precision overnight on-site installation within 14 working days.",
+    "materialsUsed": [
+      "Saint-Gobain Diamant Extra Clear Glass",
+      "Copper Mirror Composite Sheets",
+      "Godrej High-Security Electronic Locking Locks",
+      "Philips High-CRI 95+ Focus Spotlights"
+    ],
+    "designStyle": "Luxury Retail",
+    "testimonial": {
+      "quote": "Customer footfall and compliments have soared since reopening. The lighting and display finishes are flawless.",
+      "author": "Anand Soni",
+      "designation": "Director, Kalyan Heritage Jewels",
+      "avatar": "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=200&q=80"
+    }
+  },
+  {
+    "id": "proj-6",
+    "slug": "complete-duplex-villa-renovation",
+    "title": "Heritage Duplex Villa Complete Turnkey",
+    "client": "Choudhary Manor",
+    "category": "Renovation",
+    "location": "Fatehpur Road, Sikar",
+    "area": "3,400 sq ft",
+    "year": "2024",
+    "duration": "12 Weeks",
+    "budgetRange": "₹32.0L - ₹38.0L",
+    "heroImage": "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1600&q=85",
+    "beforeImage": "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=1200&q=80",
+    "afterImage": "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=85",
+    "gallery": [
+      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1600&q=85",
+      "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=1600&q=85"
+    ],
+    "overview": "Comprehensive civil and turnkey interior overhaul of a 25-year-old traditional residence into a modern, energy-efficient luxury sanctuary with home theatre and rooftop lounge.",
+    "challenge": "Damp walls, outdated plumbing lines, and uneven floor levels needed complete structural remediation before interior fit-outs.",
+    "solution": "Dr. Fixit waterproofing injected structural repair, followed by lightweight gypsum ceilings, engineered wooden flooring, and centralized smart switches.",
+    "materialsUsed": [
+      "CenturyPly Firewall Plywood",
+      "Greenlam Clads Exterior & Interior Panels",
+      "Legrand Arteor Smart Home Switches",
+      "Kajaria Polished Glazed Vitrified Tiles"
+    ],
+    "designStyle": "Turnkey Modern Elegance",
+    "testimonial": {
+      "quote": "From tearing down old walls to the final coat of Italian polish, Shree Shyam Interior managed everything under one roof with total integrity.",
+      "author": "Col. R. S. Choudhary",
+      "designation": "Veteran & Landowner, Sikar",
+      "avatar": "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=200&q=80"
+    }
+  }
+]

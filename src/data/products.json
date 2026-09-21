@@ -1,0 +1,859 @@
+[
+  {
+    "id": "prod-1",
+    "name": "CenturyPly Club Prime 710 BWP Plywood",
+    "brand": "CenturyPly",
+    "category": "plywood",
+    "subCategory": "Marine Grade",
+    "price": 128,
+    "unit": "sq ft (19mm)",
+    "isPriceOnQuote": false,
+    "rating": 4.9,
+    "reviewCount": 124,
+    "image": "https://images.unsplash.com/photo-1546484396-fb3fc6f95f98?auto=format&fit=crop&w=800&q=80",
+    "gallery": [
+      "https://images.unsplash.com/photo-1546484396-fb3fc6f95f98?auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=1200&q=80"
+    ],
+    "description": "Boiling Water Proof (IS:710) premium calibrated plywood with patented Firewall and ViroKill technology. 25-year warranty against borer & termite.",
+    "features": [
+      "Calibrated thickness for seamless modular fabrication",
+      "Borer and termite proof with 25-year warranty",
+      "Firewall technology for enhanced fire retardancy",
+      "Formaldehyde emission compliant (E0 grade safe)"
+    ],
+    "specifications": {
+      "Thickness Available": "6mm, 9mm, 12mm, 16mm, 19mm, 25mm",
+      "Grade": "BWP Marine Grade IS:710",
+      "Wood Species": "100% Gurjan / Selected Hardwoods",
+      "Core Composition": "Pre-pressed calibrated timber core"
+    },
+    "finishes": ["Calibrated Sanded", "Smooth Core"],
+    "applications": ["Modular Kitchens", "Wardrobes", "Vanity Units", "Moisture-prone Areas"],
+    "inStock": true,
+    "isBestseller": true
+  },
+  {
+    "id": "prod-2",
+    "name": "Greenlam HD Gloss & Suede Acrylic Laminates",
+    "brand": "Greenlam",
+    "category": "laminates",
+    "subCategory": "High Pressure Laminate",
+    "price": 2850,
+    "unit": "sheet (8ft x 4ft x 1.25mm)",
+    "isPriceOnQuote": false,
+    "rating": 4.8,
+    "reviewCount": 89,
+    "image": "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=800&q=80",
+    "gallery": [
+      "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=1200&q=80"
+    ],
+    "description": "Architectural high-pressure laminates with antibacterial surface and anti-fingerprint silky touch. Ideal for modern kitchen shutters and TV consoles.",
+    "features": [
+      "Anti-fingerprint silky matte and mirror gloss variants",
+      "Scratch resistant and heat resistant up to 180°C",
+      "Dimensional stability with non-fading pigments"
+    ],
+    "specifications": {
+      "Dimensions": "8ft x 4ft (2440mm x 1220mm)",
+      "Thickness": "1.0mm - 1.25mm",
+      "Surface Finish": "Suede, High Gloss, Veneer Texture",
+      "Warranty": "10 Years"
+    },
+    "finishes": ["Walnut Grain", "Carrara Marble", "Matte Charcoal", "Champagne Bronze"],
+    "applications": ["Kitchen Shutters", "Wardrobe Facades", "Wall Cladding", "Executive Desks"],
+    "inStock": true,
+    "isBestseller": true
+  },
+  {
+    "id": "prod-3",
+    "name": "Häfele Matrix Box P Slim Soft-Close Drawer System",
+    "brand": "Häfele",
+    "category": "hardware",
+    "subCategory": "Drawer Runners",
+    "price": 4650,
+    "unit": "set (500mm depth)",
+    "isPriceOnQuote": false,
+    "rating": 5.0,
+    "reviewCount": 67,
+    "image": "https://images.unsplash.com/photo-1503602642458-232111445657?auto=format&fit=crop&w=800&q=80",
+    "gallery": [
+      "https://images.unsplash.com/photo-1503602642458-232111445657?auto=format&fit=crop&w=1200&q=80"
+    ],
+    "description": "German engineered ultra-slim 13mm double-wall drawer system with integrated soft-close damping and 50,000 certified test cycles.",
+    "features": [
+      "Ultra-thin 13mm straight side walls maximizing storage",
+      "Smove integrated soft-closing deceleration",
+      "Full extension synchronized undermount runners",
+      "Weight capacity up to 45kg dynamic load"
+    ],
+    "specifications": {
+      "Depth": "500mm / 550mm",
+      "Drawer Height": "84mm, 120mm, 168mm",
+      "Finish": "Anthracite Dark Grey / White",
+      "Load Capacity": "45 kg"
+    },
+    "finishes": ["Anthracite Silk", "Pure White"],
+    "applications": ["Modular Kitchen Drawers", "Wardrobe Pull-outs", "Pantry Units"],
+    "inStock": true,
+    "isBestseller": true
+  },
+  {
+    "id": "prod-4",
+    "name": "Philips Magnetic Architectural Track Light System (48V)",
+    "brand": "Philips",
+    "category": "lighting",
+    "subCategory": "Architectural Track",
+    "price": 1850,
+    "unit": "module (12W COB)",
+    "isPriceOnQuote": false,
+    "rating": 4.9,
+    "reviewCount": 42,
+    "image": "https://images.unsplash.com/photo-1513506003901-1e6a229e2d15?auto=format&fit=crop&w=800&q=80",
+    "gallery": [
+      "https://images.unsplash.com/photo-1513506003901-1e6a229e2d15?auto=format&fit=crop&w=1200&q=80"
+    ],
+    "description": "Recessed slim 48V low-voltage magnetic track lighting with snap-in spotlights, floodlights, and micro-diffusers. CRI 92+ for true color rendering.",
+    "features": [
+      "Magnetic snap-in modules easily repositioned by hand",
+      "Ultra-high CRI 92+ for museum-grade color rendering",
+      "Triac / DALI / Smart Dimming compatible",
+      "Minimalist recessed rimless profile"
+    ],
+    "specifications": {
+      "Voltage": "48V DC Safe Low Voltage",
+      "Color Temp": "3000K Warm White / 4000K Natural",
+      "Beam Angle": "24° / 36° / 120° linear",
+      "Track Length": "1m, 2m, 3m profiles"
+    },
+    "finishes": ["Matte Black Deep Anodized", "Satin White"],
+    "applications": ["Living Room Ceiling", "Art Highlighting", "Dining Island", "Offices"],
+    "inStock": true,
+    "isBestseller": true
+  },
+  {
+    "id": "prod-5",
+    "name": "Charcoal Acoustic Fluted Wall Louvers & Slats",
+    "brand": "Shree Shyam Signature",
+    "category": "wall-panels",
+    "subCategory": "Interior Cladding",
+    "price": 950,
+    "unit": "panel (9.5ft x 5inch)",
+    "isPriceOnQuote": false,
+    "rating": 4.9,
+    "reviewCount": 115,
+    "image": "https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&w=800&q=80",
+    "gallery": [
+      "https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&w=1200&q=80"
+    ],
+    "description": "High-density polystyrene and charcoal compound fluted louvers. Waterproof, borer proof, and pre-finished with metallic and natural wood grain foils.",
+    "features": [
+      "100% waterproof and borer-termite proof",
+      "Interlocking tongue-and-groove joint for invisible seams",
+      "Lightweight, sound-dampening acoustic profile"
+    ],
+    "specifications": {
+      "Length": "9.5 feet (2900mm)",
+      "Width": "5 inches (125mm)",
+      "Depth": "12mm fluted depth",
+      "Material": "Charcoal & Virgin Polymer Compound"
+    },
+    "finishes": ["Dark Walnut & Gold Bevel", "Matte Emerald & Brass", "Smoked Oak", "Pure Cream Fluted"],
+    "applications": ["TV Feature Wall", "Bed Back Paneling", "Foyer Entryway", "Office Conference"],
+    "inStock": true,
+    "isBestseller": true
+  },
+  {
+    "id": "prod-6",
+    "name": "Asian Paints Royale Glitz Luxury Interior Emulsion",
+    "brand": "Asian Paints",
+    "category": "paint",
+    "subCategory": "Luxury Emulsion",
+    "price": 5400,
+    "unit": "10 Litre Bucket",
+    "isPriceOnQuote": false,
+    "rating": 4.8,
+    "reviewCount": 94,
+    "image": "https://images.unsplash.com/photo-1562259949-e8e7689d7828?auto=format&fit=crop&w=800&q=80",
+    "gallery": [
+      "https://images.unsplash.com/photo-1562259949-e8e7689d7828?auto=format&fit=crop&w=1200&q=80"
+    ],
+    "description": "Ultra-sheen interior paint formulated with Teflon surface protector, ultra-crack bridging, and stain repellent technology.",
+    "features": [
+      "Luxury ultra-sheen finish with radiant depth",
+      "Teflon surface protector against tough household stains",
+      "GreenAssure certified low VOC formulation"
+    ],
+    "specifications": {
+      "Coverage": "140 - 160 sq ft / litre for 2 coats",
+      "Drying Time": "30 minutes to touch",
+      "Sheen Level": "High Sheen Gloss",
+      "Warranty": "7-Year Performance Warranty"
+    },
+    "finishes": ["Warm Alabaster", "Royal Forest Green", "Desert Sand", "Champagne Mist"],
+    "applications": ["Living Room Walls", "Bedrooms", "Ceiling Features"],
+    "inStock": true,
+    "isBestseller": false
+  },
+  {
+    "id": "prod-7",
+    "name": "Saint-Gobain Planilaque Tinted Glass & Fluted Panels",
+    "brand": "Saint-Gobain",
+    "category": "glass-aluminium",
+    "subCategory": "Lacquered Glass",
+    "price": 380,
+    "unit": "sq ft (6mm toughened)",
+    "isPriceOnQuote": false,
+    "rating": 5.0,
+    "reviewCount": 53,
+    "image": "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=800&q=80",
+    "gallery": [
+      "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1200&q=80"
+    ],
+    "description": "Colored lacquered glass with UV-resistant polyurethane paint backing. Humidity-resistant and heat-toughened for kitchen dado and wardrobe sliding doors.",
+    "features": [
+      "High gloss opaque finish reflecting light beautifully",
+      "Scratch resistant and non-porous hygienic glass",
+      "Moisture and heat resistant for kitchen splashbacks"
+    ],
+    "specifications": {
+      "Thickness": "6mm & 8mm Extra Clear Toughened",
+      "Safety": "Conforms to IS:2553 safety glazing standards",
+      "Edge Polish": "Machine bevelled or flat polished"
+    },
+    "finishes": ["Bronze Mirror", "Grey Fluted Moru", "Champagne Gold", "Black Pearl"],
+    "applications": ["Kitchen Splashback", "Wardrobe Sliding Panels", "Bar Units", "Wall Cladding"],
+    "inStock": true,
+    "isBestseller": true
+  },
+  {
+    "id": "prod-8",
+    "name": "Hettich Sensys 8645i Soft-Close Integrated Hinges",
+    "brand": "Hettich",
+    "category": "hardware",
+    "subCategory": "Cabinet Hinges",
+    "price": 380,
+    "unit": "piece with plate",
+    "isPriceOnQuote": false,
+    "rating": 4.9,
+    "reviewCount": 140,
+    "image": "https://images.unsplash.com/photo-1581858726788-75bc0f6a952d?auto=format&fit=crop&w=800&q=80",
+    "gallery": [
+      "https://images.unsplash.com/photo-1581858726788-75bc0f6a952d?auto=format&fit=crop&w=1200&q=80"
+    ],
+    "description": "Award-winning concealed hinge with invisible integrated Silent System damping. Operates effortlessly down to 35° closing angle.",
+    "features": [
+      "Invisible damping integrated directly in hinge arm",
+      "3D cam adjustment: depth, overlay, and height",
+      "Tested for 200,000 opening and closing cycles"
+    ],
+    "specifications": {
+      "Opening Angle": "110°",
+      "Cup Diameter": "35mm",
+      "Door Thickness": "15mm - 24mm",
+      "Finish": "Obsidian Black / Nickel Plated"
+    },
+    "finishes": ["Obsidian Black", "Nickel Plated Mirror"],
+    "applications": ["Kitchen Shutters", "Wardrobe Doors", "Bathroom Vanity Cabinets"],
+    "inStock": true,
+    "isBestseller": true
+  },
+  {
+    "id": "prod-9",
+    "name": "CenturyPly Sainik 710 Asli Waterproof Plywood",
+    "brand": "CenturyPly",
+    "category": "plywood",
+    "subCategory": "Marine Grade",
+    "price": 96,
+    "unit": "sq ft (18mm)",
+    "isPriceOnQuote": false,
+    "rating": 4.8,
+    "reviewCount": 165,
+    "image": "https://images.unsplash.com/photo-1588854337236-6889d631faa8?auto=format&fit=crop&w=800&q=80",
+    "gallery": [
+      "https://images.unsplash.com/photo-1588854337236-6889d631faa8?auto=format&fit=crop&w=1200&q=80"
+    ],
+    "description": "India's benchmark waterproof plywood with Century's 8-year warranty. Calibrated uniform thickness with high tensile cross-layer bonding.",
+    "features": [
+      "100% Boiling Water Proof (BWP IS:710)",
+      "Specially treated against borer and termites",
+      "Cost-effective authentic marine plywood"
+    ],
+    "specifications": {
+      "Thickness": "12mm, 16mm, 18mm, 25mm",
+      "Core": "Seasoned Hardwood Core",
+      "Glue Line": "Modified Phenol Formaldehyde Resin"
+    },
+    "finishes": ["Calibrated Commercial Sanded"],
+    "applications": ["Modular Wardrobes", "Beds & Storage", "Office Workstations"],
+    "inStock": true,
+    "isBestseller": true
+  },
+  {
+    "id": "prod-10",
+    "name": "CenturyVeneers Natural Burma Teak Architectural Flitch",
+    "brand": "CenturyPly",
+    "category": "laminates",
+    "subCategory": "Natural Wood Veneer",
+    "price": 4200,
+    "unit": "sheet (8ft x 4ft x 4mm)",
+    "isPriceOnQuote": false,
+    "rating": 5.0,
+    "reviewCount": 38,
+    "image": "https://images.unsplash.com/photo-1517646287270-a5a9ca602e5c?auto=format&fit=crop&w=800&q=80",
+    "gallery": [
+      "https://images.unsplash.com/photo-1517646287270-a5a9ca602e5c?auto=format&fit=crop&w=1200&q=80"
+    ],
+    "description": "Exotic crown-cut natural Burma teak wood veneer on Gurjan plywood backing. Ready for matte PU polish or high-sheen polyester lamination.",
+    "features": [
+      "Quarter-cut authentic Burmese teak grain patterns",
+      "0.55mm thick natural face veneer flitch",
+      "Eco-friendly sustainable plantation timber"
+    ],
+    "specifications": {
+      "Dimensions": "8ft x 4ft (2440mm x 1220mm)",
+      "Backing": "FSC Certified Hardwood Plywood 3.5mm",
+      "Moisture Content": "8% - 12%"
+    },
+    "finishes": ["Natural Raw Sanded", "Open Grain Teak"],
+    "applications": ["Villa Main Doors", "Living Room TV Paneling", "Dining Tables", "Executive Boardrooms"],
+    "inStock": true,
+    "isBestseller": false
+  },
+  {
+    "id": "prod-11",
+    "name": "Greenlam Anti-Bacterial Solid Core Compact Laminates",
+    "brand": "Greenlam",
+    "category": "laminates",
+    "subCategory": "Exterior & Restroom Grade",
+    "price": 5600,
+    "unit": "sheet (8ft x 4ft x 12mm)",
+    "isPriceOnQuote": false,
+    "rating": 4.9,
+    "reviewCount": 47,
+    "image": "https://images.unsplash.com/photo-1598928506311-c55ded91a20c?auto=format&fit=crop&w=800&q=80",
+    "gallery": [
+      "https://images.unsplash.com/photo-1598928506311-c55ded91a20c?auto=format&fit=crop&w=1200&q=80"
+    ],
+    "description": "Self-supporting 12mm solid phenolic core compact board. 100% moisture-proof, impact-resistant, and certified anti-microbial for vanity counters and partition cubicles.",
+    "features": [
+      "12mm solid homogeneous core - no substrate required",
+      "Extreme scratch, chemical, and fire resistance",
+      "Non-porous hygienic surface certified to ISO 22196"
+    ],
+    "specifications": {
+      "Thickness": "12mm",
+      "Density": "1400 kg/m3",
+      "Edge Profile": "Chamfered CNC Polished Black Core"
+    },
+    "finishes": ["Black Slate", "Concrete Grey", "Pure Snow White"],
+    "applications": ["Bathroom Vanity Tops", "Restroom Cubicles", "Kitchen Countertops", "Lab Benches"],
+    "inStock": true,
+    "isBestseller": false
+  },
+  {
+    "id": "prod-12",
+    "name": "Hettich InnoTech Atira Double-Walled Drawer System",
+    "brand": "Hettich",
+    "category": "hardware",
+    "subCategory": "Drawer Systems",
+    "price": 5200,
+    "unit": "set with Quadro runners (500mm)",
+    "isPriceOnQuote": false,
+    "rating": 5.0,
+    "reviewCount": 98,
+    "image": "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=800&q=80",
+    "gallery": [
+      "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=1200&q=80"
+    ],
+    "description": "German engineered double-walled steel drawer sides with distinctive sharp contour design. Includes Quadro full-extension soft-close runners with 30kg rating.",
+    "features": [
+      "Distinctive straight-line design profile with railing options",
+      "Integrated Silent System damping for whisper-quiet closing",
+      "Internal divider accessories for cutlery and spice bottles",
+      "Quadro full extension runners with 30kg dynamic capacity"
+    ],
+    "specifications": {
+      "Length": "500mm depth",
+      "Side Heights": "70mm, 144mm, 176mm",
+      "Finish": "Anthracite Dark Metallic"
+    },
+    "finishes": ["Anthracite Metallic", "Silver Grey"],
+    "applications": ["Modular Kitchen Cutlery", "Pots & Pans Drawers", "Wardrobe Internal Organizers"],
+    "inStock": true,
+    "isBestseller": true
+  },
+  {
+    "id": "prod-13",
+    "name": "Hettich TopLine XL Soft-Close Wardrobe Sliding System",
+    "brand": "Hettich",
+    "category": "hardware",
+    "subCategory": "Sliding Systems",
+    "price": 18500,
+    "unit": "set (2-door mechanism)",
+    "isPriceOnQuote": false,
+    "rating": 4.9,
+    "reviewCount": 54,
+    "image": "https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=800&q=80",
+    "gallery": [
+      "https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=1200&q=80"
+    ],
+    "description": "Premium concealed top-running sliding door system for large floor-to-ceiling wardrobe doors up to 80kg each. Completely silent soft-open and soft-close.",
+    "features": [
+      "Supports door weights up to 80 kg each and heights up to 3 meters",
+      "Integrated Silent System for soft closing and soft opening",
+      "Invisible running track concealed beneath top panel"
+    ],
+    "specifications": {
+      "Max Door Weight": "80 kg per shutter",
+      "Door Thickness": "18mm - 30mm",
+      "System Type": "Overlay Top-Running"
+    },
+    "finishes": ["Champagne Anodized Aluminium", "Matte Black Track"],
+    "applications": ["Master Bedroom Wardrobes", "Walk-In Closets", "Pocket Room Dividers"],
+    "inStock": true,
+    "isBestseller": true
+  },
+  {
+    "id": "prod-14",
+    "name": "Blum AVENTOS HF Bi-Fold Lift System for Wall Cabinets",
+    "brand": "Blum",
+    "category": "hardware",
+    "subCategory": "Overhead Lift Systems",
+    "price": 14800,
+    "unit": "complete mechanism set",
+    "isPriceOnQuote": false,
+    "rating": 5.0,
+    "reviewCount": 73,
+    "image": "https://images.unsplash.com/photo-1503602642458-232111445657?auto=format&fit=crop&w=800&q=80",
+    "gallery": [
+      "https://images.unsplash.com/photo-1503602642458-232111445657?auto=format&fit=crop&w=1200&q=80"
+    ],
+    "description": "Austrian engineered bi-fold overhead lift system. The 2-piece front folds up and away smoothly, leaving cooking space completely open and unobstructed.",
+    "features": [
+      "Stops at any desired height and stays in place",
+      "Integrated BLUMOTION soft-close damping",
+      "Suitable for high and mid-height wall units with large fronts",
+      "Tool-free clip-on assembly and 3D front adjustment"
+    ],
+    "specifications": {
+      "Cabinet Height": "480mm - 1040mm",
+      "Cabinet Width": "up to 1800mm",
+      "Origin": "Blum Austria"
+    },
+    "finishes": ["Silk White Cover Caps", "Light Grey Covers"],
+    "applications": ["Modular Kitchen Upper Wall Units", "Appliance Garages", "Bar Display Units"],
+    "inStock": true,
+    "isBestseller": true
+  },
+  {
+    "id": "prod-15",
+    "name": "Häfele RE-Force Smart Digital Fingerprint & RFID Mortise Lock",
+    "brand": "Häfele",
+    "category": "hardware",
+    "subCategory": "Digital Door Locks",
+    "price": 16500,
+    "unit": "unit with mortise latch",
+    "isPriceOnQuote": false,
+    "rating": 4.9,
+    "reviewCount": 61,
+    "image": "https://images.unsplash.com/photo-1558002038-1055907df827?auto=format&fit=crop&w=800&q=80",
+    "gallery": [
+      "https://images.unsplash.com/photo-1558002038-1055907df827?auto=format&fit=crop&w=1200&q=80"
+    ],
+    "description": "High-security digital mortise lock with 5-in-1 unlocking: Optical Fingerprint, Touch PIN, RFID Smart Card, Mechanical Key, and Mobile App access.",
+    "features": [
+      "High-speed 0.3s semiconductor fingerprint sensor",
+      "Fake PIN code feature to prevent passcode espionage",
+      "Auto-locking mechanism with anti-tamper alarm",
+      "Emergency USB power backup port"
+    ],
+    "specifications": {
+      "Door Thickness": "35mm - 60mm",
+      "Battery": "4 x AA Alkaline (1-year life)",
+      "Material": "Zinc Alloy & Tempered Glass"
+    },
+    "finishes": ["Matte Black Armor", "Brushed Rose Gold"],
+    "applications": ["Villa Main Entrance Door", "Master Bedroom Suite", "Private Office"],
+    "inStock": true,
+    "isBestseller": true
+  },
+  {
+    "id": "prod-16",
+    "name": "Havells Glitz High CRI 90+ Architectural COB LED Strip",
+    "brand": "Havells",
+    "category": "lighting",
+    "subCategory": "LED Strip Lights",
+    "price": 1450,
+    "unit": "roll (5 meters 24V)",
+    "isPriceOnQuote": false,
+    "rating": 4.9,
+    "reviewCount": 83,
+    "image": "https://images.unsplash.com/photo-1507473885765-e6ed057f782c?auto=format&fit=crop&w=800&q=80",
+    "gallery": [
+      "https://images.unsplash.com/photo-1507473885765-e6ed057f782c?auto=format&fit=crop&w=1200&q=80"
+    ],
+    "description": "Seamless dot-free continuous COB (Chip-on-Board) LED flexible strip. High color rendering index CRI 90+ with 480 chips per meter for uniform cove and profile glow.",
+    "features": [
+      "Zero visible LED diode dots inside slim aluminium channels",
+      "True Color CRI 90+ brings out rich natural wood and marble textures",
+      "24V constant voltage for zero lumen drop across 10m runs",
+      "Cuttable every 50mm for precise cabinetry fitting"
+    ],
+    "specifications": {
+      "Color Temp": "3000K Warm / 4000K Natural White",
+      "Power": "14W / meter",
+      "Lumen Output": "1200 lm / meter",
+      "Voltage": "24V DC"
+    },
+    "finishes": ["4000K Natural Daylight", "3000K Warm Golden"],
+    "applications": ["False Ceiling Cove", "Under-Cabinet Kitchen Lighting", "Wardrobe Fluted Louvers", "Mirror Backlighting"],
+    "inStock": true,
+    "isBestseller": true
+  },
+  {
+    "id": "prod-17",
+    "name": "Havells Adore Deep Anti-Glare Recessed COB Spotlight",
+    "brand": "Havells",
+    "category": "lighting",
+    "subCategory": "Downlights",
+    "price": 650,
+    "unit": "piece (9W with driver)",
+    "isPriceOnQuote": false,
+    "rating": 4.8,
+    "reviewCount": 112,
+    "image": "https://images.unsplash.com/photo-1524484485831-a92ffc0de03f?auto=format&fit=crop&w=800&q=80",
+    "gallery": [
+      "https://images.unsplash.com/photo-1524484485831-a92ffc0de03f?auto=format&fit=crop&w=1200&q=80"
+    ],
+    "description": "Deep-set architectural ceiling spotlight engineered to eliminate eye glare (UGR < 16). Features dark baffle reflector and Osram COB LED chip.",
+    "features": [
+      "Deep recessed reflector with 45° cut-off angle for zero glare",
+      "Die-cast aluminium heat sink for 50,000 burning hours",
+      "Compact rimless white or black bezel options"
+    ],
+    "specifications": {
+      "Wattage": "9W (900 Lumens)",
+      "Cutout Size": "75mm diameter",
+      "Beam Angle": "36° focused beam"
+    },
+    "finishes": ["Matte White with Black Baffle", "All Matte Black"],
+    "applications": ["Living Room Grid", "Passages & Foyers", "Artwork Focus"],
+    "inStock": true,
+    "isBestseller": true
+  },
+  {
+    "id": "prod-18",
+    "name": "Milano Ergonomic Italian Leather Sectional L-Shape Sofa",
+    "brand": "Shree Shyam Signature",
+    "category": "furniture",
+    "subCategory": "Living Room Furniture",
+    "price": 78000,
+    "unit": "set (6-seater with lounger)",
+    "isPriceOnQuote": false,
+    "rating": 5.0,
+    "reviewCount": 29,
+    "image": "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=800&q=80",
+    "gallery": [
+      "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=1200&q=80"
+    ],
+    "description": "Handcrafted luxury sectional crafted with top-grain semi-aniline Italian leather, high-resilience 40D memory foam core, and solid kiln-dried sal wood frame.",
+    "features": [
+      "Genuine semi-aniline breathable Italian leather upholstery",
+      "10-year warranty on kiln-dried termite-treated hardwood frame",
+      "Ergonomic lumbar support and adjustable headrests",
+      "Electroplated champagne gold titanium stainless steel legs"
+    ],
+    "specifications": {
+      "Dimensions": "9.5ft x 6ft (L-Shape Modular)",
+      "Foam Density": "40D High Resilience Foam + Feather Layer",
+      "Frame": "Kiln-Dried Hardwood & S-Spring Webbing"
+    },
+    "finishes": ["Caramel Tan Leather", "Slate Grey Nappa", "Olive Velvet"],
+    "applications": ["Living Room Centerpiece", "Home Cinema Lounge", "Penthouse Foyer"],
+    "inStock": true,
+    "isBestseller": true
+  },
+  {
+    "id": "prod-19",
+    "name": "Nordic 6-Seater Sintered Stone Luxury Dining Table",
+    "brand": "Shree Shyam Signature",
+    "category": "furniture",
+    "subCategory": "Dining Furniture",
+    "price": 54000,
+    "unit": "table with 6 upholstered chairs",
+    "isPriceOnQuote": false,
+    "rating": 4.9,
+    "reviewCount": 35,
+    "image": "https://images.unsplash.com/photo-1617806118233-18e1de247200?auto=format&fit=crop&w=800&q=80",
+    "gallery": [
+      "https://images.unsplash.com/photo-1617806118233-18e1de247200?auto=format&fit=crop&w=1200&q=80"
+    ],
+    "description": "12mm Italian Statuario sintered ceramic stone tabletop. Scratch-proof, knife-resistant, and withstands up to 1200°C heat. Accompanied by carbon-steel architectural base.",
+    "features": [
+      "Non-porous sintered stone: zero absorption of turmeric, wine, or oil stains",
+      "Direct heat resistant: hot pans can be placed without trivets",
+      "Sculptural carbon-steel criss-cross pedestal base"
+    ],
+    "specifications": {
+      "Dimensions": "6ft x 3ft x 2.5ft (1800mm x 900mm)",
+      "Top Thickness": "12mm Solid Sintered Stone",
+      "Seating Capacity": "6 to 8 Adults"
+    },
+    "finishes": ["Statuario White & Gold Vein", "Laurent Noir Black Marble"],
+    "applications": ["Dining Hall", "Open Kitchen Island", "Executive Meeting Room"],
+    "inStock": true,
+    "isBestseller": true
+  },
+  {
+    "id": "prod-20",
+    "name": "Legrand Arteor Smart Wi-Fi Touch Glass Switch Panel",
+    "brand": "Legrand",
+    "category": "electrical",
+    "subCategory": "Smart Home Switches",
+    "price": 4800,
+    "unit": "module (4-channel touch glass)",
+    "isPriceOnQuote": false,
+    "rating": 4.9,
+    "reviewCount": 78,
+    "image": "https://images.unsplash.com/photo-1545259741-2ea3ebf61fa3?auto=format&fit=crop&w=800&q=80",
+    "gallery": [
+      "https://images.unsplash.com/photo-1545259741-2ea3ebf61fa3?auto=format&fit=crop&w=1200&q=80"
+    ],
+    "description": "French luxury capacitive touch glass switch panel. Integrates with Alexa, Google Home, and Apple HomeKit for voice, app, and tactile touch lighting scenes.",
+    "features": [
+      "Beveled 4mm toughened glass faceplate with micro-LED indicators",
+      "Wi-Fi connected - operates without expensive central hub",
+      "In-built fan regulator with smooth 5-speed hum-free step control",
+      "Child safety spark-proof electronic switching"
+    ],
+    "specifications": {
+      "Plate Size": "Standard 4-Module Indian Gang Box",
+      "Operating Voltage": "110V - 240V AC 50Hz",
+      "Connectivity": "Wi-Fi 2.4GHz + Zigbee 3.0"
+    },
+    "finishes": ["Obsidian Black Glass", "Pure Alabaster White Glass"],
+    "applications": ["Master Bedside Panels", "Living Room Scene Controls", "Entryways"],
+    "inStock": true,
+    "isBestseller": true
+  },
+  {
+    "id": "prod-21",
+    "name": "Havells Fabio Luxury Modular Polycarbonate Switches & Plates",
+    "brand": "Havells",
+    "category": "electrical",
+    "subCategory": "Modular Switches",
+    "price": 320,
+    "unit": "plate with 4 switches",
+    "isPriceOnQuote": false,
+    "rating": 4.8,
+    "reviewCount": 130,
+    "image": "https://images.unsplash.com/photo-1558002038-1055907df827?auto=format&fit=crop&w=800&q=80",
+    "gallery": [
+      "https://images.unsplash.com/photo-1558002038-1055907df827?auto=format&fit=crop&w=1200&q=80"
+    ],
+    "description": "Polycarbonate modular switch plates featuring dual-tone chrome accents and silver-plated contact tips for 100,000 spark-free clicks.",
+    "features": [
+      "Fire-retardant grade pure virgin polycarbonate",
+      "Silver cad-oxide contacts for ultra-low resistance",
+      "Dust-free smooth curved styling with hidden screw covers"
+    ],
+    "specifications": {
+      "Rating": "10A / 20A Heavy Duty",
+      "Certification": "IS:3854 ISI Marked",
+      "Warranty": "10 Years Replacement Warranty"
+    },
+    "finishes": ["Frosted Silver with Chrome Collar", "Charcoal Grey", "Gloss White"],
+    "applications": ["Whole Home Electrical Fitting", "Kitchen Appliances", "Air Conditioner Sockets"],
+    "inStock": true,
+    "isBestseller": false
+  },
+  {
+    "id": "prod-22",
+    "name": "Bosch GKS 190 Professional Heavy-Duty Wood Plunge Saw",
+    "brand": "Bosch",
+    "category": "tools",
+    "subCategory": "Power Tools",
+    "price": 7200,
+    "unit": "unit with 190mm carbide blade",
+    "isPriceOnQuote": false,
+    "rating": 4.9,
+    "reviewCount": 64,
+    "image": "https://images.unsplash.com/photo-1581147036324-c17ac41dfa6c?auto=format&fit=crop&w=800&q=80",
+    "gallery": [
+      "https://images.unsplash.com/photo-1581147036324-c17ac41dfa6c?auto=format&fit=crop&w=1200&q=80"
+    ],
+    "description": "The most powerful 1400W tool in the entry-level carpentry category. 70mm maximum cutting depth for fast sawing in softwood, hardwood, and calibrated plywood.",
+    "features": [
+      "1,400 Watts motor power for fast sawing progress",
+      "Compact design with turbo dust blower for a clear line of sight",
+      "Robust stamped metal base plate and closed aluminium die-cast pendulum guard"
+    ],
+    "specifications": {
+      "Rated Input Power": "1400 W",
+      "No-load speed": "5500 rpm",
+      "Saw Blade Diameter": "190 mm",
+      "Max Cutting Depth": "70 mm (at 90°)"
+    },
+    "finishes": ["Bosch Professional Blue"],
+    "applications": ["On-Site Plywood Cutting", "Door Trimming", "Solid Wood Carpentry"],
+    "inStock": true,
+    "isBestseller": true
+  },
+  {
+    "id": "prod-23",
+    "name": "Saint-Gobain Gyproc Moisture & Fire Resistant False Ceiling Board",
+    "brand": "Saint-Gobain",
+    "category": "false-ceiling",
+    "subCategory": "Ceiling Boards",
+    "price": 38,
+    "unit": "sq ft (12.5mm board)",
+    "isPriceOnQuote": false,
+    "rating": 4.9,
+    "reviewCount": 182,
+    "image": "https://images.unsplash.com/photo-1600585154526-990dced4db0d?auto=format&fit=crop&w=800&q=80",
+    "gallery": [
+      "https://images.unsplash.com/photo-1600585154526-990dced4db0d?auto=format&fit=crop&w=1200&q=80"
+    ],
+    "description": "Engineered gypsum ceiling boards encased in 100% recycled paper. Formulated with silicone additives for high moisture resistance and thermal insulation.",
+    "features": [
+      "Ultra-smooth surface for flawless seamless paint finishes",
+      "Sag-resistant core engineered for Indian humidity conditions",
+      "Crack-free joints with Gyproc paper jointing tape and jointing compound"
+    ],
+    "specifications": {
+      "Dimensions": "6ft x 4ft (1830mm x 1220mm)",
+      "Thickness": "12.5mm",
+      "Fire Rating": "Class 1 (BS 476 Part 7)"
+    },
+    "finishes": ["Tapered Edge Smooth Board"],
+    "applications": ["Living Room Cove Ceilings", "Kitchen False Ceiling", "Acoustic Insulation"],
+    "inStock": true,
+    "isBestseller": true
+  },
+  {
+    "id": "prod-24",
+    "name": "Asian Paints Royale Play Metallics Designer Wall Texture",
+    "brand": "Asian Paints",
+    "category": "paint",
+    "subCategory": "Texture Finishes",
+    "price": 2800,
+    "unit": "4 Litre Bucket",
+    "isPriceOnQuote": false,
+    "rating": 4.9,
+    "reviewCount": 87,
+    "image": "https://images.unsplash.com/photo-1589939705384-5185137a7f0f?auto=format&fit=crop&w=800&q=80",
+    "gallery": [
+      "https://images.unsplash.com/photo-1589939705384-5185137a7f0f?auto=format&fit=crop&w=1200&q=80"
+    ],
+    "description": "Water-based special effects interior paint offering glittering metallic highlights. Perfect for Italian Stucco, Safari, and Criss-Cross trowel artisan textures.",
+    "features": [
+      "Metallic golden, copper, and silver reflective particles",
+      "High washability with non-yellowing polyurethane formula",
+      "Easy application with trowel, sea sponge, or spatula"
+    ],
+    "specifications": {
+      "Coverage": "100 - 120 sq ft / litre for 1 coat",
+      "Finish": "Metallic Shimmer Texture",
+      "Base": "Water-thinnable Acrylic Emulsion"
+    },
+    "finishes": ["Antique Gold", "Copper Blaze", "Silver Frost", "Bronze Lustre"],
+    "applications": ["Living Room Accent Wall", "Bed Headboard Wall", "Foyer Features"],
+    "inStock": true,
+    "isBestseller": true
+  },
+  {
+    "id": "prod-25",
+    "name": "Pergo Scandinavian Herringbone Engineered Oak Wood Flooring",
+    "brand": "Pergo",
+    "category": "flooring",
+    "subCategory": "Engineered Wood",
+    "price": 340,
+    "unit": "sq ft (14mm thickness)",
+    "isPriceOnQuote": false,
+    "rating": 5.0,
+    "reviewCount": 46,
+    "image": "https://images.unsplash.com/photo-1533779283484-8da49dc9a67e?auto=format&fit=crop&w=800&q=80",
+    "gallery": [
+      "https://images.unsplash.com/photo-1533779283484-8da49dc9a67e?auto=format&fit=crop&w=1200&q=80"
+    ],
+    "description": "Genuine European Oak top layer with multi-layer high density hardwood substrate. Precision micro-bevelled edges for classic herringbone chevron layouts.",
+    "features": [
+      "3.2mm genuine European Oak wear layer can be sanded twice",
+      "Uniclic patented click-lock joint system - zero adhesive required",
+      "TitanX anti-scratch protective top coating"
+    ],
+    "specifications": {
+      "Plank Size": "600mm x 120mm x 14mm",
+      "Core": "Multi-layer Birch Plywood Stability Core",
+      "Warranty": "25-Year Residential Warranty"
+    },
+    "finishes": ["Smoked Natural Oak", "Warm Honey Oak", "Nordic White Wash"],
+    "applications": ["Master Bedroom Flooring", "Penthouse Living Lounge", "Walk-In Closets"],
+    "inStock": true,
+    "isBestseller": true
+  },
+  {
+    "id": "prod-26",
+    "name": "Fevicol Marine Waterproof Wood Adhesive (IS:4835)",
+    "brand": "Fevicol",
+    "category": "hardware",
+    "subCategory": "Adhesives & Chemicals",
+    "price": 1850,
+    "unit": "5 kg Bucket",
+    "isPriceOnQuote": false,
+    "rating": 4.9,
+    "reviewCount": 210,
+    "image": "https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=800&q=80",
+    "gallery": [
+      "https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=1200&q=80"
+    ],
+    "description": "Advanced synthetic resin adhesive with superior waterproof bonding. Withstands 48 hours of boiling water and continuous cold water immersion without bond failure.",
+    "features": [
+      "Boiling water resistant adhesive complying with IS:4835",
+      "Fast setting time (4 to 6 hours clamping time)",
+      "High coverage spreadability with zero bubble formation"
+    ],
+    "specifications": {
+      "Appearance": "Milky White Viscous Paste",
+      "Bond Strength": "Exceeds 250 kg/cm2",
+      "Shelf Life": "12 Months in airtight container"
+    },
+    "finishes": ["Dries Clear Film"],
+    "applications": ["Plywood-to-Laminate Bonding", "Modular Kitchen Carcass Assembly", "Dining Tables"],
+    "inStock": true,
+    "isBestseller": true
+  },
+  {
+    "id": "prod-27",
+    "name": "3M VHB Architectural Heavy-Duty Acrylic Mounting Tape",
+    "brand": "3M",
+    "category": "hardware",
+    "subCategory": "Specialty Bonding Tapes",
+    "price": 980,
+    "unit": "roll (33 meters x 19mm)",
+    "isPriceOnQuote": false,
+    "rating": 5.0,
+    "reviewCount": 88,
+    "image": "https://images.unsplash.com/photo-1581092335397-9583fe92d232?auto=format&fit=crop&w=800&q=80",
+    "gallery": [
+      "https://images.unsplash.com/photo-1581092335397-9583fe92d232?auto=format&fit=crop&w=1200&q=80"
+    ],
+    "description": "Permanent viscoelastic closed-cell acrylic foam tape. Replaces rivets, screws, and liquid glues for seamless bonding of mirrors, acoustic panels, and glass dado.",
+    "features": [
+      "Permanent indestructible bond distributing stress across joint length",
+      "Dampens vibration and compensates for thermal expansion",
+      "Waterproof and weather-resistant bond indoors and outdoors"
+    ],
+    "specifications": {
+      "Thickness": "1.1mm",
+      "Width": "19mm",
+      "Core": "100% Solid Acrylic Foam Matrix"
+    },
+    "finishes": ["Grey High Strength Matrix"],
+    "applications": ["Lacquered Glass Splashbacks", "Frameless Vanity Mirrors", "Charcoal Louver Mounting"],
+    "inStock": true,
+    "isBestseller": true
+  }
+]

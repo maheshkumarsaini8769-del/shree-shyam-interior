@@ -1,0 +1,42 @@
+[
+  {
+    "id": "test-1",
+    "name": "Dr. Mahendra Kedia",
+    "city": "Sikar, Rajasthan",
+    "project": "Complete 4BHK Bunglow Interior",
+    "rating": 5,
+    "review": "Shree Shyam Interior provided 100% genuine CenturyPly and Häfele hardware. The carpentry craftsmanship and finish quality on our TV wall and kitchen is on par with the best penthouses in Mumbai.",
+    "avatar": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&q=80",
+    "date": "November 2024"
+  },
+  {
+    "id": "test-2",
+    "name": "Priyanka Agarwal",
+    "city": "Jaipur, Rajasthan",
+    "project": "Luxury Modular Kitchen & Wardrobes",
+    "rating": 5,
+    "review": "Their 3D design visualized exactly how the space would look, and execution was completed right on the promised 35-day deadline. Transparent billing without any surprise hidden charges.",
+    "avatar": "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=150&q=80",
+    "date": "January 2025"
+  },
+  {
+    "id": "test-3",
+    "name": "Sanjay Choudhary",
+    "city": "Sikar, Rajasthan",
+    "project": "Commercial Showroom & Office Interior",
+    "rating": 5,
+    "review": "Best interior showroom in Shekhawati region! Having all materials under one roof—from plywood and laminates to designer track lights—saved us weeks of running around.",
+    "avatar": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=150&q=80",
+    "date": "December 2024"
+  },
+  {
+    "id": "test-4",
+    "name": "Adv. Alok Rathore",
+    "city": "Delhi NCR",
+    "project": "Law Chambers & Conference Room",
+    "rating": 5,
+    "review": "Acoustic wooden slats and fluted glass partitions were installed with pinpoint German precision. Truly professional project management and exceptional turnkey delivery.",
+    "avatar": "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=150&q=80",
+    "date": "October 2024"
+  }
+]

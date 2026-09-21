@@ -1,0 +1,98 @@
+[
+  {
+    "id": "plywood",
+    "name": "Plywood & Boards",
+    "slug": "plywood",
+    "tagline": "Calibrated, BWP, Marine & Fire Retardant",
+    "image": "https://images.unsplash.com/photo-1546484396-fb3fc6f95f98?auto=format&fit=crop&w=800&q=80",
+    "itemCount": 24
+  },
+  {
+    "id": "laminates",
+    "name": "Luxury Laminates & Acrylics",
+    "slug": "laminates",
+    "tagline": "High-Gloss, Matte, Fluted & Fabric Textures",
+    "image": "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=800&q=80",
+    "itemCount": 42
+  },
+  {
+    "id": "hardware",
+    "name": "Architectural Hardware",
+    "slug": "hardware",
+    "tagline": "Concealed Hinges, Soft-Close Channels & Luxury Handles",
+    "image": "https://images.unsplash.com/photo-1503602642458-232111445657?auto=format&fit=crop&w=800&q=80",
+    "itemCount": 38
+  },
+  {
+    "id": "lighting",
+    "name": "Designer Lighting & COB",
+    "slug": "lighting",
+    "tagline": "Magnetic Track Lights, Profile Strips & Chandeliers",
+    "image": "https://images.unsplash.com/photo-1513506003901-1e6a229e2d15?auto=format&fit=crop&w=800&q=80",
+    "itemCount": 31
+  },
+  {
+    "id": "furniture",
+    "name": "Bespoke Modular Furniture",
+    "slug": "furniture",
+    "tagline": "Ergonomic Sofas, Dining Tables & Consoles",
+    "image": "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?auto=format&fit=crop&w=800&q=80",
+    "itemCount": 19
+  },
+  {
+    "id": "electrical",
+    "name": "Modular Switches & Automation",
+    "slug": "electrical",
+    "tagline": "Smart Touch Glass Panels & Distribution Units",
+    "image": "https://images.unsplash.com/photo-1558002038-1055907df827?auto=format&fit=crop&w=800&q=80",
+    "itemCount": 16
+  },
+  {
+    "id": "tools",
+    "name": "Tools & Machinery",
+    "slug": "tools",
+    "tagline": "Precision Edge Banders, Routers & Laser Meters",
+    "image": "https://images.unsplash.com/photo-1581147036324-c17ac41dfa6c?auto=format&fit=crop&w=800&q=80",
+    "itemCount": 14
+  },
+  {
+    "id": "false-ceiling",
+    "name": "Gypsum & Wooden Ceiling",
+    "slug": "false-ceiling",
+    "tagline": "Saint-Gobain Gyproc, Metal Grids & Wooden Louvers",
+    "image": "https://images.unsplash.com/photo-1600585154526-990dced4db0d?auto=format&fit=crop&w=800&q=80",
+    "itemCount": 20
+  },
+  {
+    "id": "wall-panels",
+    "name": "WPC & Charcoal Wall Panels",
+    "slug": "wall-panels",
+    "tagline": "Acoustic Slats, Marble PVC & Fluted Louvers",
+    "image": "https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&w=800&q=80",
+    "itemCount": 28
+  },
+  {
+    "id": "paint",
+    "name": "Texture Paints & Italian Stucco",
+    "slug": "paint",
+    "tagline": "Royale Luxury Emulsions, Metallic Glaze & Lime Plaster",
+    "image": "https://images.unsplash.com/photo-1562259949-e8e7689d7828?auto=format&fit=crop&w=800&q=80",
+    "itemCount": 22
+  },
+  {
+    "id": "flooring",
+    "name": "Wooden & SPC Flooring",
+    "slug": "flooring",
+    "tagline": "Herringbone Engineered Wood & Waterproof SPC Tiles",
+    "image": "https://images.unsplash.com/photo-1581858726788-75bc0f6a952d?auto=format&fit=crop&w=800&q=80",
+    "itemCount": 25
+  },
+  {
+    "id": "glass-aluminium",
+    "name": "Slim Glass & Aluminium Partitions",
+    "slug": "glass-aluminium",
+    "tagline": "Fluted Glass, Telescopic Sliders & Wardrobe Profiles",
+    "image": "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=800&q=80",
+    "itemCount": 18
+  }
+]

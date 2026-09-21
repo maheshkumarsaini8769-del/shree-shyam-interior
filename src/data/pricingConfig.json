@@ -1,0 +1,38 @@
+{
+  "baseRatePerSqFt": {
+    "1BHK": 1200,
+    "2BHK": 1350,
+    "3BHK": 1500,
+    "4BHK / Villa": 1750,
+    "Office / Studio": 1400,
+    "Retail / Commercial": 1650
+  },
+  "roomMultipliers": {
+    "Full Home": 1.0,
+    "Living Room": 1.15,
+    "Modular Kitchen": 1.45,
+    "Master Bedroom": 1.2,
+    "False Ceiling & Lighting": 0.65,
+    "Custom Wardrobes": 1.1
+  },
+  "tierMultipliers": {
+    "Essential": 0.85,
+    "Premium Luxury": 1.15,
+    "Ultra Bespoke": 1.45
+  },
+  "styleMultipliers": {
+    "Modern Minimalist": 1.0,
+    "Contemporary Indian Luxury": 1.15,
+    "Warm Japandi": 1.1,
+    "Industrial Chic": 1.05,
+    "Royal Traditional": 1.25
+  },
+  "costSplits": {
+    "materialPercentage": 0.58,
+    "labourPercentage": 0.27,
+    "designPercentage": 0.05
+  },
+  "gstRate": 0.18,
+  "currency": "INR",
+  "symbol": "₹"
+}

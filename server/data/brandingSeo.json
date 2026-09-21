@@ -1,0 +1,37 @@
+{
+  "logo": {
+    "type": "text",
+    "text": "Shree Shyam",
+    "tagline": "INTERIOR",
+    "imageUrl": "",
+    "faviconUrl": "/vite.svg"
+  },
+  "announcement": {
+    "enabled": true,
+    "badge": "LIMITED OFFER",
+    "text": "🎉 Special Festive Offer: Free In-Person Site Visit & 3D Estimation in Sikar & Jaipur!",
+    "link": "/site-visit",
+    "linkLabel": "Book Free Visit →"
+  },
+  "seo": {
+    "siteTitle": "Shree Shyam Interior | Architectural Materials & Turnkey Design in Sikar, Rajasthan",
+    "tagline": "Sikar's Premier Interior Studio & Authentic Materials",
+    "metaDescription": "Rajasthan's trusted turnkey interior atelier. 100% genuine CenturyPly, Hettich, Häfele, and Asian Paints. Custom modular kitchens, 3D interactive studio visualizer, and free site visits.",
+    "keywords": "Interior Design Sikar, Shree Shyam Interior, Modular Kitchen Sikar, Century Plywood dealer Rajasthan, Hettich hardware Sikar, Turnkey Interior Designer Jaipur",
+    "ogImage": "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=1200&q=80",
+    "canonicalUrl": "https://shreeshyaminterior.com",
+    "googleAnalyticsId": ""
+  },
+  "socialLinks": {
+    "instagram": "https://instagram.com/shreeshyaminterior",
+    "facebook": "https://facebook.com/shreeshyaminterior",
+    "youtube": "https://youtube.com/@shreeshyaminterior",
+    "whatsapp": "+91 98765 43210",
+    "email": "maheshkumarsaini8769@gmail.com"
+  },
+  "footer": {
+    "aboutText": "Shree Shyam Interior is Sikar and Jaipur's premier turnkey interior design atelier and authorized distributor of leading European and Indian building materials.",
+    "copyrightText": "© 2026 Shree Shyam Interior. All rights reserved. Masterfully crafted in Rajasthan.",
+    "address": "Piprali Road, Near Railway Overbridge, Sikar, Rajasthan - 332001"
+  }
+}
