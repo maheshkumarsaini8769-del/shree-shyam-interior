@@ -229,6 +229,9 @@ export interface BrandingSEOData {
     youtube: string;
     whatsapp: string;
     email: string;
+    googleMaps?: string;
+    pinterest?: string;
+    twitter?: string;
   };
   footer: {
     aboutText: string;

@@ -55,6 +55,7 @@ const AdminQuotes = lazyWithRetry(() => import('./pages/admin/AdminQuotes').then
 const AdminSettings = lazyWithRetry(() => import('./pages/admin/AdminSettings').then((m) => ({ default: m.AdminSettings })));
 const Admin3DStudio = lazyWithRetry(() => import('./pages/admin/Admin3DStudio').then((m) => ({ default: m.Admin3DStudio })));
 const AdminBrandingSEO = lazyWithRetry(() => import('./pages/admin/AdminBrandingSEO').then((m) => ({ default: m.AdminBrandingSEO })));
+const AdminSocialLinks = lazyWithRetry(() => import('./pages/admin/AdminSocialLinks').then((m) => ({ default: m.AdminSocialLinks })));
 
 // Scroll to top helper on route transition with smooth hash anchor support
 const ScrollToTop: React.FC = () => {
@@ -144,6 +145,7 @@ const AppContent: React.FC = () => {
             <Route path="/admin" element={<AdminLayout />}>
               <Route index element={<AdminDashboard />} />
               <Route path="3d-studio" element={<Admin3DStudio />} />
+              <Route path="social-links" element={<AdminSocialLinks />} />
               <Route path="seo-branding" element={<AdminBrandingSEO />} />
               <Route path="products" element={<AdminProducts />} />
               <Route path="categories" element={<AdminCategories />} />

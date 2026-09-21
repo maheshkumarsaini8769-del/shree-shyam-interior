@@ -117,13 +117,28 @@ export const Footer: React.FC = () => {
                 )}
                 {branding.socialLinks.whatsapp && (
                   <a
-                    href={`https://wa.me/${branding.socialLinks.whatsapp.replace(/[^0-9]/g, '')}`}
+                    href={
+                      branding.socialLinks.whatsapp.startsWith('http')
+                        ? branding.socialLinks.whatsapp
+                        : `https://wa.me/${branding.socialLinks.whatsapp.replace(/[^0-9]/g, '')}`
+                    }
                     target="_blank"
                     rel="noreferrer"
                     className="w-8 h-8 rounded-full bg-forest-900/80 border border-cream-200/10 hover:border-copper-400 flex items-center justify-center text-cream-200 hover:text-copper-400 transition-colors"
                     title="WhatsApp"
                   >
                     <MessageCircle className="w-4 h-4" />
+                  </a>
+                )}
+                {branding.socialLinks.googleMaps && (
+                  <a
+                    href={branding.socialLinks.googleMaps}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="w-8 h-8 rounded-full bg-forest-900/80 border border-cream-200/10 hover:border-copper-400 flex items-center justify-center text-cream-200 hover:text-copper-400 transition-colors"
+                    title="Google Maps Showroom Location"
+                  >
+                    <MapPin className="w-4 h-4" />
                   </a>
                 )}
               </div>

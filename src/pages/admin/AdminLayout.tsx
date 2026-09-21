@@ -18,7 +18,8 @@ import {
   Sun,
   Moon,
   Box,
-  Sparkles
+  Sparkles,
+  Share2
 } from 'lucide-react';
 import { apiService } from '../../services/apiService';
 import { useTheme } from '../../context/ThemeContext';
@@ -43,6 +44,7 @@ export const AdminLayout: React.FC = () => {
   const navItems = [
     { label: 'Dashboard', path: '/admin', icon: LayoutDashboard, exact: true },
     { label: '3D Studio Finishes', path: '/admin/3d-studio', icon: Box },
+    { label: 'Social Media Links', path: '/admin/social-links', icon: Share2 },
     { label: 'Logo, SEO & Banners', path: '/admin/seo-branding', icon: Sparkles },
     { label: 'Products & Materials', path: '/admin/products', icon: Package },
     { label: 'Categories', path: '/admin/categories', icon: FolderTree },
