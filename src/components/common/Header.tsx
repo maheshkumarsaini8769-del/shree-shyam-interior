@@ -4,7 +4,7 @@ import { Search, ShoppingBag, Menu, X, Sun, Moon, Sparkles, Calculator, ArrowRig
 import { useScrollDirection } from '../../hooks/useScrollDirection';
 import { useQuote } from '../../context/QuoteContext';
 import { useTheme } from '../../context/ThemeContext';
-import { SearchModal } from './SearchModal';
+const SearchModal = React.lazy(() => import('./SearchModal').then((m) => ({ default: m.SearchModal })));
 import { apiService, BrandingSEOData } from '../../services/apiService';
 
 export const Header: React.FC = () => {
@@ -284,7 +284,11 @@ export const Header: React.FC = () => {
       </header>
 
       {/* Global Search Modal */}
-      <SearchModal isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
+      {isSearchOpen && (
+        <React.Suspense fallback={null}>
+          <SearchModal isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
+        </React.Suspense>
+      )}
     </>
   );
 };

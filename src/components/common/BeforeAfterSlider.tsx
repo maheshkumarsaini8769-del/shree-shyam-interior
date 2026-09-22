@@ -69,7 +69,8 @@ export const BeforeAfterSlider: React.FC<BeforeAfterSliderProps> = ({
         src={afterImage}
         alt="After Turnkey Renovation"
         className="absolute inset-0 w-full h-full object-cover pointer-events-none block select-none"
-        loading="eager"
+        loading="lazy"
+        decoding="async"
         onError={(e) => onImageErrorWithFallback(e, 'https://images.unsplash.com/photo-1616594039964-ae9021a400a0?auto=format&fit=crop&w=1200&q=80')}
       />
 
@@ -82,7 +83,8 @@ export const BeforeAfterSlider: React.FC<BeforeAfterSliderProps> = ({
         style={{
           clipPath: `inset(0 ${100 - sliderPosition}% 0 0)`
         }}
-        loading="eager"
+        loading="lazy"
+        decoding="async"
         onError={(e) => onImageErrorWithFallback(e, 'https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=1000&q=80')}
       />
 

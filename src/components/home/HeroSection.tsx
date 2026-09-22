@@ -14,7 +14,7 @@ export const HeroSection: React.FC = () => {
     primaryCtaLink: '/site-visit',
     secondaryCtaText: 'Explore 3D Studio',
     secondaryCtaLink: '/design-ai',
-    backgroundImage: 'https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=1920&q=85'
+    backgroundImage: 'https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=1200&q=75'
   });
 
   useEffect(() => {
@@ -29,7 +29,7 @@ export const HeroSection: React.FC = () => {
           primaryCtaLink: content.hero.primaryCtaLink || '/site-visit',
           secondaryCtaText: content.hero.secondaryCtaText || 'Explore 3D Studio',
           secondaryCtaLink: content.hero.secondaryCtaLink || '/design-ai',
-          backgroundImage: content.hero.backgroundImage || 'https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=1920&q=85'
+          backgroundImage: content.hero.backgroundImage || 'https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=1200&q=75'
         });
       }
     });
@@ -43,26 +43,25 @@ export const HeroSection: React.FC = () => {
 
   return (
     <section className="relative min-h-[90vh] sm:min-h-screen flex items-center overflow-hidden bg-forest-950 text-cream-100 pt-20 sm:pt-24 pb-16">
-      {/* Background Luxury Interior Photograph */}
-      <motion.div
-        initial={{ scale: 1.05, opacity: 0.9 }}
-        animate={{ scale: 1.0, opacity: 1 }}
-        transition={{ duration: 1.4, ease: [0.16, 1, 0.3, 1] }}
-        className="absolute inset-0 z-0 overflow-hidden"
-      >
+      {/* Background Luxury Interior Photograph - LCP Optimized */}
+      <div className="absolute inset-0 z-0 overflow-hidden">
         <img
           src={heroData.backgroundImage}
+          srcSet="https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=640&q=75 640w, https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=1080&q=75 1080w, https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=1600&q=80 1600w"
+          sizes="100vw"
           alt="Shree Shyam Interior Modern Luxury Living Architecture"
           className="w-full h-full object-cover object-center pointer-events-none filter brightness-90"
           loading="eager"
+          decoding="sync"
+          fetchPriority="high"
           onError={(e) => {
-            e.currentTarget.src = "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1920&q=80";
+            e.currentTarget.src = "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=75";
           }}
         />
         {/* Subtle Dark Gradient Overlay */}
         <div className="absolute inset-0 bg-gradient-to-r from-forest-950/90 via-forest-950/65 to-transparent" />
         <div className="absolute inset-0 bg-gradient-to-t from-forest-950 via-transparent to-forest-950/40" />
-      </motion.div>
+      </div>
 
       {/* Main Content Area */}
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
@@ -137,7 +136,8 @@ export const HeroSection: React.FC = () => {
                   src={img}
                   alt={`Happy homeowner ${idx + 1}`}
                   className="w-9 h-9 rounded-full border-2 border-forest-950 object-cover"
-                  loading="eager"
+                  loading="lazy"
+                  decoding="async"
                 />
               ))}
             </div>

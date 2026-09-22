@@ -1,5 +1,4 @@
 import { useEffect } from 'react';
-import Lenis from 'lenis';
 
 export const useSmoothScroll = () => {
   useEffect(() => {
@@ -11,26 +10,33 @@ export const useSmoothScroll = () => {
     const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
     if (isTouch) return;
 
-    const lenis = new Lenis({
-      duration: 1.2,
-      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-      orientation: 'vertical',
-      smoothWheel: true,
-      wheelMultiplier: 0.9,
-    });
-
+    let lenisInstance: any = null;
     let animationFrameId: number;
 
-    function raf(time: number) {
-      lenis.raf(time);
-      animationFrameId = requestAnimationFrame(raf);
-    }
+    import('lenis').then(({ default: Lenis }) => {
+      lenisInstance = new Lenis({
+        duration: 1.2,
+        easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+        orientation: 'vertical',
+        smoothWheel: true,
+        wheelMultiplier: 0.9,
+      });
 
-    animationFrameId = requestAnimationFrame(raf);
+      function raf(time: number) {
+        lenisInstance?.raf(time);
+        animationFrameId = requestAnimationFrame(raf);
+      }
+
+      animationFrameId = requestAnimationFrame(raf);
+    });
 
     return () => {
-      cancelAnimationFrame(animationFrameId);
-      lenis.destroy();
+      if (animationFrameId) {
+        cancelAnimationFrame(animationFrameId);
+      }
+      if (lenisInstance) {
+        lenisInstance.destroy();
+      }
     };
   }, []);
 };

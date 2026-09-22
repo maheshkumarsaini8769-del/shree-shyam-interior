@@ -30,8 +30,10 @@ const lazyWithRetry = (importFn: () => Promise<any>) =>
     }
   });
 
-// Route Lazy Loading with Stale Chunk Auto-Recovery
-const HomePage = lazyWithRetry(() => import('./pages/HomePage').then((m) => ({ default: m.HomePage })));
+// Critical Root Route: Eager import for instant FCP and LCP
+import { HomePage } from './pages/HomePage';
+
+// Secondary Routes: Route Lazy Loading with Stale Chunk Auto-Recovery
 const ProductsPage = lazyWithRetry(() => import('./pages/ProductsPage').then((m) => ({ default: m.ProductsPage })));
 const ProjectsPage = lazyWithRetry(() => import('./pages/ProjectsPage').then((m) => ({ default: m.ProjectsPage })));
 const ProjectDetailPage = lazyWithRetry(() => import('./pages/ProjectDetailPage').then((m) => ({ default: m.ProjectDetailPage })));
