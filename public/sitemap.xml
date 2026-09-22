@@ -145,9 +145,118 @@
   <!-- Site Visit Booking -->
   <url>
     <loc>https://wooden-five.vercel.app/site-visit</loc>
-    <lastmod>2026-09-21</lastmod>
+    <lastmod>2026-09-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
+  </url>
+
+  <!-- FAQ Hub -->
+  <url>
+    <loc>https://wooden-five.vercel.app/faq</loc>
+    <lastmod>2026-09-22</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+
+  <!-- Design Blog & Inspiration Hub -->
+  <url>
+    <loc>https://wooden-five.vercel.app/blog</loc>
+    <lastmod>2026-09-22</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+
+  <!-- Blog Articles -->
+  <url>
+    <loc>https://wooden-five.vercel.app/blog/modular-kitchen-trends-sikar-2026</loc>
+    <lastmod>2026-09-22</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.75</priority>
+  </url>
+
+  <url>
+    <loc>https://wooden-five.vercel.app/blog/bwp-vs-commercial-plywood-guide</loc>
+    <lastmod>2026-09-22</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.75</priority>
+  </url>
+
+  <url>
+    <loc>https://wooden-five.vercel.app/blog/luxury-master-bedroom-design-ideas</loc>
+    <lastmod>2026-09-22</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.75</priority>
+  </url>
+
+  <url>
+    <loc>https://wooden-five.vercel.app/blog/interior-design-cost-calculator-sikar</loc>
+    <lastmod>2026-09-22</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.75</priority>
+  </url>
+
+  <url>
+    <loc>https://wooden-five.vercel.app/blog/living-room-tv-unit-partition-ideas</loc>
+    <lastmod>2026-09-22</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.75</priority>
+  </url>
+
+  <url>
+    <loc>https://wooden-five.vercel.app/blog/false-ceiling-types-pop-vs-gypsum</loc>
+    <lastmod>2026-09-22</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.75</priority>
+  </url>
+
+  <url>
+    <loc>https://wooden-five.vercel.app/blog/modern-wardrobe-designs-small-bedrooms</loc>
+    <lastmod>2026-09-22</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.75</priority>
+  </url>
+
+  <url>
+    <loc>https://wooden-five.vercel.app/blog/office-interior-design-productivity</loc>
+    <lastmod>2026-09-22</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.75</priority>
+  </url>
+
+  <url>
+    <loc>https://wooden-five.vercel.app/blog/sustainable-eco-friendly-interiors-rajasthan</loc>
+    <lastmod>2026-09-22</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.75</priority>
+  </url>
+
+  <url>
+    <loc>https://wooden-five.vercel.app/blog/lighting-design-guide-ambient-task-accent</loc>
+    <lastmod>2026-09-22</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.75</priority>
+  </url>
+
+  <!-- Legal & Policies -->
+  <url>
+    <loc>https://wooden-five.vercel.app/privacy-policy</loc>
+    <lastmod>2026-09-22</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
+    <loc>https://wooden-five.vercel.app/terms-and-conditions</loc>
+    <lastmod>2026-09-22</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
+    <loc>https://wooden-five.vercel.app/cancellation-refund-policy</loc>
+    <lastmod>2026-09-22</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
   </url>
 
 </urlset>

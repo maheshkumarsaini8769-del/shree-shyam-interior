@@ -5,6 +5,7 @@ interface SEOHeadProps {
   description: string;
   keywords?: string;
   canonicalPath?: string;
+  canonical?: string;
   ogType?: 'website' | 'article';
   ogImage?: string;
   jsonLd?: object | object[];
@@ -19,6 +20,7 @@ export const SEOHead: React.FC<SEOHeadProps> = ({
   description,
   keywords,
   canonicalPath = '',
+  canonical,
   ogType = 'website',
   ogImage = DEFAULT_IMAGE,
   jsonLd,
@@ -53,8 +55,16 @@ export const SEOHead: React.FC<SEOHeadProps> = ({
     setMeta('robots', noindex ? 'noindex, nofollow' : 'index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1');
 
     // 5. Canonical URL
-    const cleanPath = canonicalPath.startsWith('/') ? canonicalPath : `/${canonicalPath}`;
-    const canonicalUrl = `${SITE_URL}${cleanPath === '/' ? '' : cleanPath}`;
+    const targetCanonical = canonical || canonicalPath;
+    let canonicalUrl = SITE_URL;
+    if (targetCanonical) {
+      if (targetCanonical.startsWith('http')) {
+        canonicalUrl = targetCanonical;
+      } else {
+        const cleanPath = targetCanonical.startsWith('/') ? targetCanonical : `/${targetCanonical}`;
+        canonicalUrl = `${SITE_URL}${cleanPath === '/' ? '' : cleanPath}`;
+      }
+    }
     let canonicalTag = document.querySelector('link[rel="canonical"]');
     if (!canonicalTag) {
       canonicalTag = document.createElement('link');

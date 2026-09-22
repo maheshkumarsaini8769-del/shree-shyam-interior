@@ -186,35 +186,35 @@ export const Footer: React.FC = () => {
               <li><Link to="/services/wardrobe" className="hover:text-cream-50 transition-colors">Modern Wardrobe Design</Link></li>
               <li><Link to="/services/office-interior" className="hover:text-cream-50 transition-colors">Office & Commercial Design</Link></li>
               <li><Link to="/services/false-ceiling" className="hover:text-cream-50 transition-colors">Designer False Ceiling</Link></li>
-              <li><Link to="/services" className="text-copper-400 hover:underline text-xs font-semibold block pt-1">View All Services →</Link></li>
+              <li><Link to="/services" className="text-copper-400 hover:underline text-xs font-semibold block pt-1">All Interior Services →</Link></li>
             </ul>
           </div>
 
-          {/* Material Catalog */}
+          {/* Resources & Inspiration */}
           <div>
             <h4 className="text-xs font-bold uppercase tracking-widest text-copper-400 mb-4">
-              Material Catalog
+              Design & Resources
             </h4>
             <ul className="space-y-2 text-sm text-charcoal-300">
-              <li><Link to="/products?category=plywood" className="hover:text-cream-50 transition-colors">Century Marine Plywood</Link></li>
-              <li><Link to="/products?category=laminates" className="hover:text-cream-50 transition-colors">Greenlam Acrylics & Clads</Link></li>
-              <li><Link to="/products?category=hardware" className="hover:text-cream-50 transition-colors">Häfele & Hettich Hardware</Link></li>
-              <li><Link to="/products?category=lighting" className="hover:text-cream-50 transition-colors">Philips Magnetic 48V Tracks</Link></li>
-              <li><Link to="/products?category=wall-panels" className="hover:text-cream-50 transition-colors">Charcoal Acoustic Louvers</Link></li>
-              <li><Link to="/products?category=paint" className="hover:text-cream-50 transition-colors">Asian Paints Italian Stucco</Link></li>
-            </ul>
-          </div>
-
-          {/* Quick Tools & Portfolios */}
-          <div>
-            <h4 className="text-xs font-bold uppercase tracking-widest text-copper-400 mb-4">
-              Studio & Tools
-            </h4>
-            <ul className="space-y-2 text-sm text-charcoal-300">
+              <li><Link to="/blog" className="hover:text-cream-50 transition-colors flex items-center gap-1.5"><Sparkles className="w-3 h-3 text-copper-400" />Design Ideas & Blog</Link></li>
+              <li><Link to="/faq" className="hover:text-cream-50 transition-colors">Frequently Asked (FAQ)</Link></li>
               <li><Link to="/projects" className="hover:text-cream-50 transition-colors">Completed Projects</Link></li>
+              <li><Link to="/products" className="hover:text-cream-50 transition-colors">Materials & Hardware</Link></li>
               <li><Link to="/design-ai" className="hover:text-cream-50 transition-colors">3D Room Configurator</Link></li>
               <li><Link to="/quote" className="hover:text-cream-50 transition-colors">Instant Cost Estimator</Link></li>
-              <li><Link to="/site-visit" className="hover:text-cream-50 transition-colors">Book Free Site Visit</Link></li>
+            </ul>
+          </div>
+
+          {/* Company & Legal Policies */}
+          <div>
+            <h4 className="text-xs font-bold uppercase tracking-widest text-copper-400 mb-4">
+              Legal & Support
+            </h4>
+            <ul className="space-y-2 text-sm text-charcoal-300">
+              <li><Link to="/site-visit" className="text-copper-400 font-semibold hover:underline">Book Free Site Visit</Link></li>
+              <li><Link to="/privacy-policy" className="hover:text-cream-50 transition-colors">Privacy Policy</Link></li>
+              <li><Link to="/terms-and-conditions" className="hover:text-cream-50 transition-colors">Terms & Conditions</Link></li>
+              <li><Link to="/cancellation-refund-policy" className="hover:text-cream-50 transition-colors">Cancellation & Refund</Link></li>
               <li><a href="https://maps.google.com/?q=Shree+Shyam+Interior+Sikar" target="_blank" rel="noreferrer" className="hover:text-cream-50 transition-colors">Showroom Directions</a></li>
             </ul>
           </div>
@@ -226,12 +226,16 @@ export const Footer: React.FC = () => {
             {branding?.footer?.copyrightText ||
               `© ${new Date().getFullYear()} Shree Shyam Interior. All Rights Reserved. Sikar, Rajasthan.`}
           </p>
-          <div className="flex items-center gap-4">
-            <span className="hover:text-copper-400 transition-colors">Privacy Policy</span>
+          <div className="flex flex-wrap items-center gap-3 sm:gap-4 text-charcoal-400">
+            <Link to="/privacy-policy" className="hover:text-copper-400 transition-colors">Privacy Policy</Link>
             <span>•</span>
-            <span className="hover:text-copper-400 transition-colors">Terms of Work</span>
+            <Link to="/terms-and-conditions" className="hover:text-copper-400 transition-colors">Terms of Work</Link>
             <span>•</span>
-            <span className="hover:text-copper-400 transition-colors">Warranty Terms</span>
+            <Link to="/cancellation-refund-policy" className="hover:text-copper-400 transition-colors">Cancellation & Refund</Link>
+            <span>•</span>
+            <Link to="/faq" className="hover:text-copper-400 transition-colors">FAQ</Link>
+            <span>•</span>
+            <Link to="/blog" className="hover:text-copper-400 transition-colors">Blog</Link>
           </div>
         </div>
       </div>

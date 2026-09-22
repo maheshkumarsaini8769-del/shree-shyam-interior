@@ -41,6 +41,12 @@ const SiteVisitPage = lazyWithRetry(() => import('./pages/SiteVisitPage').then((
 const ProfilePage = lazyWithRetry(() => import('./pages/ProfilePage').then((m) => ({ default: m.ProfilePage })));
 const ServicesHubPage = lazyWithRetry(() => import('./pages/ServicesHubPage').then((m) => ({ default: m.ServicesHubPage })));
 const ServiceDetailPage = lazyWithRetry(() => import('./pages/ServiceDetailPage').then((m) => ({ default: m.ServiceDetailPage })));
+const FAQPage = lazyWithRetry(() => import('./pages/FAQPage').then((m) => ({ default: m.FAQPage })));
+const BlogPage = lazyWithRetry(() => import('./pages/BlogPage').then((m) => ({ default: m.BlogPage })));
+const BlogPostPage = lazyWithRetry(() => import('./pages/BlogPostPage').then((m) => ({ default: m.BlogPostPage })));
+const PrivacyPolicyPage = lazyWithRetry(() => import('./pages/PrivacyPolicyPage').then((m) => ({ default: m.PrivacyPolicyPage })));
+const TermsConditionsPage = lazyWithRetry(() => import('./pages/TermsConditionsPage').then((m) => ({ default: m.TermsConditionsPage })));
+const CancellationRefundPage = lazyWithRetry(() => import('./pages/CancellationRefundPage').then((m) => ({ default: m.CancellationRefundPage })));
 const NotFoundPage = lazyWithRetry(() => import('./pages/NotFoundPage').then((m) => ({ default: m.NotFoundPage })));
 
 // Admin Pages Lazy Loading
@@ -182,6 +188,12 @@ const AppContent: React.FC = () => {
               <Route path="/products" element={<ProductsPage />} />
               <Route path="/projects" element={<ProjectsPage />} />
               <Route path="/projects/:slug" element={<ProjectDetailPage />} />
+              <Route path="/blog" element={<BlogPage />} />
+              <Route path="/blog/:slug" element={<BlogPostPage />} />
+              <Route path="/faq" element={<FAQPage />} />
+              <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
+              <Route path="/terms-and-conditions" element={<TermsConditionsPage />} />
+              <Route path="/cancellation-refund-policy" element={<CancellationRefundPage />} />
               <Route path="/design-ai" element={<DesignAIPage />} />
               <Route path="/quote" element={<QuotePage />} />
               <Route path="/site-visit" element={<SiteVisitPage />} />

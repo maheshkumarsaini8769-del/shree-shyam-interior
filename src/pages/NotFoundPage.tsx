@@ -1,74 +1,98 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Home, Compass, Calculator, Calendar, ArrowLeft } from 'lucide-react';
+import { Home, Compass, Sparkles, Phone, ArrowLeft, ArrowRight, Layers } from 'lucide-react';
 import { SEOHead } from '../components/common/SEOHead';
 
 export const NotFoundPage: React.FC = () => {
   return (
-    <div className="min-h-screen bg-cream-50 text-charcoal-800 dark:bg-forest-950 dark:text-cream-100 flex flex-col items-center justify-center px-4 py-32 text-center transition-colors">
+    <div className="min-h-screen bg-[#FDFBF7] text-[#14251F] flex flex-col items-center justify-center px-4 py-32 text-center selection:bg-[#C68A43]/20 relative overflow-hidden">
       <SEOHead
         title="Page Not Found (404) | Shree Shyam Interior Sikar"
-        description="The requested page cannot be found. Discover interior design services, modular kitchens, project portfolio, or schedule a free site consultation in Sikar."
+        description="Looks like this space hasn't been designed yet. Discover bespoke interior design services, modular kitchens, luxury bedrooms, or contact Shree Shyam Interior in Sikar."
         noindex={true}
       />
 
-      <div className="max-w-md w-full p-8 sm:p-10 rounded-3xl bg-white dark:bg-forest-900 border border-cream-200 dark:border-copper-500/20 shadow-elevated space-y-6">
-        <div className="w-16 h-16 mx-auto rounded-2xl bg-copper-500/10 border border-copper-500/30 flex items-center justify-center text-copper-600 dark:text-copper-400 font-serif text-3xl font-black">
-          404
+      {/* Decorative ambient background blur */}
+      <div className="absolute top-1/4 -left-20 w-80 h-80 rounded-full bg-[#C68A43]/10 blur-3xl pointer-events-none" />
+      <div className="absolute bottom-1/4 -right-20 w-80 h-80 rounded-full bg-[#14251F]/10 blur-3xl pointer-events-none" />
+
+      <div className="max-w-lg w-full p-8 sm:p-12 rounded-3xl bg-white border border-stone-200/90 shadow-xl relative z-10 space-y-6">
+        {/* Minimal Interior Accent Badge */}
+        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#C68A43]/10 text-[#C68A43] text-xs font-semibold tracking-wider uppercase">
+          <Sparkles className="w-3.5 h-3.5" />
+          404 Architecture Error
         </div>
 
+        {/* Large 404 Typography */}
+        <div className="relative">
+          <span className="font-serif text-7xl sm:text-8xl lg:text-9xl font-black text-[#14251F]/90 tracking-tighter block select-none">
+            404
+          </span>
+          <div className="w-16 h-1 bg-[#C68A43] mx-auto -mt-2 rounded-full" />
+        </div>
+
+        {/* Requested Headline & Description */}
         <div>
-          <h1 className="font-serif text-2xl sm:text-3xl font-bold text-forest-950 dark:text-cream-50">
-            Page Not Located
+          <h1 className="font-serif text-2xl sm:text-3xl font-bold text-[#14251F] leading-snug">
+            Looks like this space hasn&apos;t been designed yet.
           </h1>
-          <p className="text-xs sm:text-sm text-charcoal-500 dark:text-cream-300/80 mt-2 leading-relaxed">
-            The page you were looking for may have moved or no longer exists. Let’s get you back on track.
+          <p className="text-stone-500 text-xs sm:text-sm mt-3 leading-relaxed max-w-sm mx-auto">
+            The blueprint you are looking for has either been moved, updated, or does not exist. Let&apos;s guide you back to our completed projects and bespoke spaces.
           </p>
         </div>
 
-        <div className="grid grid-cols-2 gap-2.5 text-xs font-semibold">
+        {/* 4 Requested Action Buttons */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+          {/* 1. Back to Home */}
           <Link
             to="/"
-            className="flex items-center justify-center gap-1.5 p-3 rounded-xl bg-cream-100 dark:bg-forest-800 hover:bg-copper-500 hover:text-white transition-colors"
+            className="flex items-center justify-center gap-2 p-3.5 rounded-2xl bg-[#14251F] text-white hover:bg-[#C68A43] transition-colors text-xs sm:text-sm font-semibold shadow-sm group"
           >
-            <Home className="w-3.5 h-3.5" />
-            <span>Homepage</span>
+            <Home className="w-4 h-4" />
+            <span>Back to Home</span>
           </Link>
 
-          <Link
-            to="/services"
-            className="flex items-center justify-center gap-1.5 p-3 rounded-xl bg-cream-100 dark:bg-forest-800 hover:bg-copper-500 hover:text-white transition-colors"
-          >
-            <Compass className="w-3.5 h-3.5" />
-            <span>Our Services</span>
-          </Link>
-
+          {/* 2. Explore Projects */}
           <Link
             to="/projects"
-            className="flex items-center justify-center gap-1.5 p-3 rounded-xl bg-cream-100 dark:bg-forest-800 hover:bg-copper-500 hover:text-white transition-colors"
+            className="flex items-center justify-center gap-2 p-3.5 rounded-2xl bg-stone-100 text-stone-800 hover:bg-stone-200 hover:text-[#14251F] transition-colors text-xs sm:text-sm font-semibold group"
           >
-            <Calendar className="w-3.5 h-3.5" />
-            <span>Portfolio</span>
+            <Layers className="w-4 h-4 text-[#C68A43]" />
+            <span>Explore Projects</span>
           </Link>
 
+          {/* 3. View Services */}
           <Link
-            to="/quote"
-            className="flex items-center justify-center gap-1.5 p-3 rounded-xl bg-cream-100 dark:bg-forest-800 hover:bg-copper-500 hover:text-white transition-colors"
+            to="/services"
+            className="flex items-center justify-center gap-2 p-3.5 rounded-2xl bg-stone-100 text-stone-800 hover:bg-stone-200 hover:text-[#14251F] transition-colors text-xs sm:text-sm font-semibold group"
           >
-            <Calculator className="w-3.5 h-3.5" />
-            <span>Cost Estimator</span>
+            <Compass className="w-4 h-4 text-[#C68A43]" />
+            <span>View Services</span>
+          </Link>
+
+          {/* 4. Contact Us */}
+          <Link
+            to="/site-visit"
+            className="flex items-center justify-center gap-2 p-3.5 rounded-2xl bg-[#C68A43] text-white hover:bg-[#b57a35] transition-colors text-xs sm:text-sm font-semibold shadow-sm group"
+          >
+            <Phone className="w-4 h-4" />
+            <span>Contact Us</span>
           </Link>
         </div>
 
+        {/* Quick Return Link */}
         <div className="pt-2">
           <Link
-            to="/site-visit"
-            className="inline-flex items-center justify-center w-full py-3 rounded-xl bg-[#B57731] hover:bg-[#9E6526] text-white font-bold text-xs uppercase tracking-wider shadow-md transition-colors"
+            to="/"
+            className="text-xs text-stone-400 hover:text-[#C68A43] inline-flex items-center gap-1 transition-colors"
           >
-            Book Free Site Visit in Sikar
+            <ArrowLeft className="w-3 h-3" />
+            Return to Shree Shyam Interior homepage
           </Link>
         </div>
       </div>
     </div>
   );
 };
+
+export default NotFoundPage;

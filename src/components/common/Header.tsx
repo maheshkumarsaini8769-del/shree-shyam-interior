@@ -37,15 +37,15 @@ export const Header: React.FC = () => {
   const isHome = location.pathname === '/';
   const headerSolid = isScrolled || !isHome;
 
-  // Streamlined, elegant labels for a clean, spacious luxury navbar
   const navLinks: { label: string; path: string; badge?: string }[] = [
     { label: 'Home', path: '/' },
     { label: 'Services', path: '/services' },
     { label: 'Products', path: '/products' },
     { label: 'Projects', path: '/projects' },
     { label: 'Design AI', path: '/design-ai' },
-    { label: 'Cost Estimator', path: '/quote' },
-    { label: 'Showroom', path: '/#showroom' }
+    { label: 'Blog', path: '/blog' },
+    { label: 'FAQ', path: '/faq' },
+    { label: 'Estimator', path: '/quote' }
   ];
 
   const showAnnouncement = branding?.announcement?.enabled && !announcementDismissed;
