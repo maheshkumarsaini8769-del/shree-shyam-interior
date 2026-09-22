@@ -85,8 +85,15 @@ export const AdminLeads: React.FC = () => {
 
         <div className="flex items-center gap-2">
           <span className="text-xs font-bold text-copper-600 dark:text-copper-400 bg-copper-500/10 border border-copper-500/20 px-3 py-1.5 rounded-xl">
-            {leads.filter((l) => l.status === 'New').length} New Actionable Leads
+            {leads.filter((l) => l.status === 'New').length} New Leads ({leads.length} Total)
           </span>
+          <button
+            onClick={loadLeads}
+            disabled={loading}
+            className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-white dark:bg-[#121720] border border-cream-200 dark:border-cream-200/10 hover:border-copper-500/50 text-xs font-semibold text-charcoal-700 dark:text-cream-100 shadow-soft transition-all active:scale-95 disabled:opacity-50"
+          >
+            <span>{loading ? 'Refreshing...' : 'Refresh'}</span>
+          </button>
         </div>
       </div>
 

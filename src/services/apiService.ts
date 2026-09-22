@@ -617,35 +617,78 @@ export const apiService = {
 
   // Leads
   async getLeads(): Promise<Lead[]> {
+    let apiLeads: Lead[] = [];
     try {
-      return await apiFetch<Lead[]>('/leads');
+      apiLeads = await apiFetch<Lead[]>('/leads');
+      if (!Array.isArray(apiLeads)) apiLeads = [];
     } catch {
-      return [];
+      apiLeads = [];
     }
+
+    try {
+      const raw = localStorage.getItem('ssi_site_visits');
+      if (raw) {
+        const localLeads: Lead[] = JSON.parse(raw);
+        const map = new Map<string, Lead>();
+        apiLeads.forEach((l) => map.set(l.id, l));
+        (Array.isArray(localLeads) ? localLeads : []).forEach((l) => {
+          if (!map.has(l.id)) {
+            map.set(l.id, l);
+          }
+        });
+        return Array.from(map.values()).sort(
+          (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        );
+      }
+    } catch (e) {
+      console.warn('Error reading local site visits:', e);
+    }
+    return apiLeads;
   },
 
   async submitLead(lead: Omit<Lead, 'id' | 'status' | 'createdAt'>): Promise<Lead> {
+    const newLead: Lead = {
+      ...lead,
+      id: `LEAD-${Date.now()}`,
+      status: 'New',
+      createdAt: new Date().toISOString()
+    };
+
+    // Immediately persist to localStorage
     try {
-      return await apiFetch<Lead>('/leads', {
-        method: 'POST',
-        body: JSON.stringify(lead)
-      });
-    } catch {
-      // Fallback to local storage if API down
-      const fallbackLead: Lead = {
-        ...lead,
-        id: `LEAD-${Date.now()}`,
-        status: 'New',
-        createdAt: new Date().toISOString()
-      };
       const raw = localStorage.getItem('ssi_site_visits');
-      const list = raw ? JSON.parse(raw) : [];
-      localStorage.setItem('ssi_site_visits', JSON.stringify([fallbackLead, ...list]));
-      return fallbackLead;
+      const list: Lead[] = raw ? JSON.parse(raw) : [];
+      localStorage.setItem('ssi_site_visits', JSON.stringify([newLead, ...list]));
+    } catch (e) {
+      console.warn('Failed to save lead to localStorage', e);
+    }
+
+    // Persist to server API
+    try {
+      const saved = await apiFetch<Lead>('/leads', {
+        method: 'POST',
+        body: JSON.stringify(newLead)
+      });
+      return saved || newLead;
+    } catch (e) {
+      console.warn('API submitLead failed, fallback stored locally', e);
+      return newLead;
     }
   },
 
   async updateLeadStatus(id: string, updates: Partial<Lead>): Promise<Lead> {
+    try {
+      const raw = localStorage.getItem('ssi_site_visits');
+      if (raw) {
+        const list: Lead[] = JSON.parse(raw);
+        const idx = list.findIndex((l) => l.id === id);
+        if (idx !== -1) {
+          list[idx] = { ...list[idx], ...updates };
+          localStorage.setItem('ssi_site_visits', JSON.stringify(list));
+        }
+      }
+    } catch (_) {}
+
     return apiFetch<Lead>(`/leads/${id}`, {
       method: 'PATCH',
       body: JSON.stringify(updates)
@@ -653,6 +696,15 @@ export const apiService = {
   },
 
   async deleteLead(id: string): Promise<{ success: boolean; id: string }> {
+    try {
+      const raw = localStorage.getItem('ssi_site_visits');
+      if (raw) {
+        const list: Lead[] = JSON.parse(raw);
+        const filtered = list.filter((l) => l.id !== id);
+        localStorage.setItem('ssi_site_visits', JSON.stringify(filtered));
+      }
+    } catch (_) {}
+
     return apiFetch<{ success: boolean; id: string }>(`/leads/${id}`, {
       method: 'DELETE'
     });
@@ -660,21 +712,74 @@ export const apiService = {
 
   // Quotes
   async getQuotes(): Promise<QuoteRequest[]> {
+    let apiQuotes: QuoteRequest[] = [];
     try {
-      return await apiFetch<QuoteRequest[]>('/quotes');
+      apiQuotes = await apiFetch<QuoteRequest[]>('/quotes');
+      if (!Array.isArray(apiQuotes)) apiQuotes = [];
     } catch {
-      return [];
+      apiQuotes = [];
     }
+
+    try {
+      const raw = localStorage.getItem('ssi_quotes');
+      if (raw) {
+        const localQuotes: QuoteRequest[] = JSON.parse(raw);
+        const map = new Map<string, QuoteRequest>();
+        apiQuotes.forEach((q) => map.set(q.id, q));
+        (Array.isArray(localQuotes) ? localQuotes : []).forEach((q) => {
+          if (!map.has(q.id)) {
+            map.set(q.id, q);
+          }
+        });
+        return Array.from(map.values()).sort(
+          (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        );
+      }
+    } catch (e) {
+      console.warn('Error reading local quotes:', e);
+    }
+    return apiQuotes;
   },
 
   async submitQuote(quote: Omit<QuoteRequest, 'id' | 'createdAt'>): Promise<QuoteRequest> {
-    return apiFetch<QuoteRequest>('/quotes', {
-      method: 'POST',
-      body: JSON.stringify(quote)
-    });
+    const newQuote: QuoteRequest = {
+      ...quote,
+      id: `QUOTE-${Date.now()}`,
+      createdAt: new Date().toISOString()
+    };
+
+    // Immediately persist to localStorage
+    try {
+      const raw = localStorage.getItem('ssi_quotes');
+      const list: QuoteRequest[] = raw ? JSON.parse(raw) : [];
+      localStorage.setItem('ssi_quotes', JSON.stringify([newQuote, ...list]));
+    } catch (e) {
+      console.warn('Failed to save quote to localStorage', e);
+    }
+
+    // Persist to server API
+    try {
+      const saved = await apiFetch<QuoteRequest>('/quotes', {
+        method: 'POST',
+        body: JSON.stringify(newQuote)
+      });
+      return saved || newQuote;
+    } catch (e) {
+      console.warn('API submitQuote failed, fallback stored locally', e);
+      return newQuote;
+    }
   },
 
   async deleteQuote(id: string): Promise<{ success: boolean; id: string }> {
+    try {
+      const raw = localStorage.getItem('ssi_quotes');
+      if (raw) {
+        const list: QuoteRequest[] = JSON.parse(raw);
+        const filtered = list.filter((q) => q.id !== id);
+        localStorage.setItem('ssi_quotes', JSON.stringify(filtered));
+      }
+    } catch (_) {}
+
     return apiFetch<{ success: boolean; id: string }>(`/quotes/${id}`, {
       method: 'DELETE'
     });

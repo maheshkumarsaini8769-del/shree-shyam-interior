@@ -37,13 +37,27 @@ export const AdminQuotes: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="font-serif text-2xl font-bold text-forest-950 dark:text-cream-50">
-          Quotation Requests & Material Estimates
-        </h2>
-        <p className="text-xs text-charcoal-500 dark:text-cream-200/70 mt-0.5">
-          Review customer inquiries generated from the live Quotation Cart
-        </p>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div>
+          <div className="flex items-center gap-2">
+            <h2 className="font-serif text-2xl font-bold text-forest-950 dark:text-cream-50">
+              Quotation Requests & Material Estimates
+            </h2>
+            <span className="px-2.5 py-0.5 rounded-full bg-copper-500/10 text-copper-600 dark:text-copper-400 font-mono text-xs font-bold">
+              {quotes.length}
+            </span>
+          </div>
+          <p className="text-xs text-charcoal-500 dark:text-cream-200/70 mt-0.5">
+            Review customer inquiries generated from the live Quotation Cart
+          </p>
+        </div>
+        <button
+          onClick={loadQuotes}
+          disabled={loading}
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white dark:bg-[#121720] border border-cream-200 dark:border-cream-200/10 hover:border-copper-500/50 text-xs font-semibold text-charcoal-700 dark:text-cream-100 shadow-soft transition-all active:scale-95 disabled:opacity-50"
+        >
+          <span>{loading ? 'Refreshing...' : 'Refresh Quotes'}</span>
+        </button>
       </div>
 
       {quotes.length === 0 ? (

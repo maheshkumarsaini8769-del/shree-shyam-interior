@@ -46,9 +46,10 @@ export default {
         }
       },
       fontFamily: {
-        serif: ['"Playfair Display"', 'Georgia', 'serif'],
+        serif: ['"Outfit"', '"Plus Jakarta Sans"', 'sans-serif'],
         sans: ['"Plus Jakarta Sans"', 'Inter', 'sans-serif'],
-        script: ['"Caveat"', '"Playfair Display"', 'cursive'],
+        heading: ['"Outfit"', '"Plus Jakarta Sans"', 'sans-serif'],
+        script: ['"Caveat"', '"Outfit"', 'cursive'],
       },
       boxShadow: {
         'soft': '0 4px 20px -2px rgba(11, 15, 21, 0.08), 0 2px 6px -1px rgba(11, 15, 21, 0.04)',

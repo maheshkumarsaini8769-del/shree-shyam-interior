@@ -1,141 +1,166 @@
 import fs from 'fs/promises';
 import path from 'path';
+import os from 'os';
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const DATA_DIR = path.join(__dirname, 'data');
+// On Vercel serverless, __dirname is in a read-only filesystem (/var/task).
+// Only /tmp is writable.
+const IS_VERCEL = !!process.env.VERCEL;
+const BUNDLED_DATA_DIR = path.join(__dirname, 'data');
 const SRC_DATA_DIR = path.join(__dirname, '..', 'src', 'data');
-const UPLOADS_DIR = path.join(__dirname, '..', 'uploads');
+const WRITABLE_DATA_DIR = IS_VERCEL ? path.join(os.tmpdir(), 'ssi_data') : BUNDLED_DATA_DIR;
+const UPLOADS_DIR = IS_VERCEL ? path.join(os.tmpdir(), 'ssi_uploads') : path.join(__dirname, '..', 'uploads');
 
-// Ensure directories exist
-export async function initDb() {
-  await fs.mkdir(DATA_DIR, { recursive: true });
-  await fs.mkdir(UPLOADS_DIR, { recursive: true });
+// Fast in-memory cache to guarantee instant availability across function lifetime
+const memoryStore = new Map();
 
-  const files = [
-    'products.json',
-    'categories.json',
-    'brands.json',
-    'projects.json',
-    'testimonials.json'
-  ];
-
-  for (const file of files) {
-    const dest = path.join(DATA_DIR, file);
-    try {
-      await fs.access(dest);
-    } catch {
-      // Copy from src/data if exists
-      const src = path.join(SRC_DATA_DIR, file);
-      try {
-        const content = await fs.readFile(src, 'utf-8');
-        await fs.writeFile(dest, content, 'utf-8');
-      } catch (err) {
-        await fs.writeFile(dest, JSON.stringify([], null, 2), 'utf-8');
-      }
-    }
-  }
-
-  // Ensure siteContent.json exists
-  const siteContentFile = path.join(DATA_DIR, 'siteContent.json');
+// Helper to safely write to disk without throwing 500 crashes
+async function safeWriteFile(filePath, content) {
   try {
-    await fs.access(siteContentFile);
-  } catch {
-    const defaultSiteContent = {
-      hero: {
-        badge: "Sikar's Premier Interior Architecture Studio",
-        titlePrefix: "Crafting Timeless Luxury Spaces with",
-        titleHighlight: "Master Craftsmanship",
-        subtitle: "Rajasthan's trusted turnkey interior atelier. Sourcing 100% genuine CenturyPly, Hettich, Häfele, and Asian Paints with itemized transparent pricing.",
-        primaryCtaText: "Book Free Site Visit",
-        primaryCtaLink: "/site-visit",
-        secondaryCtaText: "Explore 3D Studio",
-        secondaryCtaLink: "/design-ai",
-        backgroundImage: "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=1920&q=80"
-      },
-      stats: [
-        { label: "Projects Completed", value: "500+", subtext: "Across Sikar, Jaipur & Shekhawati" },
-        { label: "Years of Craftsmanship", value: "15+", subtext: "Since 2009 in Rajasthan" },
-        { label: "Partner Brands", value: "100%", subtext: "Certified German & Indian Makers" },
-        { label: "Client Satisfaction", value: "4.9★", subtext: "From 320+ verified home owners" }
-      ],
-      siteVisitBanner: {
-        title: "Book a Free In-Person Site Visit in Sikar & Jaipur",
-        description: "Our principal consultant visits your site with physical material catalogues, laser meters, and turnkey cost estimators—100% free with zero obligation.",
-        consultantName: "Er. Rajesh Sharma",
-        consultantTitle: "Principal Interior Architect & Estimator",
-        consultantPhoto: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80",
-        checkpoints: [
-          "Laser room dimension mapping & structural check",
-          "Genuine plywood & laminate swatches presented on site",
-          "Instant turnkey budget quotation in 24 hours",
-          "Dedicated 3D space visualizer consultation"
-        ]
-      },
-      showroom: {
-        name: "Shree Shyam Interior Experience Center",
-        address: "Piprali Road, Near Railway Overbridge, Sikar, Rajasthan - 332001",
-        phone: "+91 98765 43210",
-        whatsapp: "+91 98765 43210",
-        email: "contact@shreeshyaminterior.com",
-        timings: "Monday - Sunday: 9:30 AM to 8:30 PM",
-        mapCoordinates: "27.6094, 75.1398",
-        image: "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=1200&q=80"
-      }
-    };
-    await fs.writeFile(siteContentFile, JSON.stringify(defaultSiteContent, null, 2), 'utf-8');
-  }
-
-  // Ensure leads.json exists
-  const leadsFile = path.join(DATA_DIR, 'leads.json');
-  try {
-    await fs.access(leadsFile);
-  } catch {
-    await fs.writeFile(leadsFile, JSON.stringify([], null, 2), 'utf-8');
-  }
-
-  // Ensure quotes.json exists
-  const quotesFile = path.join(DATA_DIR, 'quotes.json');
-  try {
-    await fs.access(quotesFile);
-  } catch {
-    await fs.writeFile(quotesFile, JSON.stringify([], null, 2), 'utf-8');
-  }
-
-  // Ensure settings.json exists
-  const settingsFile = path.join(DATA_DIR, 'settings.json');
-  try {
-    await fs.access(settingsFile);
-  } catch {
-    const defaultSettings = {
-      adminEmail: 'maheshkumarsaini8769@gmail.com',
-      adminUsername: 'maheshkumarsaini8769@gmail.com',
-      adminPassword: 'mahesh99830',
-      businessName: 'Shree Shyam Interior',
-      gstNumber: '08AAAAA0000A1Z5',
-      primaryPhone: '+91 98765 43210',
-      whatsappNumber: '+91 98765 43210',
-      email: 'maheshkumarsaini8769@gmail.com',
-      address: 'Piprali Road, Sikar, Rajasthan - 332001'
-    };
-    await fs.writeFile(settingsFile, JSON.stringify(defaultSettings, null, 2), 'utf-8');
+    const dir = path.dirname(filePath);
+    await fs.mkdir(dir, { recursive: true });
+    await fs.writeFile(filePath, content, 'utf-8');
+    return true;
+  } catch (err) {
+    console.warn(`[SafeWrite] Could not write to ${filePath} (using in-memory store):`, err.message);
+    return false;
   }
 }
 
+// Ensure directories and initial data exist
+let initPromise = null;
+
+export async function initDb() {
+  if (initPromise) return initPromise;
+
+  initPromise = (async () => {
+    try {
+      await fs.mkdir(WRITABLE_DATA_DIR, { recursive: true });
+    } catch (_) {}
+    try {
+      await fs.mkdir(UPLOADS_DIR, { recursive: true });
+    } catch (_) {}
+
+    const files = [
+      'products.json',
+      'categories.json',
+      'brands.json',
+      'projects.json',
+      'testimonials.json',
+      'leads.json',
+      'quotes.json',
+      'settings.json',
+      'siteContent.json',
+      'brandingSeo.json',
+      'configurator.json'
+    ];
+
+    for (const file of files) {
+      // 1. Try reading from writable directory
+      const writablePath = path.join(WRITABLE_DATA_DIR, file);
+      try {
+        const content = await fs.readFile(writablePath, 'utf-8');
+        memoryStore.set(file, JSON.parse(content));
+        continue;
+      } catch (_) {}
+
+      // 2. Try reading from bundled server/data
+      const bundledPath = path.join(BUNDLED_DATA_DIR, file);
+      try {
+        const content = await fs.readFile(bundledPath, 'utf-8');
+        const parsed = JSON.parse(content);
+        memoryStore.set(file, parsed);
+        if (IS_VERCEL) {
+          await safeWriteFile(writablePath, content);
+        }
+        continue;
+      } catch (_) {}
+
+      // 3. Try reading from src/data
+      const srcPath = path.join(SRC_DATA_DIR, file);
+      try {
+        const content = await fs.readFile(srcPath, 'utf-8');
+        const parsed = JSON.parse(content);
+        memoryStore.set(file, parsed);
+        if (IS_VERCEL) {
+          await safeWriteFile(writablePath, content);
+        }
+        continue;
+      } catch (_) {}
+
+      // 4. Defaults for quotes and leads if missing
+      if (file === 'leads.json' || file === 'quotes.json') {
+        memoryStore.set(file, []);
+        await safeWriteFile(writablePath, '[]');
+      }
+    }
+  })();
+
+  return initPromise;
+}
+
+// Auto-run initDb
+initDb().catch(console.error);
+
 export async function readData(fileName) {
-  const filePath = path.join(DATA_DIR, fileName);
+  // 1. Check in-memory store first
+  if (memoryStore.has(fileName)) {
+    return memoryStore.get(fileName);
+  }
+
+  // 2. Try writable path
+  const writablePath = path.join(WRITABLE_DATA_DIR, fileName);
   try {
-    const content = await fs.readFile(filePath, 'utf-8');
-    return JSON.parse(content);
+    const content = await fs.readFile(writablePath, 'utf-8');
+    const parsed = JSON.parse(content);
+    memoryStore.set(fileName, parsed);
+    return parsed;
+  } catch (_) {}
+
+  // 3. Try bundled path
+  const bundledPath = path.join(BUNDLED_DATA_DIR, fileName);
+  try {
+    const content = await fs.readFile(bundledPath, 'utf-8');
+    const parsed = JSON.parse(content);
+    memoryStore.set(fileName, parsed);
+    return parsed;
+  } catch (_) {}
+
+  // 4. Try src/data path
+  const srcPath = path.join(SRC_DATA_DIR, fileName);
+  try {
+    const content = await fs.readFile(srcPath, 'utf-8');
+    const parsed = JSON.parse(content);
+    memoryStore.set(fileName, parsed);
+    return parsed;
   } catch (err) {
-    console.error(`Error reading ${fileName}:`, err);
+    if (fileName === 'leads.json' || fileName === 'quotes.json') {
+      memoryStore.set(fileName, []);
+      return [];
+    }
+    console.error(`Error reading ${fileName}:`, err.message);
     return null;
   }
 }
 
 export async function writeData(fileName, data) {
-  const filePath = path.join(DATA_DIR, fileName);
-  await fs.writeFile(filePath, JSON.stringify(data, null, 2), 'utf-8');
+  // Always update in-memory store immediately
+  memoryStore.set(fileName, data);
+
+  const jsonString = JSON.stringify(data, null, 2);
+
+  // Write to writable location (/tmp/ssi_data on Vercel)
+  const writablePath = path.join(WRITABLE_DATA_DIR, fileName);
+  await safeWriteFile(writablePath, jsonString);
+
+  // If running locally, also save to server/data
+  if (!IS_VERCEL) {
+    const localPath = path.join(BUNDLED_DATA_DIR, fileName);
+    if (localPath !== writablePath) {
+      await safeWriteFile(localPath, jsonString);
+    }
+  }
 }
