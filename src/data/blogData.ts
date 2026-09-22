@@ -54,7 +54,7 @@ export const blogPosts: BlogPost[] = [
       role: 'Principal Interior Architect',
       avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80'
     },
-    image: 'https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=1200&q=85',
+    image: 'https://images.unsplash.com/photo-1600585152220-90363fe7e115?auto=format&fit=crop&w=1200&q=85',
     tags: ['Modular Kitchen Sikar', 'German Hardware', 'Kitchen Trends', 'Quartz Countertops'],
     seoTitle: 'Modular Kitchen Design Trends in Sikar (2026) | Shree Shyam Interior',
     seoDescription: 'Discover the top 7 modular kitchen design trends in Sikar for 2026: anti-scratch acrylics, German soft-close hardware, quartz countertops & ergonomic pantry units.',

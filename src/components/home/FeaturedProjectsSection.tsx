@@ -1,20 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import { onImageErrorWithFallback } from '../../utils/imageFallback';
+import { apiService, Project } from '../../services/apiService';
 
 export const FeaturedProjectsSection: React.FC = () => {
   const [activeFilter, setActiveFilter] = useState<'All' | 'Home' | 'Office' | 'Commercial' | 'Renovation'>('All');
 
-  const filters: ('All' | 'Home' | 'Office' | 'Commercial' | 'Renovation')[] = [
-    'All',
-    'Home',
-    'Office',
-    'Commercial',
-    'Renovation'
-  ];
-
-  const displayProjects = [
+  const defaultProjects = [
     {
       title: 'Modern Living Room',
       location: 'Jaipur',
@@ -28,8 +21,8 @@ export const FeaturedProjectsSection: React.FC = () => {
       location: 'Sikar',
       category: 'Home',
       slug: 'contemporary-modular-kitchen-sikar',
-      image: 'https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=800&q=80',
-      fallback: 'https://images.unsplash.com/photo-1507089947368-19c1da9775ae?auto=format&fit=crop&w=800&q=80'
+      image: 'https://images.unsplash.com/photo-1600585152220-90363fe7e115?auto=format&fit=crop&w=800&q=80',
+      fallback: 'https://images.unsplash.com/photo-1600489000022-c2086d79f9d4?auto=format&fit=crop&w=800&q=80'
     },
     {
       title: 'Office Interior',
@@ -39,6 +32,32 @@ export const FeaturedProjectsSection: React.FC = () => {
       image: 'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80',
       fallback: 'https://images.unsplash.com/photo-1497215728101-856f4ea42174?auto=format&fit=crop&w=800&q=80'
     }
+  ];
+
+  const [displayProjects, setDisplayProjects] = useState(defaultProjects);
+
+  useEffect(() => {
+    apiService.getProjects().then((data) => {
+      if (Array.isArray(data) && data.length > 0) {
+        const mapped = data.map((p) => ({
+          title: p.title,
+          location: p.location,
+          category: p.category,
+          slug: p.slug,
+          image: p.coverImage || p.afterImage || (p as any).heroImage || 'https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=800&q=80',
+          fallback: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80'
+        }));
+        setDisplayProjects(mapped);
+      }
+    }).catch(() => {});
+  }, []);
+
+  const filters: ('All' | 'Home' | 'Office' | 'Commercial' | 'Renovation')[] = [
+    'All',
+    'Home',
+    'Office',
+    'Commercial',
+    'Renovation'
   ];
 
   const filtered = displayProjects.filter((p) => {

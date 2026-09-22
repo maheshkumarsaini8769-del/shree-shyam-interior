@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { MapPin, ArrowRight, Sparkles, Maximize2 } from 'lucide-react';
 import projectsData from '../data/projects.json';
@@ -6,17 +6,27 @@ import { Project } from '../types/project';
 import { ImageViewer } from '../components/common/ImageViewer';
 import { onImageErrorWithFallback } from '../utils/imageFallback';
 import { SEOHead } from '../components/common/SEOHead';
+import { apiService } from '../services/apiService';
 
 export const ProjectsPage: React.FC = () => {
   const [activeCategory, setActiveCategory] = useState<'All' | 'Home' | 'Office' | 'Commercial' | 'Renovation'>('All');
   const [lightboxImages, setLightboxImages] = useState<{ images: string[]; title: string } | null>(null);
+  const [projects, setProjects] = useState<Project[]>(projectsData as unknown as Project[]);
+
+  useEffect(() => {
+    apiService.getProjects().then((data) => {
+      if (Array.isArray(data) && data.length > 0) {
+        setProjects(data as unknown as Project[]);
+      }
+    }).catch(() => {});
+  }, []);
 
   const categories = ['All', 'Home', 'Office', 'Commercial', 'Renovation'] as const;
 
-  const filtered = projectsData.filter((p) => {
+  const filtered = projects.filter((p) => {
     if (activeCategory === 'All') return true;
     return p.category === activeCategory;
-  }) as Project[];
+  });
 
   return (
     <div className="pt-24 pb-28 min-h-screen bg-cream-50 text-charcoal-800">

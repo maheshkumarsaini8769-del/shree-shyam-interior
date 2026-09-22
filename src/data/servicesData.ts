@@ -117,7 +117,7 @@ export const servicesData: Record<string, ServiceData> = {
     badge: 'German Hardware • 100% Waterproof',
     tagline: 'Engineered for Heavy Indian Cooking — Effortless Maintenance & Ergonomics',
     overview: 'The kitchen is the spiritual heart of an Indian home. Shree Shyam Interior designs and manufactures heavy-duty, moisture-proof modular kitchens in Sikar tailored for Indian culinary demands. We combine 100% boiling waterproof IS:710 marine plywood carcasses with ultra-gloss anti-fingerprint acrylic or PU shutters, German Häfele and Hettich soft-close drawer runners, quartz stone counters, and seamless spice carousels that stay flawless for decades.',
-    heroImage: 'https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=1600&q=85',
+    heroImage: 'https://images.unsplash.com/photo-1600585152220-90363fe7e115?auto=format&fit=crop&w=1600&q=85',
     startingPrice: '₹1.85 Lakhs',
     priceUnit: 'complete setup onwards',
     estimatedTimeline: '21 to 30 Days',
@@ -149,9 +149,10 @@ export const servicesData: Record<string, ServiceData> = {
       { title: 'Custom Island & Parallel Layouts', desc: 'Whether you need a compact L-shape, U-shape, or an expansive island kitchen with breakfast bar.' }
     ],
     gallery: [
-      { url: 'https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=1200&q=80', alt: 'Modern luxury charcoal and white modular kitchen in Sikar with quartz counter', caption: 'L-Shaped Modern Acrylic Kitchen, Sikar' },
-      { url: 'https://images.unsplash.com/photo-1600585154526-990dced4db0d?auto=format&fit=crop&w=1200&q=80', alt: 'Island modular kitchen with warm LED under-cabinet strip lighting Sikar', caption: 'Contemporary Island Kitchen with Breakfast Counter' },
-      { url: 'https://images.unsplash.com/photo-1507089947368-19c1da9775ae?auto=format&fit=crop&w=1200&q=80', alt: 'Parallel layout modular kitchen with Häfele soft-close pullouts in Sikar', caption: 'Ergonomic Parallel Layout with Tall Pantry' }
+      { url: 'https://images.unsplash.com/photo-1600585152220-90363fe7e115?auto=format&fit=crop&w=1200&q=85', alt: 'Ultra-luxury modern modular kitchen with waterfall quartz island in Sikar', caption: 'Waterfall Quartz Island & Handleless Acrylics' },
+      { url: 'https://images.unsplash.com/photo-1600489000022-c2086d79f9d4?auto=format&fit=crop&w=1200&q=85', alt: 'German ergonomic modular kitchen with built-in appliances in Sikar home', caption: 'German Precision Modular Setup & Ambient Lights' },
+      { url: 'https://images.unsplash.com/photo-1600565193348-f74bd3c7ccdf?auto=format&fit=crop&w=1200&q=85', alt: 'Parallel layout modular kitchen with breakfast counter and Häfele hardware in Sikar', caption: 'Parallel Layout with Fluted Breakfast Bar' },
+      { url: 'https://images.unsplash.com/photo-1600566752355-35792bedcfea?auto=format&fit=crop&w=1200&q=85', alt: 'Charcoal matte acrylic modular kitchen with under-cabinet profile lighting Sikar', caption: 'Charcoal Matte Finish with Concealed Gola Profiles' }
     ],
     faqs: [
       { question: 'What is the starting price of a modular kitchen in Sikar?', answer: 'A compact premium modular kitchen in Sikar starts at ₹1.85 Lakhs. Medium to large luxury kitchens with high-gloss acrylic shutters, quartz countertops, and German soft-close drawers typically cost between ₹3.5 Lakhs and ₹6.5 Lakhs.' },

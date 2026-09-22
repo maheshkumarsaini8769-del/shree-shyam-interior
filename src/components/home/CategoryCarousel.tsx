@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import { onImageErrorWithFallback } from '../../utils/imageFallback';
+import { apiService } from '../../services/apiService';
 
 interface CategoryItem {
   id: string;
@@ -71,6 +72,23 @@ const primaryCategories: CategoryItem[] = [
 ];
 
 export const CategoryCarousel: React.FC = () => {
+  const [categories, setCategories] = useState<CategoryItem[]>(primaryCategories);
+
+  useEffect(() => {
+    apiService.getCategories().then((data) => {
+      if (Array.isArray(data) && data.length > 0) {
+        const mapped = data.map((c: any) => ({
+          id: c.id || c.slug,
+          name: c.name,
+          slug: c.slug || c.id,
+          image: c.image || 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=600&q=80',
+          fallback: 'https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=600&q=80'
+        }));
+        setCategories(mapped);
+      }
+    }).catch(() => {});
+  }, []);
+
   return (
     <section className="py-12 sm:py-16 bg-cream-100 dark:bg-forest-950 transition-colors">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -99,7 +117,7 @@ export const CategoryCarousel: React.FC = () => {
           className="flex lg:grid lg:grid-cols-8 gap-3 sm:gap-4 overflow-x-auto pb-4 scrollbar-none -mx-4 px-4 sm:mx-0 sm:px-0"
           style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
         >
-          {primaryCategories.map((cat) => (
+          {categories.slice(0, 8).map((cat) => (
             <Link
               key={cat.id}
               to={`/products?category=${cat.slug}`}

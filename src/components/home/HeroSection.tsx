@@ -66,14 +66,15 @@ export const HeroSection: React.FC = () => {
       {/* Main Content Area */}
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
         <div className="max-w-xl sm:max-w-2xl">
-          {/* Top Label */}
+          {/* Top Luxury Pill Badge */}
           <motion.div
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.15 }}
-            className="text-xs font-bold tracking-[0.25em] text-cream-200/90 uppercase mb-4"
+            className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-forest-900/80 border border-copper-500/30 text-copper-300 text-[11px] font-semibold tracking-[0.18em] uppercase backdrop-blur-md mb-5"
           >
-            {heroData.badge}
+            <span className="w-1.5 h-1.5 rounded-full bg-copper-400 animate-pulse" />
+            <span>{heroData.badge}</span>
           </motion.div>
 
           {/* Main Editorial Headline */}
@@ -84,7 +85,7 @@ export const HeroSection: React.FC = () => {
             className="font-serif text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight leading-[1.12] text-cream-50"
           >
             {heroData.titlePrefix} <br />
-            <span className="text-[#C68A43] italic font-normal">{heroData.titleHighlight}</span>
+            <span className="text-copper-400 italic font-normal">{heroData.titleHighlight}</span>
           </motion.h1>
 
           {/* Subtitle Description */}
@@ -106,7 +107,7 @@ export const HeroSection: React.FC = () => {
           >
             <Link
               to={heroData.primaryCtaLink}
-              className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full bg-[#B57731] hover:bg-[#9E6526] text-white font-semibold text-sm tracking-wide shadow-glow-copper transition-all hover:scale-105 active:scale-95 group"
+              className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full bg-gradient-to-r from-copper-500 to-copper-600 hover:from-copper-600 hover:to-copper-700 text-white font-semibold text-xs tracking-wider uppercase shadow-glow-copper transition-all hover:scale-[1.02] active:scale-95 group"
             >
               <span>{heroData.primaryCtaText}</span>
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -115,7 +116,7 @@ export const HeroSection: React.FC = () => {
             {heroData.secondaryCtaText && (
               <Link
                 to={heroData.secondaryCtaLink}
-                className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full bg-white/10 hover:bg-white/20 text-cream-100 font-semibold text-sm tracking-wide backdrop-blur-md transition-all hover:scale-105 active:scale-95"
+                className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full bg-cream-100/10 hover:bg-cream-100/15 border border-cream-100/20 text-cream-100 font-semibold text-xs tracking-wider uppercase backdrop-blur-md transition-all hover:scale-[1.02] active:scale-95"
               >
                 <span>{heroData.secondaryCtaText}</span>
               </Link>
