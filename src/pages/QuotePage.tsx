@@ -16,6 +16,7 @@ import { useQuote } from '../context/QuoteContext';
 import { generateWhatsAppQuoteUrl } from '../services/quoteService';
 import { useToast } from '../context/ToastContext';
 import { SEOHead } from '../components/common/SEOHead';
+import { apiService } from '../services/apiService';
 
 export const QuotePage: React.FC = () => {
   const { items, removeItem, updateQuantity, clearQuote, subtotal, gstAmount, grandTotal } = useQuote();
@@ -31,11 +32,25 @@ export const QuotePage: React.FC = () => {
     showToast('Print dialog triggered for quotation sheet', 'info');
   };
 
-  const handleSendWhatsApp = () => {
+  const handleSendWhatsApp = async () => {
     if (items.length === 0) {
       showToast('Quotation list is empty', 'error');
       return;
     }
+
+    // Save quote to backend API so it appears in the admin panel
+    try {
+      await apiService.submitQuote({
+        customerName: customerName || 'Anonymous',
+        phone: customerPhone || '',
+        city: siteCity,
+        items: items,
+        totalAmount: grandTotal,
+      });
+    } catch (_) {
+      // Non-blocking — WhatsApp still opens even if API fails
+    }
+
     const url = generateWhatsAppQuoteUrl(items, customerName, customerPhone);
     window.open(url, '_blank');
     setIsSent(true);

@@ -3,6 +3,7 @@ import { ArrowRight, CheckSquare, X, CheckCircle2 } from 'lucide-react';
 import { saveSiteVisit } from '../../services/bookingService';
 import { SiteVisitRequest } from '../../types/quote';
 import { useToast } from '../../context/ToastContext';
+import { apiService } from '../../services/apiService';
 
 export const SiteVisitSection: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -21,11 +22,27 @@ export const SiteVisitSection: React.FC = () => {
   const [confirmedBooking, setConfirmedBooking] = useState<SiteVisitRequest | null>(null);
   const { showToast } = useToast();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.fullName.trim() || !formData.phone.trim()) {
       showToast('Please enter your Name and Mobile Number', 'error');
       return;
+    }
+
+    // Save lead to backend API so it appears in the admin panel
+    try {
+      await apiService.submitLead({
+        name: formData.fullName,
+        phone: formData.phone,
+        email: formData.email,
+        address: `${formData.address}${formData.city ? ', ' + formData.city : ''}`,
+        date: formData.preferredDate,
+        slot: formData.preferredTime,
+        roomType: formData.propertyType,
+        notes: `Area: ${formData.approxArea} sq ft. ${formData.additionalNotes}`.trim(),
+      });
+    } catch (_) {
+      // Non-blocking — local confirmation still proceeds
     }
 
     const saved = saveSiteVisit(formData);

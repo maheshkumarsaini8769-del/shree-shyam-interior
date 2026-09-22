@@ -5,6 +5,7 @@ import { SiteVisitRequest } from '../types/quote';
 import { useToast } from '../context/ToastContext';
 import { Link } from 'react-router-dom';
 import { SEOHead } from '../components/common/SEOHead';
+import { apiService } from '../services/apiService';
 
 export const SiteVisitPage: React.FC = () => {
   const { showToast } = useToast();
@@ -23,11 +24,27 @@ export const SiteVisitPage: React.FC = () => {
 
   const [bookingConfirmed, setBookingConfirmed] = useState<SiteVisitRequest | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.fullName.trim() || !formData.phone.trim()) {
       showToast('Please enter your name and contact phone number', 'error');
       return;
+    }
+
+    // Save lead to backend API so it appears in the admin panel
+    try {
+      await apiService.submitLead({
+        name: formData.fullName,
+        phone: formData.phone,
+        email: formData.email,
+        address: `${formData.address}${formData.city ? ', ' + formData.city : ''}`,
+        date: formData.preferredDate,
+        slot: formData.preferredTime,
+        roomType: formData.propertyType,
+        notes: `Area: ${formData.approxArea} sq ft. ${formData.additionalNotes}`.trim(),
+      });
+    } catch (_) {
+      // Non-blocking — WhatsApp + local confirmation still proceed
     }
 
     const newBooking = saveSiteVisit(formData);
