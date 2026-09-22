@@ -37,9 +37,11 @@ export const AdminLogin: React.FC = () => {
       <div className="max-w-md w-full bg-[#121720] border border-copper-500/30 rounded-3xl p-8 sm:p-10 shadow-2xl relative z-10">
         {/* Logo & Header */}
         <div className="text-center mb-8">
-          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-copper-500 to-copper-600 flex items-center justify-center mx-auto mb-4 shadow-glow-copper">
-            <span className="font-serif font-bold text-2xl text-white">SS</span>
-          </div>
+          <img
+            src="/logo.jpg"
+            alt="Shree Shyam Interior Logo"
+            className="w-16 h-16 rounded-2xl object-cover border border-copper-500/40 shadow-glow-copper mx-auto mb-4"
+          />
           <span className="text-xs font-bold uppercase tracking-widest text-copper-400">
             Shree Shyam Interior
           </span>

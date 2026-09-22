@@ -242,11 +242,11 @@ export interface BrandingSEOData {
 
 const fallbackBrandingSEO: BrandingSEOData = {
   logo: {
-    type: 'text',
+    type: 'both',
     text: 'Shree Shyam',
     tagline: 'INTERIOR',
-    imageUrl: '',
-    faviconUrl: '/vite.svg'
+    imageUrl: '/logo.jpg',
+    faviconUrl: '/logo.jpg'
   },
   announcement: {
     enabled: true,

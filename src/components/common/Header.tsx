@@ -98,50 +98,26 @@ export const Header: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between py-3">
           {/* Left: Brand Logo & Tagline */}
           <Link to="/" className="flex items-center gap-2.5 sm:gap-3 group shrink-0">
-            {branding?.logo?.imageUrl && (branding.logo.type === 'image' || branding.logo.type === 'both') ? (
-              <img
-                src={branding.logo.imageUrl}
-                alt={branding.logo.text || 'Shree Shyam Interior'}
-                className="h-9 sm:h-10 w-auto max-w-[150px] object-contain"
-              />
-            ) : (
-              <div className="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center shrink-0">
-                <svg viewBox="0 0 100 100" className="w-full h-full drop-shadow-sm">
-                  <path
-                    d="M10 52 L50 18 L90 52"
-                    fill="none"
-                    stroke="#C68A43"
-                    strokeWidth="10"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                  <path
-                    d="M24 45 L24 82 L76 82 L76 45"
-                    fill="none"
-                    stroke="#1B2026"
-                    className="dark:stroke-cream-100"
-                    strokeWidth="9"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                  <path d="M42 82 L42 54 L58 54 L58 82" fill="#C68A43" />
-                </svg>
-              </div>
-            )}
+            <img
+              src={branding?.logo?.imageUrl || '/logo.jpg'}
+              alt={branding?.logo?.text || 'Shree Shyam Interior'}
+              className="h-10 w-10 sm:h-11 sm:w-11 rounded-xl object-cover border border-copper-500/30 shadow-soft group-hover:border-copper-500/70 transition-all shrink-0"
+              onError={(e) => {
+                e.currentTarget.src = '/logo.jpg';
+              }}
+            />
 
-            {(!branding?.logo?.type || branding.logo.type === 'text' || branding.logo.type === 'both') && (
-              <div className="flex flex-col">
-                <span className="font-serif font-black text-forest-950 dark:text-cream-50 text-base sm:text-lg tracking-tight leading-none uppercase">
-                  {branding?.logo?.text || 'SHREE SHYAM'}{' '}
-                  <span className="text-xs font-sans font-extrabold tracking-widest text-copper-600 dark:text-copper-400">
-                    {branding?.logo?.tagline || 'INTERIOR'}
-                  </span>
+            <div className="flex flex-col">
+              <span className="font-serif font-black text-forest-950 dark:text-cream-50 text-base sm:text-lg tracking-tight leading-none uppercase group-hover:text-copper-600 dark:group-hover:text-copper-400 transition-colors">
+                {branding?.logo?.text || 'SHREE SHYAM'}{' '}
+                <span className="text-xs font-sans font-extrabold tracking-widest text-copper-600 dark:text-copper-400">
+                  {branding?.logo?.tagline || 'INTERIOR'}
                 </span>
-                <span className="text-[10px] font-sans text-charcoal-500 dark:text-cream-300/80 font-medium tracking-normal mt-0.5">
-                  Crafting Homes, From the Heart!
-                </span>
-              </div>
-            )}
+              </span>
+              <span className="text-[10px] font-sans text-charcoal-500 dark:text-cream-300/80 font-medium tracking-normal mt-0.5">
+                घर सजाते हैं, दिल से !
+              </span>
+            </div>
           </Link>
 
 

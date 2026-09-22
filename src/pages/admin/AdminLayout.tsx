@@ -64,9 +64,11 @@ export const AdminLayout: React.FC = () => {
         {/* Brand Header */}
         <div className="p-5 border-b border-cream-200 dark:border-cream-200/10 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-copper-500 to-copper-600 flex items-center justify-center text-white font-serif font-bold text-lg shadow-glow-copper">
-              SS
-            </div>
+            <img
+              src="/logo.jpg"
+              alt="Shree Shyam Interior Logo"
+              className="w-10 h-10 rounded-xl object-cover border border-copper-500/40 shadow-soft shrink-0"
+            />
             <div>
               <h2 className="font-serif font-bold text-base text-forest-950 dark:text-cream-50 tracking-tight leading-tight">
                 Shree Shyam

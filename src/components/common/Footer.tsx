@@ -51,18 +51,15 @@ export const Footer: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 py-12">
           {/* Brand & Mission */}
           <div className="lg:col-span-2 space-y-4">
-            <div className="flex items-center gap-2.5">
-              {branding?.logo?.imageUrl ? (
-                <img
-                  src={branding.logo.imageUrl}
-                  alt={branding.logo.text || 'Shree Shyam'}
-                  className="h-10 w-auto max-w-[140px] object-contain rounded-lg"
-                />
-              ) : (
-                <div className="w-10 h-10 rounded-xl bg-forest-900 border border-copper-500/40 flex items-center justify-center">
-                  <span className="text-copper-400 font-serif font-bold text-xl">SS</span>
-                </div>
-              )}
+            <div className="flex items-center gap-3">
+              <img
+                src={branding?.logo?.imageUrl || '/logo.jpg'}
+                alt={branding?.logo?.text || 'Shree Shyam'}
+                className="h-11 w-11 rounded-2xl object-cover border border-copper-500/40 shadow-soft shrink-0"
+                onError={(e) => {
+                  e.currentTarget.src = '/logo.jpg';
+                }}
+              />
               <div>
                 <span className="font-serif font-bold text-cream-50 text-xl tracking-tight block uppercase">
                   {branding?.logo?.text || 'SHREE SHYAM'}{' '}
