@@ -1,5 +1,7 @@
 import React from 'react';
 import { MessageSquare, Phone, MapPin } from 'lucide-react';
+import { apiService } from '../../services/apiService';
+
 
 export const FloatingActions: React.FC = () => {
   return (
@@ -38,6 +40,15 @@ export const FloatingActions: React.FC = () => {
         href="https://wa.me/919876543210?text=Hello%20Shree%20Shyam%20Interior,%20I%20would%20like%20to%20consult%20for%20my%20interior%20project."
         target="_blank"
         rel="noopener noreferrer"
+        onClick={() => {
+          apiService.submitWhatsAppOrder({
+            customerName: 'Quick WhatsApp Visitor',
+            phone: '+91 98765 43210 (Clicked Chat)',
+            orderType: 'General Chat',
+            message: 'Initiated WhatsApp consultation from website floating action button',
+            status: 'New'
+          }).catch(() => {});
+        }}
         aria-label="Chat on WhatsApp"
         className="pointer-events-auto flex items-center gap-2 p-3.5 rounded-full bg-[#25D366] text-white shadow-elevated hover:brightness-105 hover:scale-105 active:scale-95 transition-all group"
       >

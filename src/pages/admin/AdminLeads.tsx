@@ -76,10 +76,10 @@ export const AdminLeads: React.FC = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h2 className="font-serif text-2xl font-bold text-forest-950 dark:text-cream-50">
-            Site Visits & Inquiries CRM
+            Bookings (Site Visits) CRM
           </h2>
           <p className="text-xs text-charcoal-500 dark:text-cream-200/70 mt-0.5">
-            Real-time pipeline of consultation & site visit requests submitted by potential clients
+            Real-time pipeline of measurement & site consultation bookings submitted by clients
           </p>
         </div>
 
@@ -220,6 +220,14 @@ export const AdminLeads: React.FC = () => {
                 </select>
 
                 <div className="flex items-center gap-2">
+                  <a
+                    href={`tel:${lead.phone}`}
+                    className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-copper-500/10 text-copper-600 hover:bg-copper-500 hover:text-white text-xs font-bold transition-colors shadow-sm"
+                    title="Call Client"
+                  >
+                    <Phone className="w-3.5 h-3.5" />
+                  </a>
+
                   <a
                     href={`https://wa.me/91${lead.phone.replace(/[^0-9]/g, '')}?text=Namaste%20${encodeURIComponent(lead.name)},%20this%20is%20Shree%20Shyam%20Interior%20team%20regarding%20your%20site%20visit%20request.`}
                     target="_blank"

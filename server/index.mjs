@@ -415,6 +415,21 @@ app.post('/api/quotes', async (req, res) => {
   }
 });
 
+app.patch('/api/quotes/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const quotes = (await readData('quotes.json')) || [];
+    const idx = quotes.findIndex((q) => q.id === id);
+    if (idx === -1) return res.status(404).json({ error: 'Quote not found' });
+
+    quotes[idx] = { ...quotes[idx], ...req.body };
+    await writeData('quotes.json', quotes);
+    res.json(quotes[idx]);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 app.delete('/api/quotes/:id', async (req, res) => {
   try {
     const { id } = req.params;
@@ -426,6 +441,73 @@ app.delete('/api/quotes/:id', async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+
+// -------------------------------------------------------------
+// WhatsApp Orders & Inquiries
+// -------------------------------------------------------------
+app.get('/api/whatsapp-orders', async (req, res) => {
+  try {
+    const orders = (await readData('whatsappOrders.json')) || [];
+    res.json(orders);
+  } catch (err) {
+    console.error('Error fetching whatsapp orders:', err);
+    res.json([]);
+  }
+});
+
+app.post('/api/whatsapp-orders', async (req, res) => {
+  try {
+    const orders = (await readData('whatsappOrders.json')) || [];
+    const newOrder = {
+      id: req.body?.id || `WA-${Date.now()}`,
+      status: req.body?.status || 'New',
+      orderType: req.body?.orderType || 'Quotation Order',
+      createdAt: req.body?.createdAt || new Date().toISOString(),
+      ...req.body
+    };
+    orders.unshift(newOrder);
+    await writeData('whatsappOrders.json', orders);
+    res.status(201).json(newOrder);
+  } catch (err) {
+    console.error('Error creating whatsapp order:', err);
+    const fallback = {
+      id: req.body?.id || `WA-${Date.now()}`,
+      status: 'New',
+      orderType: 'Quotation Order',
+      createdAt: new Date().toISOString(),
+      ...req.body
+    };
+    res.status(201).json(fallback);
+  }
+});
+
+app.patch('/api/whatsapp-orders/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const orders = (await readData('whatsappOrders.json')) || [];
+    const idx = orders.findIndex((o) => o.id === id);
+    if (idx === -1) return res.status(404).json({ error: 'WhatsApp order not found' });
+
+    orders[idx] = { ...orders[idx], ...req.body };
+    await writeData('whatsappOrders.json', orders);
+    res.json(orders[idx]);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.delete('/api/whatsapp-orders/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    let orders = (await readData('whatsappOrders.json')) || [];
+    orders = orders.filter((o) => o.id !== id);
+    await writeData('whatsappOrders.json', orders);
+    res.json({ success: true, id });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 
 // -------------------------------------------------------------
 // Business Settings

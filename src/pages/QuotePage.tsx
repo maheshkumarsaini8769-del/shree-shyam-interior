@@ -26,6 +26,7 @@ export const QuotePage: React.FC = () => {
   const [customerPhone, setCustomerPhone] = useState('');
   const [siteCity, setSiteCity] = useState('Sikar');
   const [isSent, setIsSent] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
   const handlePrint = () => {
     window.print();
@@ -38,24 +39,67 @@ export const QuotePage: React.FC = () => {
       return;
     }
 
-    // Save quote to backend API so it appears in the admin panel
+    // Save to BOTH Material Quotes AND WhatsApp Orders in admin panel with cloud sync
     try {
-      await apiService.submitQuote({
-        customerName: customerName || 'Anonymous',
-        phone: customerPhone || '',
-        city: siteCity,
-        items: items,
-        totalAmount: grandTotal,
-      });
+      await Promise.all([
+        apiService.submitQuote({
+          customerName: customerName || 'WhatsApp Client',
+          phone: customerPhone || '',
+          city: siteCity,
+          items: items,
+          totalAmount: grandTotal,
+          status: 'New'
+        }),
+        apiService.submitWhatsAppOrder({
+          customerName: customerName || 'WhatsApp Client',
+          phone: customerPhone || '',
+          city: siteCity,
+          orderType: 'Quotation Order',
+          items: items,
+          totalAmount: grandTotal,
+          message: `Quotation requested with ${items.length} items. Total: ₹${grandTotal.toLocaleString('en-IN')}`,
+          status: 'New'
+        })
+      ]);
     } catch (_) {
-      // Non-blocking — WhatsApp still opens even if API fails
+      // Non-blocking
     }
 
     const url = generateWhatsAppQuoteUrl(items, customerName, customerPhone);
     window.open(url, '_blank');
     setIsSent(true);
-    showToast('Quotation sent to Shree Shyam Interior desk via WhatsApp!', 'success');
+    showToast('Quotation dispatched to Shree Shyam Interior WhatsApp desk!', 'success');
   };
+
+  const handleSubmitDirectQuote = async () => {
+    if (items.length === 0) {
+      showToast('Quotation list is empty', 'error');
+      return;
+    }
+    if (!customerPhone.trim()) {
+      showToast('Please enter your contact phone number', 'error');
+      return;
+    }
+
+    try {
+      setSubmitting(true);
+      await apiService.submitQuote({
+        customerName: customerName || 'Valued Customer',
+        phone: customerPhone,
+        city: siteCity,
+        items: items,
+        totalAmount: grandTotal,
+        status: 'New'
+      });
+      setIsSent(true);
+      showToast('Quotation request submitted to studio desk! Check admin panel.', 'success');
+    } catch (_) {
+      showToast('Failed to submit quote, please retry', 'error');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
 
   return (
     <div className="pt-24 pb-28 min-h-screen bg-cream-50 text-charcoal-800">
@@ -269,19 +313,34 @@ export const QuotePage: React.FC = () => {
                   </div>
                 </div>
 
+                {isSent && (
+                  <div className="p-3 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-xs flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-400" />
+                    <span>Quote recorded successfully! Our team will contact you.</span>
+                  </div>
+                )}
+
                 {/* Primary Actions */}
-                <div className="pt-2 space-y-3 print:hidden">
+                <div className="pt-2 space-y-2.5 print:hidden">
                   <button
                     onClick={handleSendWhatsApp}
-                    className="w-full py-3.5 rounded-xl bg-[#25D366] hover:bg-[#20ba59] text-white font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-elevated transition-all active:scale-95"
+                    className="w-full py-3.5 rounded-xl bg-[#25D366] hover:bg-[#20ba59] text-white font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-elevated transition-all active:scale-95 cursor-pointer"
                   >
                     <MessageSquare className="w-4 h-4 fill-current" />
                     <span>Send Quote to WhatsApp Desk</span>
                   </button>
 
+                  <button
+                    onClick={handleSubmitDirectQuote}
+                    disabled={submitting}
+                    className="w-full py-3 rounded-xl bg-copper-500 hover:bg-copper-600 text-white font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-glow-copper transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
+                  >
+                    <span>{submitting ? 'Submitting...' : 'Submit Quote to Studio Desk'}</span>
+                  </button>
+
                   <Link
                     to="/site-visit"
-                    className="w-full py-3 rounded-xl bg-copper-500 hover:bg-copper-600 text-white font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-glow-copper transition-all"
+                    className="w-full py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-cream-100 font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition-all border border-cream-200/20"
                   >
                     <span>Book Site Visit for Measurement</span>
                   </Link>

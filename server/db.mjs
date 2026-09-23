@@ -30,6 +30,45 @@ async function safeWriteFile(filePath, content) {
   }
 }
 
+// Cloud store object ID for cross-instance and cross-device persistence
+const CLOUD_SYNC_URL = 'https://api.restful-api.dev/objects/ff808181a09d98f701a0c9c936407072';
+
+async function fetchCloudStore() {
+  try {
+    const res = await fetch(CLOUD_SYNC_URL, {
+      signal: AbortSignal.timeout(2800)
+    });
+    if (res.ok) {
+      const json = await res.json();
+      return json?.data || null;
+    }
+  } catch (err) {
+    // Non-blocking fallback to local memory
+  }
+  return null;
+}
+
+async function updateCloudStore(key, data) {
+  try {
+    const current = (await fetchCloudStore()) || {};
+    const payload = {
+      name: 'shree-shyam-interior-store',
+      data: {
+        ...current,
+        [key]: data
+      }
+    };
+    await fetch(CLOUD_SYNC_URL, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+      signal: AbortSignal.timeout(3500)
+    });
+  } catch (err) {
+    // Non-blocking
+  }
+}
+
 // Ensure directories and initial data exist
 let initPromise = null;
 
@@ -52,13 +91,24 @@ export async function initDb() {
       'testimonials.json',
       'leads.json',
       'quotes.json',
+      'whatsappOrders.json',
       'settings.json',
       'siteContent.json',
       'brandingSeo.json',
       'configurator.json'
     ];
 
+    // Seed cloud data if present
+    const cloudData = await fetchCloudStore();
+    if (cloudData) {
+      if (Array.isArray(cloudData.leads)) memoryStore.set('leads.json', cloudData.leads);
+      if (Array.isArray(cloudData.quotes)) memoryStore.set('quotes.json', cloudData.quotes);
+      if (Array.isArray(cloudData.whatsappOrders)) memoryStore.set('whatsappOrders.json', cloudData.whatsappOrders);
+    }
+
     for (const file of files) {
+      if (memoryStore.has(file)) continue;
+
       // 1. Try reading from writable directory
       const writablePath = path.join(WRITABLE_DATA_DIR, file);
       try {
@@ -91,8 +141,8 @@ export async function initDb() {
         continue;
       } catch (_) {}
 
-      // 4. Defaults for quotes and leads if missing
-      if (file === 'leads.json' || file === 'quotes.json') {
+      // 4. Defaults for quotes, leads and whatsappOrders if missing
+      if (file === 'leads.json' || file === 'quotes.json' || file === 'whatsappOrders.json') {
         memoryStore.set(file, []);
         await safeWriteFile(writablePath, '[]');
       }
@@ -106,7 +156,17 @@ export async function initDb() {
 initDb().catch(console.error);
 
 export async function readData(fileName) {
-  // 1. Check in-memory store first
+  // For leads, quotes, and whatsappOrders, sync with cloud store for multi-container consistency
+  if (fileName === 'leads.json' || fileName === 'quotes.json' || fileName === 'whatsappOrders.json') {
+    const cloudData = await fetchCloudStore();
+    const cloudKey = fileName === 'leads.json' ? 'leads' : (fileName === 'quotes.json' ? 'quotes' : 'whatsappOrders');
+    if (cloudData && Array.isArray(cloudData[cloudKey])) {
+      memoryStore.set(fileName, cloudData[cloudKey]);
+      return cloudData[cloudKey];
+    }
+  }
+
+  // 1. Check in-memory store
   if (memoryStore.has(fileName)) {
     return memoryStore.get(fileName);
   }
@@ -137,7 +197,7 @@ export async function readData(fileName) {
     memoryStore.set(fileName, parsed);
     return parsed;
   } catch (err) {
-    if (fileName === 'leads.json' || fileName === 'quotes.json') {
+    if (fileName === 'leads.json' || fileName === 'quotes.json' || fileName === 'whatsappOrders.json') {
       memoryStore.set(fileName, []);
       return [];
     }
@@ -163,4 +223,14 @@ export async function writeData(fileName, data) {
       await safeWriteFile(localPath, jsonString);
     }
   }
+
+  // Sync dynamic leads, quotes, and whatsappOrders with cloud store asynchronously
+  if (fileName === 'leads.json') {
+    updateCloudStore('leads', data).catch(() => {});
+  } else if (fileName === 'quotes.json') {
+    updateCloudStore('quotes', data).catch(() => {});
+  } else if (fileName === 'whatsappOrders.json') {
+    updateCloudStore('whatsappOrders', data).catch(() => {});
+  }
 }
+

@@ -115,9 +115,25 @@ export interface QuoteRequest {
   city?: string;
   items: any[];
   totalAmount: number;
+  status?: 'New' | 'Contacted' | 'Quotation Shared' | 'Converted' | 'Cancelled';
   notes?: string;
   createdAt: string;
 }
+
+export interface WhatsAppOrder {
+  id: string;
+  customerName: string;
+  phone: string;
+  orderType: 'Quotation Order' | 'Product Inquiry' | 'Site Consultation' | 'General Chat' | 'Custom Order';
+  items?: any[];
+  totalAmount?: number;
+  city?: string;
+  message?: string;
+  status: 'New' | 'Contacted' | 'In Discussion' | 'Order Confirmed' | 'Completed' | 'Cancelled';
+  createdAt: string;
+  notes?: string;
+}
+
 
 export interface BusinessSettings {
   businessName: string;
@@ -615,35 +631,59 @@ export const apiService = {
     });
   },
 
-  // Leads
+  // -------------------------------------------------------------
+  // Dynamic Leads, Quotes & WhatsApp Orders with Cloud Persistence
+  // -------------------------------------------------------------
   async getLeads(): Promise<Lead[]> {
-    let apiLeads: Lead[] = [];
-    try {
-      apiLeads = await apiFetch<Lead[]>('/leads');
-      if (!Array.isArray(apiLeads)) apiLeads = [];
-    } catch {
-      apiLeads = [];
-    }
+    const map = new Map<string, Lead>();
 
+    // 1. Fetch from server API
+    try {
+      const apiLeads = await apiFetch<Lead[]>('/leads');
+      if (Array.isArray(apiLeads)) {
+        apiLeads.forEach((l) => map.set(l.id, l));
+      }
+    } catch (_) {}
+
+    // 2. Fallback / Sync from Cloud Store
+    try {
+      const cloudRes = await fetch('https://api.restful-api.dev/objects/ff808181a09d98f701a0c9c936407072', {
+        signal: AbortSignal.timeout(2800)
+      });
+      if (cloudRes.ok) {
+        const json = await cloudRes.json();
+        const cloudLeads = json?.data?.leads;
+        if (Array.isArray(cloudLeads)) {
+          cloudLeads.forEach((l: Lead) => {
+            if (!map.has(l.id)) map.set(l.id, l);
+          });
+        }
+      }
+    } catch (_) {}
+
+    // 3. Fallback from browser localStorage
     try {
       const raw = localStorage.getItem('ssi_site_visits');
       if (raw) {
         const localLeads: Lead[] = JSON.parse(raw);
-        const map = new Map<string, Lead>();
-        apiLeads.forEach((l) => map.set(l.id, l));
-        (Array.isArray(localLeads) ? localLeads : []).forEach((l) => {
-          if (!map.has(l.id)) {
-            map.set(l.id, l);
-          }
-        });
-        return Array.from(map.values()).sort(
-          (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-        );
+        if (Array.isArray(localLeads)) {
+          localLeads.forEach((l) => {
+            if (!map.has(l.id)) map.set(l.id, l);
+          });
+        }
       }
-    } catch (e) {
-      console.warn('Error reading local site visits:', e);
-    }
-    return apiLeads;
+    } catch (_) {}
+
+    const list = Array.from(map.values()).sort(
+      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
+
+    // Keep localStorage updated with merged list
+    try {
+      localStorage.setItem('ssi_site_visits', JSON.stringify(list));
+    } catch (_) {}
+
+    return list;
   },
 
   async submitLead(lead: Omit<Lead, 'id' | 'status' | 'createdAt'>): Promise<Lead> {
@@ -654,26 +694,46 @@ export const apiService = {
       createdAt: new Date().toISOString()
     };
 
-    // Immediately persist to localStorage
+    // 1. Immediately persist to localStorage
     try {
       const raw = localStorage.getItem('ssi_site_visits');
       const list: Lead[] = raw ? JSON.parse(raw) : [];
       localStorage.setItem('ssi_site_visits', JSON.stringify([newLead, ...list]));
-    } catch (e) {
-      console.warn('Failed to save lead to localStorage', e);
-    }
+    } catch (_) {}
 
-    // Persist to server API
+    // 2. Persist to server API
     try {
-      const saved = await apiFetch<Lead>('/leads', {
+      await apiFetch<Lead>('/leads', {
         method: 'POST',
         body: JSON.stringify(newLead)
       });
-      return saved || newLead;
-    } catch (e) {
-      console.warn('API submitLead failed, fallback stored locally', e);
-      return newLead;
-    }
+    } catch (_) {}
+
+    // 3. Direct Cloud Store backup for zero-data-loss cross-device sync
+    try {
+      const cloudRes = await fetch('https://api.restful-api.dev/objects/ff808181a09d98f701a0c9c936407072');
+      let currentData: any = {};
+      if (cloudRes.ok) {
+        const json = await cloudRes.json();
+        currentData = json?.data || {};
+      }
+      const existingLeads = Array.isArray(currentData.leads) ? currentData.leads : [];
+      const updatedLeads = [newLead, ...existingLeads.filter((l: any) => l.id !== newLead.id)];
+      await fetch('https://api.restful-api.dev/objects/ff808181a09d98f701a0c9c936407072', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: 'shree-shyam-interior-store',
+          data: {
+            ...currentData,
+            leads: updatedLeads
+          }
+        }),
+        signal: AbortSignal.timeout(3500)
+      });
+    } catch (_) {}
+
+    return newLead;
   },
 
   async updateLeadStatus(id: string, updates: Partial<Lead>): Promise<Lead> {
@@ -685,6 +745,24 @@ export const apiService = {
         if (idx !== -1) {
           list[idx] = { ...list[idx], ...updates };
           localStorage.setItem('ssi_site_visits', JSON.stringify(list));
+        }
+      }
+    } catch (_) {}
+
+    // Cloud store update
+    try {
+      const cloudRes = await fetch('https://api.restful-api.dev/objects/ff808181a09d98f701a0c9c936407072');
+      if (cloudRes.ok) {
+        const json = await cloudRes.json();
+        const data = json?.data || {};
+        if (Array.isArray(data.leads)) {
+          data.leads = data.leads.map((l: any) => (l.id === id ? { ...l, ...updates } : l));
+          await fetch('https://api.restful-api.dev/objects/ff808181a09d98f701a0c9c936407072', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name: 'shree-shyam-interior-store', data }),
+            signal: AbortSignal.timeout(3500)
+          });
         }
       }
     } catch (_) {}
@@ -705,69 +783,167 @@ export const apiService = {
       }
     } catch (_) {}
 
+    // Cloud store deletion
+    try {
+      const cloudRes = await fetch('https://api.restful-api.dev/objects/ff808181a09d98f701a0c9c936407072');
+      if (cloudRes.ok) {
+        const json = await cloudRes.json();
+        const data = json?.data || {};
+        if (Array.isArray(data.leads)) {
+          data.leads = data.leads.filter((l: any) => l.id !== id);
+          await fetch('https://api.restful-api.dev/objects/ff808181a09d98f701a0c9c936407072', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name: 'shree-shyam-interior-store', data }),
+            signal: AbortSignal.timeout(3500)
+          });
+        }
+      }
+    } catch (_) {}
+
     return apiFetch<{ success: boolean; id: string }>(`/leads/${id}`, {
       method: 'DELETE'
     });
   },
 
-  // Quotes
+  // -------------------------------------------------------------
+  // Quotes (Material Estimations)
+  // -------------------------------------------------------------
   async getQuotes(): Promise<QuoteRequest[]> {
-    let apiQuotes: QuoteRequest[] = [];
-    try {
-      apiQuotes = await apiFetch<QuoteRequest[]>('/quotes');
-      if (!Array.isArray(apiQuotes)) apiQuotes = [];
-    } catch {
-      apiQuotes = [];
-    }
+    const map = new Map<string, QuoteRequest>();
 
+    // 1. Fetch from server API
+    try {
+      const apiQuotes = await apiFetch<QuoteRequest[]>('/quotes');
+      if (Array.isArray(apiQuotes)) {
+        apiQuotes.forEach((q) => map.set(q.id, q));
+      }
+    } catch (_) {}
+
+    // 2. Fetch from Cloud Store
+    try {
+      const cloudRes = await fetch('https://api.restful-api.dev/objects/ff808181a09d98f701a0c9c936407072', {
+        signal: AbortSignal.timeout(2800)
+      });
+      if (cloudRes.ok) {
+        const json = await cloudRes.json();
+        const cloudQuotes = json?.data?.quotes;
+        if (Array.isArray(cloudQuotes)) {
+          cloudQuotes.forEach((q: QuoteRequest) => {
+            if (!map.has(q.id)) map.set(q.id, q);
+          });
+        }
+      }
+    } catch (_) {}
+
+    // 3. Fallback from browser localStorage
     try {
       const raw = localStorage.getItem('ssi_quotes');
       if (raw) {
         const localQuotes: QuoteRequest[] = JSON.parse(raw);
-        const map = new Map<string, QuoteRequest>();
-        apiQuotes.forEach((q) => map.set(q.id, q));
-        (Array.isArray(localQuotes) ? localQuotes : []).forEach((q) => {
-          if (!map.has(q.id)) {
-            map.set(q.id, q);
-          }
-        });
-        return Array.from(map.values()).sort(
-          (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-        );
+        if (Array.isArray(localQuotes)) {
+          localQuotes.forEach((q) => {
+            if (!map.has(q.id)) map.set(q.id, q);
+          });
+        }
       }
-    } catch (e) {
-      console.warn('Error reading local quotes:', e);
-    }
-    return apiQuotes;
+    } catch (_) {}
+
+    const list = Array.from(map.values()).sort(
+      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
+
+    try {
+      localStorage.setItem('ssi_quotes', JSON.stringify(list));
+    } catch (_) {}
+
+    return list;
   },
 
   async submitQuote(quote: Omit<QuoteRequest, 'id' | 'createdAt'>): Promise<QuoteRequest> {
     const newQuote: QuoteRequest = {
       ...quote,
       id: `QUOTE-${Date.now()}`,
+      status: quote.status || 'New',
       createdAt: new Date().toISOString()
     };
 
-    // Immediately persist to localStorage
+    // 1. Immediately persist to localStorage
     try {
       const raw = localStorage.getItem('ssi_quotes');
       const list: QuoteRequest[] = raw ? JSON.parse(raw) : [];
       localStorage.setItem('ssi_quotes', JSON.stringify([newQuote, ...list]));
-    } catch (e) {
-      console.warn('Failed to save quote to localStorage', e);
-    }
+    } catch (_) {}
 
-    // Persist to server API
+    // 2. Persist to server API
     try {
-      const saved = await apiFetch<QuoteRequest>('/quotes', {
+      await apiFetch<QuoteRequest>('/quotes', {
         method: 'POST',
         body: JSON.stringify(newQuote)
       });
-      return saved || newQuote;
-    } catch (e) {
-      console.warn('API submitQuote failed, fallback stored locally', e);
-      return newQuote;
-    }
+    } catch (_) {}
+
+    // 3. Direct Cloud Store backup
+    try {
+      const cloudRes = await fetch('https://api.restful-api.dev/objects/ff808181a09d98f701a0c9c936407072');
+      let currentData: any = {};
+      if (cloudRes.ok) {
+        const json = await cloudRes.json();
+        currentData = json?.data || {};
+      }
+      const existingQuotes = Array.isArray(currentData.quotes) ? currentData.quotes : [];
+      const updatedQuotes = [newQuote, ...existingQuotes.filter((q: any) => q.id !== newQuote.id)];
+      await fetch('https://api.restful-api.dev/objects/ff808181a09d98f701a0c9c936407072', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: 'shree-shyam-interior-store',
+          data: {
+            ...currentData,
+            quotes: updatedQuotes
+          }
+        }),
+        signal: AbortSignal.timeout(3500)
+      });
+    } catch (_) {}
+
+    return newQuote;
+  },
+
+  async updateQuoteStatus(id: string, updates: Partial<QuoteRequest>): Promise<QuoteRequest> {
+    try {
+      const raw = localStorage.getItem('ssi_quotes');
+      if (raw) {
+        const list: QuoteRequest[] = JSON.parse(raw);
+        const idx = list.findIndex((q) => q.id === id);
+        if (idx !== -1) {
+          list[idx] = { ...list[idx], ...updates };
+          localStorage.setItem('ssi_quotes', JSON.stringify(list));
+        }
+      }
+    } catch (_) {}
+
+    try {
+      const cloudRes = await fetch('https://api.restful-api.dev/objects/ff808181a09d98f701a0c9c936407072');
+      if (cloudRes.ok) {
+        const json = await cloudRes.json();
+        const data = json?.data || {};
+        if (Array.isArray(data.quotes)) {
+          data.quotes = data.quotes.map((q: any) => (q.id === id ? { ...q, ...updates } : q));
+          await fetch('https://api.restful-api.dev/objects/ff808181a09d98f701a0c9c936407072', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name: 'shree-shyam-interior-store', data }),
+            signal: AbortSignal.timeout(3500)
+          });
+        }
+      }
+    } catch (_) {}
+
+    return apiFetch<QuoteRequest>(`/quotes/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(updates)
+    });
   },
 
   async deleteQuote(id: string): Promise<{ success: boolean; id: string }> {
@@ -780,10 +956,200 @@ export const apiService = {
       }
     } catch (_) {}
 
+    try {
+      const cloudRes = await fetch('https://api.restful-api.dev/objects/ff808181a09d98f701a0c9c936407072');
+      if (cloudRes.ok) {
+        const json = await cloudRes.json();
+        const data = json?.data || {};
+        if (Array.isArray(data.quotes)) {
+          data.quotes = data.quotes.filter((q: any) => q.id !== id);
+          await fetch('https://api.restful-api.dev/objects/ff808181a09d98f701a0c9c936407072', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name: 'shree-shyam-interior-store', data }),
+            signal: AbortSignal.timeout(3500)
+          });
+        }
+      }
+    } catch (_) {}
+
     return apiFetch<{ success: boolean; id: string }>(`/quotes/${id}`, {
       method: 'DELETE'
     });
   },
+
+  // -------------------------------------------------------------
+  // WhatsApp Orders & Direct Inquiries
+  // -------------------------------------------------------------
+  async getWhatsAppOrders(): Promise<WhatsAppOrder[]> {
+    const map = new Map<string, WhatsAppOrder>();
+
+    // 1. Fetch from server API
+    try {
+      const apiOrders = await apiFetch<WhatsAppOrder[]>('/whatsapp-orders');
+      if (Array.isArray(apiOrders)) {
+        apiOrders.forEach((o) => map.set(o.id, o));
+      }
+    } catch (_) {}
+
+    // 2. Fetch from Cloud Store
+    try {
+      const cloudRes = await fetch('https://api.restful-api.dev/objects/ff808181a09d98f701a0c9c936407072', {
+        signal: AbortSignal.timeout(2800)
+      });
+      if (cloudRes.ok) {
+        const json = await cloudRes.json();
+        const cloudOrders = json?.data?.whatsappOrders;
+        if (Array.isArray(cloudOrders)) {
+          cloudOrders.forEach((o: WhatsAppOrder) => {
+            if (!map.has(o.id)) map.set(o.id, o);
+          });
+        }
+      }
+    } catch (_) {}
+
+    // 3. Fallback from browser localStorage
+    try {
+      const raw = localStorage.getItem('ssi_whatsapp_orders');
+      if (raw) {
+        const localOrders: WhatsAppOrder[] = JSON.parse(raw);
+        if (Array.isArray(localOrders)) {
+          localOrders.forEach((o) => {
+            if (!map.has(o.id)) map.set(o.id, o);
+          });
+        }
+      }
+    } catch (_) {}
+
+    const list = Array.from(map.values()).sort(
+      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
+
+    try {
+      localStorage.setItem('ssi_whatsapp_orders', JSON.stringify(list));
+    } catch (_) {}
+
+    return list;
+  },
+
+  async submitWhatsAppOrder(order: Omit<WhatsAppOrder, 'id' | 'createdAt'>): Promise<WhatsAppOrder> {
+    const newOrder: WhatsAppOrder = {
+      ...order,
+      id: `WA-${Date.now()}`,
+      status: order.status || 'New',
+      createdAt: new Date().toISOString()
+    };
+
+    // 1. Immediately persist to localStorage
+    try {
+      const raw = localStorage.getItem('ssi_whatsapp_orders');
+      const list: WhatsAppOrder[] = raw ? JSON.parse(raw) : [];
+      localStorage.setItem('ssi_whatsapp_orders', JSON.stringify([newOrder, ...list]));
+    } catch (_) {}
+
+    // 2. Persist to server API
+    try {
+      await apiFetch<WhatsAppOrder>('/whatsapp-orders', {
+        method: 'POST',
+        body: JSON.stringify(newOrder)
+      });
+    } catch (_) {}
+
+    // 3. Direct Cloud Store backup
+    try {
+      const cloudRes = await fetch('https://api.restful-api.dev/objects/ff808181a09d98f701a0c9c936407072');
+      let currentData: any = {};
+      if (cloudRes.ok) {
+        const json = await cloudRes.json();
+        currentData = json?.data || {};
+      }
+      const existing = Array.isArray(currentData.whatsappOrders) ? currentData.whatsappOrders : [];
+      const updated = [newOrder, ...existing.filter((o: any) => o.id !== newOrder.id)];
+      await fetch('https://api.restful-api.dev/objects/ff808181a09d98f701a0c9c936407072', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: 'shree-shyam-interior-store',
+          data: {
+            ...currentData,
+            whatsappOrders: updated
+          }
+        }),
+        signal: AbortSignal.timeout(3500)
+      });
+    } catch (_) {}
+
+    return newOrder;
+  },
+
+  async updateWhatsAppOrderStatus(id: string, updates: Partial<WhatsAppOrder>): Promise<WhatsAppOrder> {
+    try {
+      const raw = localStorage.getItem('ssi_whatsapp_orders');
+      if (raw) {
+        const list: WhatsAppOrder[] = JSON.parse(raw);
+        const idx = list.findIndex((o) => o.id === id);
+        if (idx !== -1) {
+          list[idx] = { ...list[idx], ...updates };
+          localStorage.setItem('ssi_whatsapp_orders', JSON.stringify(list));
+        }
+      }
+    } catch (_) {}
+
+    try {
+      const cloudRes = await fetch('https://api.restful-api.dev/objects/ff808181a09d98f701a0c9c936407072');
+      if (cloudRes.ok) {
+        const json = await cloudRes.json();
+        const data = json?.data || {};
+        if (Array.isArray(data.whatsappOrders)) {
+          data.whatsappOrders = data.whatsappOrders.map((o: any) => (o.id === id ? { ...o, ...updates } : o));
+          await fetch('https://api.restful-api.dev/objects/ff808181a09d98f701a0c9c936407072', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name: 'shree-shyam-interior-store', data }),
+            signal: AbortSignal.timeout(3500)
+          });
+        }
+      }
+    } catch (_) {}
+
+    return apiFetch<WhatsAppOrder>(`/whatsapp-orders/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(updates)
+    });
+  },
+
+  async deleteWhatsAppOrder(id: string): Promise<{ success: boolean; id: string }> {
+    try {
+      const raw = localStorage.getItem('ssi_whatsapp_orders');
+      if (raw) {
+        const list: WhatsAppOrder[] = JSON.parse(raw);
+        const filtered = list.filter((o) => o.id !== id);
+        localStorage.setItem('ssi_whatsapp_orders', JSON.stringify(filtered));
+      }
+    } catch (_) {}
+
+    try {
+      const cloudRes = await fetch('https://api.restful-api.dev/objects/ff808181a09d98f701a0c9c936407072');
+      if (cloudRes.ok) {
+        const json = await cloudRes.json();
+        const data = json?.data || {};
+        if (Array.isArray(data.whatsappOrders)) {
+          data.whatsappOrders = data.whatsappOrders.filter((o: any) => o.id !== id);
+          await fetch('https://api.restful-api.dev/objects/ff808181a09d98f701a0c9c936407072', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name: 'shree-shyam-interior-store', data }),
+            signal: AbortSignal.timeout(3500)
+          });
+        }
+      }
+    } catch (_) {}
+
+    return apiFetch<{ success: boolean; id: string }>(`/whatsapp-orders/${id}`, {
+      method: 'DELETE'
+    });
+  },
+
 
   // Settings
   async getSettings(): Promise<BusinessSettings> {

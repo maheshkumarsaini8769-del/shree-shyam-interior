@@ -8,6 +8,7 @@ import {
   Briefcase,
   FileEdit,
   MessageSquareQuote,
+  MessageSquare,
   CalendarCheck2,
   FileText,
   Settings,
@@ -43,6 +44,9 @@ export const AdminLayout: React.FC = () => {
 
   const navItems = [
     { label: 'Dashboard', path: '/admin', icon: LayoutDashboard, exact: true },
+    { label: 'Bookings (Site Visits)', path: '/admin/leads', icon: CalendarCheck2 },
+    { label: 'Material Quotes', path: '/admin/quotes', icon: FileText },
+    { label: 'WhatsApp Orders', path: '/admin/whatsapp-orders', icon: MessageSquare },
     { label: '3D Studio Finishes', path: '/admin/3d-studio', icon: Box },
     { label: 'Social Media Links', path: '/admin/social-links', icon: Share2 },
     { label: 'Logo, SEO & Banners', path: '/admin/seo-branding', icon: Sparkles },
@@ -52,10 +56,9 @@ export const AdminLayout: React.FC = () => {
     { label: 'Projects & Portfolio', path: '/admin/projects', icon: Briefcase },
     { label: 'Homepage Content CMS', path: '/admin/content', icon: FileEdit },
     { label: 'Client Testimonials', path: '/admin/testimonials', icon: MessageSquareQuote },
-    { label: 'Site Visits CRM', path: '/admin/leads', icon: CalendarCheck2 },
-    { label: 'Quotations Inquiries', path: '/admin/quotes', icon: FileText },
     { label: 'Business Settings', path: '/admin/settings', icon: Settings },
   ];
+
 
   return (
     <div className="min-h-screen bg-cream-50 dark:bg-[#0B0F15] text-charcoal-900 dark:text-cream-50 flex transition-colors duration-200">

@@ -63,10 +63,12 @@ const AdminContentCMS = lazyWithRetry(() => import('./pages/admin/AdminContentCM
 const AdminTestimonials = lazyWithRetry(() => import('./pages/admin/AdminTestimonials').then((m) => ({ default: m.AdminTestimonials })));
 const AdminLeads = lazyWithRetry(() => import('./pages/admin/AdminLeads').then((m) => ({ default: m.AdminLeads })));
 const AdminQuotes = lazyWithRetry(() => import('./pages/admin/AdminQuotes').then((m) => ({ default: m.AdminQuotes })));
+const AdminWhatsAppOrders = lazyWithRetry(() => import('./pages/admin/AdminWhatsAppOrders').then((m) => ({ default: m.AdminWhatsAppOrders })));
 const AdminSettings = lazyWithRetry(() => import('./pages/admin/AdminSettings').then((m) => ({ default: m.AdminSettings })));
 const Admin3DStudio = lazyWithRetry(() => import('./pages/admin/Admin3DStudio').then((m) => ({ default: m.Admin3DStudio })));
 const AdminBrandingSEO = lazyWithRetry(() => import('./pages/admin/AdminBrandingSEO').then((m) => ({ default: m.AdminBrandingSEO })));
 const AdminSocialLinks = lazyWithRetry(() => import('./pages/admin/AdminSocialLinks').then((m) => ({ default: m.AdminSocialLinks })));
+
 
 // Scroll to top helper on route transition with smooth hash anchor support
 const ScrollToTop: React.FC = () => {
@@ -166,6 +168,7 @@ const AppContent: React.FC = () => {
               <Route path="testimonials" element={<AdminTestimonials />} />
               <Route path="leads" element={<AdminLeads />} />
               <Route path="quotes" element={<AdminQuotes />} />
+              <Route path="whatsapp-orders" element={<AdminWhatsAppOrders />} />
               <Route path="settings" element={<AdminSettings />} />
             </Route>
           </Routes>
