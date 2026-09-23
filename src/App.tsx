@@ -51,6 +51,7 @@ const TermsConditionsPage = lazyWithRetry(() => import('./pages/TermsConditionsP
 const CancellationRefundPage = lazyWithRetry(() => import('./pages/CancellationRefundPage').then((m) => ({ default: m.CancellationRefundPage })));
 const ContactPage = lazyWithRetry(() => import('./pages/ContactPage').then((m) => ({ default: m.ContactPage })));
 const AboutPage = lazyWithRetry(() => import('./pages/AboutPage').then((m) => ({ default: m.AboutPage })));
+const ReviewsPage = lazyWithRetry(() => import('./pages/ReviewsPage').then((m) => ({ default: m.ReviewsPage })));
 const NotFoundPage = lazyWithRetry(() => import('./pages/NotFoundPage').then((m) => ({ default: m.NotFoundPage })));
 
 
@@ -200,6 +201,7 @@ const AppContent: React.FC = () => {
               <Route path="/blog/:slug" element={<BlogPostPage />} />
               <Route path="/about" element={<AboutPage />} />
               <Route path="/contact" element={<ContactPage />} />
+              <Route path="/reviews" element={<ReviewsPage />} />
               <Route path="/faq" element={<FAQPage />} />
               <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
               <Route path="/terms-and-conditions" element={<TermsConditionsPage />} />

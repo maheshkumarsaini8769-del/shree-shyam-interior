@@ -1,1 +1,16 @@
-[]
+[
+  {
+    "id": "QUOTE-TEST-DIRECT",
+    "customerName": "Kailash Saini Node Test",
+    "phone": "9602033445",
+    "city": "Sikar",
+    "totalAmount": 35000,
+    "items": [
+      {
+        "productName": "Century Plywood",
+        "quantity": 10,
+        "unitPrice": 3500
+      }
+    ]
+  }
+]

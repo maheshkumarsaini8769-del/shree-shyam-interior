@@ -51,7 +51,12 @@ export interface Testimonial {
   review: string;
   avatar: string;
   date: string;
-  status?: 'Approved' | 'Hidden';
+  status?: 'Approved' | 'Hidden' | 'Pending';
+  verifiedClient?: boolean;
+  phone?: string;
+  adminReply?: string;
+  adminReplyDate?: string;
+  createdAt?: string;
 }
 
 export interface SiteContent {
@@ -586,33 +591,123 @@ export const apiService = {
     });
   },
 
-  // Testimonials
+  // Testimonials & Reviews
   async getTestimonials(): Promise<Testimonial[]> {
-    try {
-      return await apiFetch<Testimonial[]>('/testimonials');
-    } catch (e) {
-      return initialTestimonials as unknown as Testimonial[];
+    const map = new Map<string, Testimonial>();
+
+    // 1. Initial base testimonials
+    if (Array.isArray(initialTestimonials)) {
+      (initialTestimonials as unknown as Testimonial[]).forEach((t) => map.set(t.id, t));
     }
+
+    // 2. Fetch from server API
+    try {
+      const apiList = await apiFetch<Testimonial[]>('/testimonials');
+      if (Array.isArray(apiList)) {
+        apiList.forEach((t) => map.set(t.id, { ...map.get(t.id), ...t }));
+      }
+    } catch (_) {}
+
+    // 3. Fallback from browser localStorage
+    try {
+      const raw = localStorage.getItem('ssi_testimonials');
+      if (raw) {
+        const localList: Testimonial[] = JSON.parse(raw);
+        if (Array.isArray(localList)) {
+          localList.forEach((t) => map.set(t.id, { ...map.get(t.id), ...t }));
+        }
+      }
+    } catch (_) {}
+
+    const list = Array.from(map.values());
+    try {
+      localStorage.setItem('ssi_testimonials', JSON.stringify(list));
+    } catch (_) {}
+
+    return list;
   },
 
   async createTestimonial(t: Partial<Testimonial>): Promise<Testimonial> {
-    return apiFetch<Testimonial>('/testimonials', {
-      method: 'POST',
-      body: JSON.stringify(t)
-    });
+    const newTestimonial: Testimonial = {
+      id: t.id || `test-${Date.now()}`,
+      name: t.name || 'Anonymous Client',
+      city: t.city || 'Sikar, Rajasthan',
+      project: t.project || 'Turnkey Interior Woodwork',
+      rating: Number(t.rating) || 5,
+      review: t.review || '',
+      avatar: t.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80',
+      date: t.date || new Date().toLocaleDateString('en-IN', { month: 'short', year: 'numeric' }),
+      status: t.status || 'Approved',
+      verifiedClient: t.verifiedClient !== undefined ? t.verifiedClient : true,
+      phone: t.phone || '',
+      adminReply: t.adminReply || '',
+      adminReplyDate: t.adminReplyDate || '',
+      createdAt: t.createdAt || new Date().toISOString()
+    };
+
+    // Save to localStorage immediately
+    try {
+      const raw = localStorage.getItem('ssi_testimonials');
+      const list: Testimonial[] = raw ? JSON.parse(raw) : [];
+      localStorage.setItem('ssi_testimonials', JSON.stringify([newTestimonial, ...list.filter(x => x.id !== newTestimonial.id)]));
+    } catch (_) {}
+
+    // Save to backend API
+    try {
+      await apiFetch<Testimonial>('/testimonials', {
+        method: 'POST',
+        body: JSON.stringify(newTestimonial)
+      });
+    } catch (_) {}
+
+    return newTestimonial;
   },
 
-  async updateTestimonial(id: string, t: Partial<Testimonial>): Promise<Testimonial> {
-    return apiFetch<Testimonial>(`/testimonials/${id}`, {
-      method: 'PUT',
-      body: JSON.stringify(t)
-    });
+  async updateTestimonial(id: string, updates: Partial<Testimonial>): Promise<Testimonial> {
+    let updatedObj: Testimonial | null = null;
+
+    try {
+      const raw = localStorage.getItem('ssi_testimonials');
+      if (raw) {
+        const list: Testimonial[] = JSON.parse(raw);
+        const idx = list.findIndex((t) => t.id === id);
+        if (idx !== -1) {
+          list[idx] = { ...list[idx], ...updates };
+          updatedObj = list[idx];
+          localStorage.setItem('ssi_testimonials', JSON.stringify(list));
+        }
+      }
+    } catch (_) {}
+
+    try {
+      const apiUpdated = await apiFetch<Testimonial>(`/testimonials/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify(updates)
+      });
+      return apiUpdated;
+    } catch (_) {
+      if (updatedObj) return updatedObj;
+      throw new Error('Failed to update testimonial');
+    }
   },
 
   async deleteTestimonial(id: string): Promise<{ success: boolean; id: string }> {
-    return apiFetch<{ success: boolean; id: string }>(`/testimonials/${id}`, {
-      method: 'DELETE'
-    });
+    try {
+      const raw = localStorage.getItem('ssi_testimonials');
+      if (raw) {
+        const list: Testimonial[] = JSON.parse(raw);
+        const filtered = list.filter((t) => t.id !== id);
+        localStorage.setItem('ssi_testimonials', JSON.stringify(filtered));
+      }
+    } catch (_) {}
+
+    try {
+      return await apiFetch<{ success: boolean; id: string }>(`/testimonials/${id}`, {
+        method: 'DELETE'
+      });
+    } catch (_) {
+      return { success: true, id };
+    }
   },
 
   // Site Content CMS

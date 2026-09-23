@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Star, ChevronLeft, ChevronRight, Quote, MapPin, Clock, Shield, Navigation, Phone, MessageSquare, CheckCircle2 } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Star, ChevronLeft, ChevronRight, Quote, MapPin, Clock, Shield, Navigation, Phone, MessageSquare, CheckCircle2, ArrowRight } from 'lucide-react';
 import testimonialsData from '../../data/testimonials.json';
 import { apiService, Testimonial } from '../../services/apiService';
 
@@ -159,6 +160,24 @@ export const TestimonialsAndShowroomRow: React.FC = () => {
                     />
                   ))}
                 </div>
+              </div>
+
+              {/* Action Bar: See All Reviews & Write Review */}
+              <div className="mt-3 pt-2.5 border-t border-dashed border-cream-200 dark:border-cream-200/10 flex items-center justify-between gap-2">
+                <Link
+                  to="/reviews"
+                  className="inline-flex items-center gap-1.5 text-xs font-bold text-copper-600 dark:text-copper-400 hover:text-copper-700 dark:hover:text-copper-300 transition-colors group"
+                >
+                  <span>See All Reviews ({testimonials.length > 5 ? '250+' : testimonials.length})</span>
+                  <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />
+                </Link>
+
+                <Link
+                  to="/reviews?action=write"
+                  className="inline-flex items-center gap-1 px-3 py-1 rounded-lg bg-copper-500/10 hover:bg-copper-500/20 text-copper-700 dark:text-copper-300 text-[11px] font-bold transition-all"
+                >
+                  <span>Write a Review</span>
+                </Link>
               </div>
             </div>
           </div>

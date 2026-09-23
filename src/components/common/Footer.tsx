@@ -193,6 +193,7 @@ export const Footer: React.FC = () => {
               Design & Resources
             </h4>
             <ul className="space-y-2 text-sm text-charcoal-300">
+              <li><Link to="/reviews" className="hover:text-cream-50 transition-colors flex items-center gap-1.5"><Sparkles className="w-3 h-3 text-copper-400" />Client Reviews & Ratings</Link></li>
               <li><Link to="/blog" className="hover:text-cream-50 transition-colors flex items-center gap-1.5"><Sparkles className="w-3 h-3 text-copper-400" />Design Ideas & Blog</Link></li>
               <li><Link to="/faq" className="hover:text-cream-50 transition-colors">Frequently Asked (FAQ)</Link></li>
               <li><Link to="/projects" className="hover:text-cream-50 transition-colors">Completed Projects</Link></li>

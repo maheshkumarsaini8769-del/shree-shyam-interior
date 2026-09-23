@@ -43,6 +43,7 @@ export const Header: React.FC = () => {
     { label: 'Services', path: '/services' },
     { label: 'Products', path: '/products' },
     { label: 'Projects', path: '/projects' },
+    { label: 'Reviews', path: '/reviews' },
     { label: 'Design AI', path: '/design-ai' },
     { label: 'Blog', path: '/blog' },
     { label: 'Contact', path: '/contact' },
