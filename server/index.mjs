@@ -342,14 +342,7 @@ app.post('/api/leads', async (req, res) => {
     res.status(201).json(newLead);
   } catch (err) {
     console.error('Error creating lead:', err);
-    // Fallback response with the created object so client is never blocked
-    const fallback = {
-      id: req.body?.id || `LEAD-${Date.now()}`,
-      status: 'New',
-      createdAt: new Date().toISOString(),
-      ...req.body
-    };
-    res.status(201).json(fallback);
+    res.status(500).json({ error: err.message, stack: err.stack });
   }
 });
 
@@ -406,12 +399,7 @@ app.post('/api/quotes', async (req, res) => {
     res.status(201).json(newQuote);
   } catch (err) {
     console.error('Error creating quote:', err);
-    const fallback = {
-      id: req.body?.id || `QUOTE-${Date.now()}`,
-      createdAt: new Date().toISOString(),
-      ...req.body
-    };
-    res.status(201).json(fallback);
+    res.status(500).json({ error: err.message, stack: err.stack });
   }
 });
 
@@ -470,14 +458,7 @@ app.post('/api/whatsapp-orders', async (req, res) => {
     res.status(201).json(newOrder);
   } catch (err) {
     console.error('Error creating whatsapp order:', err);
-    const fallback = {
-      id: req.body?.id || `WA-${Date.now()}`,
-      status: 'New',
-      orderType: 'Quotation Order',
-      createdAt: new Date().toISOString(),
-      ...req.body
-    };
-    res.status(201).json(fallback);
+    res.status(500).json({ error: err.message, stack: err.stack });
   }
 });
 
@@ -567,7 +548,45 @@ app.put('/api/branding-seo', async (req, res) => {
   res.json(updated);
 });
 
+// Diagnostic endpoint to test DB and Cloud Store connectivity
+app.get('/api/test-db', async (req, res) => {
+  try {
+    const testId = `LEAD-DIAG-${Date.now()}`;
+    const testLead = {
+      id: testId,
+      name: 'Diagnostic Lead',
+      phone: '9876543210',
+      status: 'New',
+      createdAt: new Date().toISOString()
+    };
+    const t0 = Date.now();
+    const leadsBefore = (await readData('leads.json')) || [];
+    const tRead = Date.now() - t0;
+
+    const t1 = Date.now();
+    await writeData('leads.json', [testLead, ...leadsBefore]);
+    const tWrite = Date.now() - t1;
+
+    const t2 = Date.now();
+    const leadsAfter = (await readData('leads.json')) || [];
+    const tReadAfter = Date.now() - t2;
+
+    res.json({
+      success: true,
+      tRead,
+      tWrite,
+      tReadAfter,
+      leadsBeforeCount: leadsBefore.length,
+      leadsAfterCount: leadsAfter.length,
+      found: leadsAfter.some((l) => l.id === testId)
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message, stack: err.stack });
+  }
+});
+
 // Ensure Database is initialized on all environments
+
 initDb().catch((err) => console.error('DB init warning:', err));
 
 // Start Server for local execution
