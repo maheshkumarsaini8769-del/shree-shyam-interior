@@ -224,13 +224,15 @@ export async function writeData(fileName, data) {
     }
   }
 
-  // Sync dynamic leads, quotes, and whatsappOrders with cloud store asynchronously
-  if (fileName === 'leads.json') {
-    updateCloudStore('leads', data).catch(() => {});
-  } else if (fileName === 'quotes.json') {
-    updateCloudStore('quotes', data).catch(() => {});
-  } else if (fileName === 'whatsappOrders.json') {
-    updateCloudStore('whatsappOrders', data).catch(() => {});
-  }
+  // Sync dynamic leads, quotes, and whatsappOrders with cloud store
+  try {
+    if (fileName === 'leads.json') {
+      await updateCloudStore('leads', data);
+    } else if (fileName === 'quotes.json') {
+      await updateCloudStore('quotes', data);
+    } else if (fileName === 'whatsappOrders.json') {
+      await updateCloudStore('whatsappOrders', data);
+    }
+  } catch (_) {}
 }
 
