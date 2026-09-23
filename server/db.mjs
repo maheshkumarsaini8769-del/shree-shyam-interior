@@ -68,6 +68,15 @@ function sanitizeLead(l) {
 
 function sanitizeQuote(q) {
   if (!q) return null;
+  const items = Array.isArray(q.items)
+    ? q.items.slice(0, 20).map((it) => ({
+        productName: it.productName || it.name || '',
+        brand: it.brand || '',
+        quantity: it.quantity || 1,
+        unitPrice: it.unitPrice || it.price || 0
+      }))
+    : (typeof q.itemsJson === 'string' ? JSON.parse(q.itemsJson || '[]') : []);
+
   return {
     id: q.id || `QUOTE-${Date.now()}`,
     customerName: q.customerName || '',
@@ -77,19 +86,20 @@ function sanitizeQuote(q) {
     totalAmount: Number(q.totalAmount) || 0,
     status: q.status || 'New',
     createdAt: q.createdAt || new Date().toISOString(),
-    items: Array.isArray(q.items)
-      ? q.items.slice(0, 20).map((it) => ({
-          productName: it.productName || it.name || '',
-          brand: it.brand || '',
-          quantity: it.quantity || 1,
-          unitPrice: it.unitPrice || it.price || 0
-        }))
-      : []
+    itemsJson: JSON.stringify(items)
   };
 }
 
 function sanitizeWaOrder(w) {
   if (!w) return null;
+  const items = Array.isArray(w.items)
+    ? w.items.slice(0, 10).map((it) => ({
+        productName: it.productName || it.name || '',
+        quantity: it.quantity || 1,
+        unitPrice: it.unitPrice || it.price || 0
+      }))
+    : (typeof w.itemsJson === 'string' ? JSON.parse(w.itemsJson || '[]') : []);
+
   return {
     id: w.id || `WA-${Date.now()}`,
     customerName: w.customerName || '',
@@ -99,9 +109,11 @@ function sanitizeWaOrder(w) {
     totalAmount: Number(w.totalAmount) || 0,
     message: typeof w.message === 'string' ? w.message.slice(0, 300) : '',
     status: w.status || 'New',
-    createdAt: w.createdAt || new Date().toISOString()
+    createdAt: w.createdAt || new Date().toISOString(),
+    itemsJson: JSON.stringify(items)
   };
 }
+
 
 async function updateCloudStore(key, data) {
   try {
@@ -231,8 +243,18 @@ export async function readData(fileName) {
     const cloudData = await fetchCloudStore();
     const cloudKey = fileName === 'leads.json' ? 'leads' : (fileName === 'quotes.json' ? 'quotes' : 'whatsappOrders');
     if (cloudData && Array.isArray(cloudData[cloudKey])) {
-      memoryStore.set(fileName, cloudData[cloudKey]);
-      return cloudData[cloudKey];
+      const items = cloudData[cloudKey].map((entry) => {
+        if (entry && !Array.isArray(entry.items) && typeof entry.itemsJson === 'string') {
+          try {
+            entry.items = JSON.parse(entry.itemsJson);
+          } catch (_) {
+            entry.items = [];
+          }
+        }
+        return entry;
+      });
+      memoryStore.set(fileName, items);
+      return items;
     }
   }
 

@@ -829,7 +829,14 @@ export const apiService = {
         const json = await cloudRes.json();
         const cloudQuotes = json?.data?.quotes;
         if (Array.isArray(cloudQuotes)) {
-          cloudQuotes.forEach((q: QuoteRequest) => {
+          cloudQuotes.forEach((q: any) => {
+            if (!Array.isArray(q.items) && typeof q.itemsJson === 'string') {
+              try {
+                q.items = JSON.parse(q.itemsJson);
+              } catch (_) {
+                q.items = [];
+              }
+            }
             if (!map.has(q.id)) map.set(q.id, q);
           });
         }
@@ -893,6 +900,18 @@ export const apiService = {
       }
       const existingQuotes = Array.isArray(currentData.quotes) ? currentData.quotes : [];
       const updatedQuotes = [newQuote, ...existingQuotes.filter((q: any) => q.id !== newQuote.id)];
+      const cleanQuotes = updatedQuotes.map((q: any) => ({
+        id: q.id,
+        customerName: q.customerName || '',
+        phone: q.phone || '',
+        email: q.email || '',
+        city: q.city || '',
+        totalAmount: Number(q.totalAmount) || 0,
+        status: q.status || 'New',
+        createdAt: q.createdAt,
+        itemsJson: typeof q.itemsJson === 'string' ? q.itemsJson : JSON.stringify(Array.isArray(q.items) ? q.items.slice(0, 20) : [])
+      }));
+
       await fetch('https://api.restful-api.dev/objects/ff808181a09d98f701a0c9c936407072', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
@@ -900,7 +919,7 @@ export const apiService = {
           name: 'shree-shyam-interior-store',
           data: {
             ...currentData,
-            quotes: updatedQuotes
+            quotes: cleanQuotes
           }
         }),
         signal: AbortSignal.timeout(5000)
@@ -1001,7 +1020,14 @@ export const apiService = {
         const json = await cloudRes.json();
         const cloudOrders = json?.data?.whatsappOrders;
         if (Array.isArray(cloudOrders)) {
-          cloudOrders.forEach((o: WhatsAppOrder) => {
+          cloudOrders.forEach((o: any) => {
+            if (!Array.isArray(o.items) && typeof o.itemsJson === 'string') {
+              try {
+                o.items = JSON.parse(o.itemsJson);
+              } catch (_) {
+                o.items = [];
+              }
+            }
             if (!map.has(o.id)) map.set(o.id, o);
           });
         }
@@ -1025,6 +1051,7 @@ export const apiService = {
       (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     );
 
+    // Keep localStorage updated with merged list
     try {
       localStorage.setItem('ssi_whatsapp_orders', JSON.stringify(list));
     } catch (_) {}
@@ -1065,6 +1092,19 @@ export const apiService = {
       }
       const existing = Array.isArray(currentData.whatsappOrders) ? currentData.whatsappOrders : [];
       const updated = [newOrder, ...existing.filter((o: any) => o.id !== newOrder.id)];
+      const cleanWa = updated.map((w: any) => ({
+        id: w.id,
+        customerName: w.customerName || '',
+        phone: w.phone || '',
+        orderType: w.orderType || 'Quotation Order',
+        city: w.city || '',
+        totalAmount: Number(w.totalAmount) || 0,
+        message: typeof w.message === 'string' ? w.message.slice(0, 300) : '',
+        status: w.status || 'New',
+        createdAt: w.createdAt,
+        itemsJson: typeof w.itemsJson === 'string' ? w.itemsJson : JSON.stringify(Array.isArray(w.items) ? w.items.slice(0, 10) : [])
+      }));
+
       await fetch('https://api.restful-api.dev/objects/ff808181a09d98f701a0c9c936407072', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
@@ -1072,7 +1112,7 @@ export const apiService = {
           name: 'shree-shyam-interior-store',
           data: {
             ...currentData,
-            whatsappOrders: updated
+            whatsappOrders: cleanWa
           }
         }),
         signal: AbortSignal.timeout(5000)
