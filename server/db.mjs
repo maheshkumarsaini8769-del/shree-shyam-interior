@@ -48,16 +48,75 @@ async function fetchCloudStore() {
   return null;
 }
 
+function sanitizeLead(l) {
+  if (!l) return null;
+  return {
+    id: l.id || `LEAD-${Date.now()}`,
+    name: l.name || '',
+    phone: l.phone || '',
+    email: l.email || '',
+    address: l.address || '',
+    date: l.date || '',
+    slot: l.slot || '',
+    roomType: l.roomType || '',
+    budget: l.budget || '',
+    notes: typeof l.notes === 'string' ? l.notes.slice(0, 300) : '',
+    status: l.status || 'New',
+    createdAt: l.createdAt || new Date().toISOString()
+  };
+}
+
+function sanitizeQuote(q) {
+  if (!q) return null;
+  return {
+    id: q.id || `QUOTE-${Date.now()}`,
+    customerName: q.customerName || '',
+    phone: q.phone || '',
+    email: q.email || '',
+    city: q.city || '',
+    totalAmount: Number(q.totalAmount) || 0,
+    status: q.status || 'New',
+    createdAt: q.createdAt || new Date().toISOString(),
+    items: Array.isArray(q.items)
+      ? q.items.slice(0, 20).map((it) => ({
+          productName: it.productName || it.name || '',
+          brand: it.brand || '',
+          quantity: it.quantity || 1,
+          unitPrice: it.unitPrice || it.price || 0
+        }))
+      : []
+  };
+}
+
+function sanitizeWaOrder(w) {
+  if (!w) return null;
+  return {
+    id: w.id || `WA-${Date.now()}`,
+    customerName: w.customerName || '',
+    phone: w.phone || '',
+    orderType: w.orderType || 'Quotation Order',
+    city: w.city || '',
+    totalAmount: Number(w.totalAmount) || 0,
+    message: typeof w.message === 'string' ? w.message.slice(0, 300) : '',
+    status: w.status || 'New',
+    createdAt: w.createdAt || new Date().toISOString()
+  };
+}
+
 async function updateCloudStore(key, data) {
   try {
     const cloudCurrent = await fetchCloudStore();
-    const leads = key === 'leads' ? data : (cloudCurrent?.leads || memoryStore.get('leads.json') || []);
-    const quotes = key === 'quotes' ? data : (cloudCurrent?.quotes || memoryStore.get('quotes.json') || []);
-    const whatsappOrders = key === 'whatsappOrders' ? data : (cloudCurrent?.whatsappOrders || memoryStore.get('whatsappOrders.json') || []);
+    const rawLeads = key === 'leads' ? data : (cloudCurrent?.leads || memoryStore.get('leads.json') || []);
+    const rawQuotes = key === 'quotes' ? data : (cloudCurrent?.quotes || memoryStore.get('quotes.json') || []);
+    const rawWa = key === 'whatsappOrders' ? data : (cloudCurrent?.whatsappOrders || memoryStore.get('whatsappOrders.json') || []);
 
-    if (Array.isArray(leads)) memoryStore.set('leads.json', leads);
-    if (Array.isArray(quotes)) memoryStore.set('quotes.json', quotes);
-    if (Array.isArray(whatsappOrders)) memoryStore.set('whatsappOrders.json', whatsappOrders);
+    const leads = (Array.isArray(rawLeads) ? rawLeads : []).map(sanitizeLead).filter(Boolean).slice(0, 50);
+    const quotes = (Array.isArray(rawQuotes) ? rawQuotes : []).map(sanitizeQuote).filter(Boolean).slice(0, 50);
+    const whatsappOrders = (Array.isArray(rawWa) ? rawWa : []).map(sanitizeWaOrder).filter(Boolean).slice(0, 50);
+
+    memoryStore.set('leads.json', leads);
+    memoryStore.set('quotes.json', quotes);
+    memoryStore.set('whatsappOrders.json', whatsappOrders);
 
     const payload = {
       name: 'shree-shyam-interior-store',
