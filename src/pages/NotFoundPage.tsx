@@ -72,7 +72,7 @@ export const NotFoundPage: React.FC = () => {
 
           {/* 4. Contact Us */}
           <Link
-            to="/site-visit"
+            to="/contact"
             className="flex items-center justify-center gap-2 p-3.5 rounded-2xl bg-[#C68A43] text-white hover:bg-[#b57a35] transition-colors text-xs sm:text-sm font-semibold shadow-sm group"
           >
             <Phone className="w-4 h-4" />

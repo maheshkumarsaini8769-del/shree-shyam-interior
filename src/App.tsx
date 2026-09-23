@@ -49,7 +49,10 @@ const BlogPostPage = lazyWithRetry(() => import('./pages/BlogPostPage').then((m)
 const PrivacyPolicyPage = lazyWithRetry(() => import('./pages/PrivacyPolicyPage').then((m) => ({ default: m.PrivacyPolicyPage })));
 const TermsConditionsPage = lazyWithRetry(() => import('./pages/TermsConditionsPage').then((m) => ({ default: m.TermsConditionsPage })));
 const CancellationRefundPage = lazyWithRetry(() => import('./pages/CancellationRefundPage').then((m) => ({ default: m.CancellationRefundPage })));
+const ContactPage = lazyWithRetry(() => import('./pages/ContactPage').then((m) => ({ default: m.ContactPage })));
+const AboutPage = lazyWithRetry(() => import('./pages/AboutPage').then((m) => ({ default: m.AboutPage })));
 const NotFoundPage = lazyWithRetry(() => import('./pages/NotFoundPage').then((m) => ({ default: m.NotFoundPage })));
+
 
 // Admin Pages Lazy Loading
 const AdminLayout = lazyWithRetry(() => import('./pages/admin/AdminLayout').then((m) => ({ default: m.AdminLayout })));
@@ -195,6 +198,8 @@ const AppContent: React.FC = () => {
               <Route path="/projects/:slug" element={<ProjectDetailPage />} />
               <Route path="/blog" element={<BlogPage />} />
               <Route path="/blog/:slug" element={<BlogPostPage />} />
+              <Route path="/about" element={<AboutPage />} />
+              <Route path="/contact" element={<ContactPage />} />
               <Route path="/faq" element={<FAQPage />} />
               <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
               <Route path="/terms-and-conditions" element={<TermsConditionsPage />} />

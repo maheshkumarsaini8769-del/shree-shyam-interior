@@ -205,14 +205,16 @@ export const Footer: React.FC = () => {
           {/* Company & Legal Policies */}
           <div>
             <h4 className="text-xs font-bold uppercase tracking-widest text-copper-400 mb-4">
-              Legal & Support
+              Company & Support
             </h4>
             <ul className="space-y-2 text-sm text-charcoal-300">
-              <li><Link to="/site-visit" className="text-copper-400 font-semibold hover:underline">Book Free Site Visit</Link></li>
+              <li><Link to="/about" className="hover:text-cream-50 transition-colors">About Our Studio</Link></li>
+              <li><Link to="/contact" className="text-copper-400 font-semibold hover:underline">Contact Us</Link></li>
+              <li><Link to="/site-visit" className="hover:text-cream-50 transition-colors">Book Free Site Visit</Link></li>
               <li><Link to="/privacy-policy" className="hover:text-cream-50 transition-colors">Privacy Policy</Link></li>
               <li><Link to="/terms-and-conditions" className="hover:text-cream-50 transition-colors">Terms & Conditions</Link></li>
               <li><Link to="/cancellation-refund-policy" className="hover:text-cream-50 transition-colors">Cancellation & Refund</Link></li>
-              <li><a href="https://maps.google.com/?q=Shree+Shyam+Interior+Sikar" target="_blank" rel="noreferrer" className="hover:text-cream-50 transition-colors">Showroom Directions</a></li>
+              <li><a href="https://maps.google.com/?q=Shree+Shyam+Interior+Piprali+Road+Sikar" target="_blank" rel="noreferrer" className="hover:text-cream-50 transition-colors">Showroom Directions</a></li>
             </ul>
           </div>
         </div>
@@ -224,6 +226,10 @@ export const Footer: React.FC = () => {
               `© ${new Date().getFullYear()} Shree Shyam Interior. All Rights Reserved. Sikar, Rajasthan.`}
           </p>
           <div className="flex flex-wrap items-center gap-3 sm:gap-4 text-charcoal-400">
+            <Link to="/about" className="hover:text-copper-400 transition-colors">About</Link>
+            <span>•</span>
+            <Link to="/contact" className="hover:text-copper-400 transition-colors">Contact</Link>
+            <span>•</span>
             <Link to="/privacy-policy" className="hover:text-copper-400 transition-colors">Privacy Policy</Link>
             <span>•</span>
             <Link to="/terms-and-conditions" className="hover:text-copper-400 transition-colors">Terms of Work</Link>

@@ -39,14 +39,17 @@ export const Header: React.FC = () => {
 
   const navLinks: { label: string; path: string; badge?: string }[] = [
     { label: 'Home', path: '/' },
+    { label: 'About', path: '/about' },
     { label: 'Services', path: '/services' },
     { label: 'Products', path: '/products' },
     { label: 'Projects', path: '/projects' },
     { label: 'Design AI', path: '/design-ai' },
     { label: 'Blog', path: '/blog' },
+    { label: 'Contact', path: '/contact' },
     { label: 'FAQ', path: '/faq' },
     { label: 'Estimator', path: '/quote' }
   ];
+
 
   const showAnnouncement = branding?.announcement?.enabled && !announcementDismissed;
 
