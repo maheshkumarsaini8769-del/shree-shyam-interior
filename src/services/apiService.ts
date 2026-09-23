@@ -648,7 +648,7 @@ export const apiService = {
     // 2. Fallback / Sync from Cloud Store
     try {
       const cloudRes = await fetch('https://api.restful-api.dev/objects/ff808181a09d98f701a0c9c936407072', {
-        signal: AbortSignal.timeout(2800)
+        signal: AbortSignal.timeout(5000)
       });
       if (cloudRes.ok) {
         const json = await cloudRes.json();
@@ -729,7 +729,7 @@ export const apiService = {
             leads: updatedLeads
           }
         }),
-        signal: AbortSignal.timeout(3500)
+        signal: AbortSignal.timeout(5000)
       });
     } catch (_) {}
 
@@ -761,7 +761,7 @@ export const apiService = {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ name: 'shree-shyam-interior-store', data }),
-            signal: AbortSignal.timeout(3500)
+            signal: AbortSignal.timeout(5000)
           });
         }
       }
@@ -795,7 +795,7 @@ export const apiService = {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ name: 'shree-shyam-interior-store', data }),
-            signal: AbortSignal.timeout(3500)
+            signal: AbortSignal.timeout(5000)
           });
         }
       }
@@ -823,7 +823,7 @@ export const apiService = {
     // 2. Fetch from Cloud Store
     try {
       const cloudRes = await fetch('https://api.restful-api.dev/objects/ff808181a09d98f701a0c9c936407072', {
-        signal: AbortSignal.timeout(2800)
+        signal: AbortSignal.timeout(5000)
       });
       if (cloudRes.ok) {
         const json = await cloudRes.json();
@@ -903,7 +903,7 @@ export const apiService = {
             quotes: updatedQuotes
           }
         }),
-        signal: AbortSignal.timeout(3500)
+        signal: AbortSignal.timeout(5000)
       });
     } catch (_) {}
 
@@ -934,7 +934,7 @@ export const apiService = {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ name: 'shree-shyam-interior-store', data }),
-            signal: AbortSignal.timeout(3500)
+            signal: AbortSignal.timeout(5000)
           });
         }
       }
@@ -967,7 +967,7 @@ export const apiService = {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ name: 'shree-shyam-interior-store', data }),
-            signal: AbortSignal.timeout(3500)
+            signal: AbortSignal.timeout(5000)
           });
         }
       }
@@ -995,7 +995,7 @@ export const apiService = {
     // 2. Fetch from Cloud Store
     try {
       const cloudRes = await fetch('https://api.restful-api.dev/objects/ff808181a09d98f701a0c9c936407072', {
-        signal: AbortSignal.timeout(2800)
+        signal: AbortSignal.timeout(5000)
       });
       if (cloudRes.ok) {
         const json = await cloudRes.json();
@@ -1075,7 +1075,7 @@ export const apiService = {
             whatsappOrders: updated
           }
         }),
-        signal: AbortSignal.timeout(3500)
+        signal: AbortSignal.timeout(5000)
       });
     } catch (_) {}
 
@@ -1106,7 +1106,7 @@ export const apiService = {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ name: 'shree-shyam-interior-store', data }),
-            signal: AbortSignal.timeout(3500)
+            signal: AbortSignal.timeout(5000)
           });
         }
       }
@@ -1139,7 +1139,7 @@ export const apiService = {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ name: 'shree-shyam-interior-store', data }),
-            signal: AbortSignal.timeout(3500)
+            signal: AbortSignal.timeout(5000)
           });
         }
       }

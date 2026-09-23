@@ -36,7 +36,7 @@ const CLOUD_SYNC_URL = 'https://api.restful-api.dev/objects/ff808181a09d98f701a0
 async function fetchCloudStore() {
   try {
     const res = await fetch(CLOUD_SYNC_URL, {
-      signal: AbortSignal.timeout(2800)
+      signal: AbortSignal.timeout(5000)
     });
     if (res.ok) {
       const json = await res.json();
@@ -50,9 +50,14 @@ async function fetchCloudStore() {
 
 async function updateCloudStore(key, data) {
   try {
-    const leads = key === 'leads' ? data : (memoryStore.get('leads.json') || []);
-    const quotes = key === 'quotes' ? data : (memoryStore.get('quotes.json') || []);
-    const whatsappOrders = key === 'whatsappOrders' ? data : (memoryStore.get('whatsappOrders.json') || []);
+    const cloudCurrent = await fetchCloudStore();
+    const leads = key === 'leads' ? data : (cloudCurrent?.leads || memoryStore.get('leads.json') || []);
+    const quotes = key === 'quotes' ? data : (cloudCurrent?.quotes || memoryStore.get('quotes.json') || []);
+    const whatsappOrders = key === 'whatsappOrders' ? data : (cloudCurrent?.whatsappOrders || memoryStore.get('whatsappOrders.json') || []);
+
+    if (Array.isArray(leads)) memoryStore.set('leads.json', leads);
+    if (Array.isArray(quotes)) memoryStore.set('quotes.json', quotes);
+    if (Array.isArray(whatsappOrders)) memoryStore.set('whatsappOrders.json', whatsappOrders);
 
     const payload = {
       name: 'shree-shyam-interior-store',
@@ -72,6 +77,7 @@ async function updateCloudStore(key, data) {
     console.warn('[CloudStore] update warning:', err.message);
   }
 }
+
 
 
 // Ensure directories and initial data exist
