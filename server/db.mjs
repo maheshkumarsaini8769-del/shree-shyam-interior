@@ -50,24 +50,29 @@ async function fetchCloudStore() {
 
 async function updateCloudStore(key, data) {
   try {
-    const current = (await fetchCloudStore()) || {};
+    const leads = key === 'leads' ? data : (memoryStore.get('leads.json') || []);
+    const quotes = key === 'quotes' ? data : (memoryStore.get('quotes.json') || []);
+    const whatsappOrders = key === 'whatsappOrders' ? data : (memoryStore.get('whatsappOrders.json') || []);
+
     const payload = {
       name: 'shree-shyam-interior-store',
       data: {
-        ...current,
-        [key]: data
+        leads,
+        quotes,
+        whatsappOrders
       }
     };
     await fetch(CLOUD_SYNC_URL, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
-      signal: AbortSignal.timeout(3500)
+      signal: AbortSignal.timeout(5000)
     });
   } catch (err) {
-    // Non-blocking
+    console.warn('[CloudStore] update warning:', err.message);
   }
 }
+
 
 // Ensure directories and initial data exist
 let initPromise = null;
