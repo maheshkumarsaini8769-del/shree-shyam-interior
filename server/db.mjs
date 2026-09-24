@@ -130,21 +130,25 @@ async function updateCloudStore(key, data) {
   const rawLeads = key === 'leads' ? data : (cloudCurrent?.leads || memoryStore.get('leads.json') || []);
   const rawQuotes = key === 'quotes' ? data : (cloudCurrent?.quotes || memoryStore.get('quotes.json') || []);
   const rawWa = key === 'whatsappOrders' ? data : (cloudCurrent?.whatsappOrders || memoryStore.get('whatsappOrders.json') || []);
+  const rawSessions = key === 'sessions' ? data : (cloudCurrent?.sessions || memoryStore.get('sessions.json') || []);
 
   const leads = (Array.isArray(rawLeads) ? rawLeads : []).map(sanitizeLead).filter(Boolean).slice(0, 50);
   const quotes = (Array.isArray(rawQuotes) ? rawQuotes : []).map(sanitizeQuote).filter(Boolean).slice(0, 50);
   const whatsappOrders = (Array.isArray(rawWa) ? rawWa : []).map(sanitizeWaOrder).filter(Boolean).slice(0, 50);
+  const sessions = (Array.isArray(rawSessions) ? rawSessions : []).slice(0, 30);
 
   memoryStore.set('leads.json', leads);
   memoryStore.set('quotes.json', quotes);
   memoryStore.set('whatsappOrders.json', whatsappOrders);
+  memoryStore.set('sessions.json', sessions);
 
   const payload = {
     name: 'shree-shyam-interior-store',
     data: {
       leads,
       quotes,
-      whatsappOrders
+      whatsappOrders,
+      sessions
     }
   };
   const res = await fetch(CLOUD_SYNC_URL, {
@@ -189,7 +193,8 @@ export async function initDb() {
       'siteContent.json',
       'brandingSeo.json',
       'configurator.json',
-      'festival.json'
+      'festival.json',
+      'sessions.json'
     ];
 
     // Seed cloud data if present
@@ -198,6 +203,7 @@ export async function initDb() {
       if (Array.isArray(cloudData.leads)) memoryStore.set('leads.json', cloudData.leads);
       if (Array.isArray(cloudData.quotes)) memoryStore.set('quotes.json', cloudData.quotes);
       if (Array.isArray(cloudData.whatsappOrders)) memoryStore.set('whatsappOrders.json', cloudData.whatsappOrders);
+      if (Array.isArray(cloudData.sessions)) memoryStore.set('sessions.json', cloudData.sessions);
     }
 
     for (const file of files) {
@@ -235,8 +241,8 @@ export async function initDb() {
         continue;
       } catch (_) {}
 
-      // 4. Defaults for quotes, leads and whatsappOrders if missing
-      if (file === 'leads.json' || file === 'quotes.json' || file === 'whatsappOrders.json') {
+      // 4. Defaults for quotes, leads, whatsappOrders, and sessions if missing
+      if (file === 'leads.json' || file === 'quotes.json' || file === 'whatsappOrders.json' || file === 'sessions.json') {
         memoryStore.set(file, []);
         await safeWriteFile(writablePath, '[]');
       }
@@ -267,6 +273,14 @@ export async function readData(fileName) {
       });
       memoryStore.set(fileName, items);
       return items;
+    }
+  }
+
+  if (fileName === 'sessions.json') {
+    const cloudData = await fetchCloudStore();
+    if (cloudData && Array.isArray(cloudData.sessions)) {
+      memoryStore.set(fileName, cloudData.sessions);
+      return cloudData.sessions;
     }
   }
 
@@ -301,7 +315,7 @@ export async function readData(fileName) {
     memoryStore.set(fileName, parsed);
     return parsed;
   } catch (err) {
-    if (fileName === 'leads.json' || fileName === 'quotes.json' || fileName === 'whatsappOrders.json') {
+    if (fileName === 'leads.json' || fileName === 'quotes.json' || fileName === 'whatsappOrders.json' || fileName === 'sessions.json') {
       memoryStore.set(fileName, []);
       return [];
     }
@@ -328,13 +342,15 @@ export async function writeData(fileName, data) {
     }
   }
 
-  // Sync dynamic leads, quotes, and whatsappOrders with cloud store
+  // Sync dynamic leads, quotes, whatsappOrders, and sessions with cloud store
   if (fileName === 'leads.json') {
     await updateCloudStore('leads', data);
   } else if (fileName === 'quotes.json') {
     await updateCloudStore('quotes', data);
   } else if (fileName === 'whatsappOrders.json') {
     await updateCloudStore('whatsappOrders', data);
+  } else if (fileName === 'sessions.json') {
+    await updateCloudStore('sessions', data);
   }
 }
 

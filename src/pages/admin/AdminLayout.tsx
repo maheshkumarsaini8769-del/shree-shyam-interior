@@ -21,7 +21,8 @@ import {
   Box,
   Sparkles,
   Share2,
-  PartyPopper
+  PartyPopper,
+  ShieldCheck
 } from 'lucide-react';
 import { apiService } from '../../services/apiService';
 import { useTheme } from '../../context/ThemeContext';
@@ -36,7 +37,25 @@ export const AdminLayout: React.FC = () => {
   useEffect(() => {
     if (!apiService.isAuthenticated()) {
       navigate('/admin/login');
+      return;
     }
+
+    // Verify session validity on route change & periodically every 20 seconds
+    let isCancelled = false;
+    const checkSession = async () => {
+      const res = await apiService.verifyAuth();
+      if (!isCancelled && (!res || !res.valid)) {
+        apiService.logout();
+        navigate('/admin/login?revoked=true');
+      }
+    };
+
+    checkSession();
+    const interval = setInterval(checkSession, 20000);
+    return () => {
+      isCancelled = true;
+      clearInterval(interval);
+    };
   }, [navigate, location.pathname]);
 
   // Reset scroll on main panel when route changes
@@ -71,6 +90,7 @@ export const AdminLayout: React.FC = () => {
     { label: 'WhatsApp Orders', path: '/admin/whatsapp-orders', icon: MessageSquare },
     { label: '3D Studio Finishes', path: '/admin/3d-studio', icon: Box },
     { label: 'Festival Themes (त्यौहार)', path: '/admin/festive', icon: PartyPopper },
+    { label: 'Active Devices & Security', path: '/admin/sessions', icon: ShieldCheck },
     { label: 'Social Media Links', path: '/admin/social-links', icon: Share2 },
     { label: 'Logo, SEO & Banners', path: '/admin/seo-branding', icon: Sparkles },
     { label: 'Products & Materials', path: '/admin/products', icon: Package },

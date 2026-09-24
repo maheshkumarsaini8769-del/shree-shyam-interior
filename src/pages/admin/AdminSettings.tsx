@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { Settings, Save, Lock, ShieldCheck, Check } from 'lucide-react';
 import { apiService, BusinessSettings } from '../../services/apiService';
 import { useToast } from '../../context/ToastContext';
@@ -181,6 +182,27 @@ export const AdminSettings: React.FC = () => {
             </button>
           </div>
         </form>
+      </div>
+
+      {/* Active Login Devices & Sessions Card */}
+      <div className="bg-white dark:bg-[#121720] rounded-3xl p-6 sm:p-8 border border-cream-200 dark:border-cream-200/10 shadow-soft space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2">
+          <div>
+            <h3 className="font-serif text-lg font-bold text-forest-950 dark:text-cream-50 flex items-center gap-2">
+              <ShieldCheck className="w-5 h-5 text-emerald-500" />
+              <span>Active Login Devices & Security (लॉगिन डिवाइसेस)</span>
+            </h3>
+            <p className="text-xs text-charcoal-500 dark:text-cream-200/60 mt-1">
+              Check all computers, laptops, and mobile phones currently logged into your admin panel and terminate sessions remotely.
+            </p>
+          </div>
+          <Link
+            to="/admin/sessions"
+            className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-copper-500 hover:bg-copper-600 text-white text-xs font-bold transition-all shadow-glow-copper active:scale-95 shrink-0"
+          >
+            <span>View Active Devices & Logout →</span>
+          </Link>
+        </div>
       </div>
 
       {/* Security & Password Card */}

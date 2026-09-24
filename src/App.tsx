@@ -73,6 +73,7 @@ const Admin3DStudio = lazyWithRetry(() => import('./pages/admin/Admin3DStudio').
 const AdminBrandingSEO = lazyWithRetry(() => import('./pages/admin/AdminBrandingSEO').then((m) => ({ default: m.AdminBrandingSEO })));
 const AdminSocialLinks = lazyWithRetry(() => import('./pages/admin/AdminSocialLinks').then((m) => ({ default: m.AdminSocialLinks })));
 const AdminFestiveCampaigns = lazyWithRetry(() => import('./pages/admin/AdminFestiveCampaigns').then((m) => ({ default: m.AdminFestiveCampaigns })));
+const AdminSessions = lazyWithRetry(() => import('./pages/admin/AdminSessions').then((m) => ({ default: m.AdminSessions })));
 const FestiveEffects = lazyWithRetry(() => import('./components/common/FestiveEffects').then((m) => ({ default: m.FestiveEffects })));
 
 
@@ -176,6 +177,7 @@ const AppContent: React.FC = () => {
               <Route path="leads" element={<AdminLeads />} />
               <Route path="quotes" element={<AdminQuotes />} />
               <Route path="whatsapp-orders" element={<AdminWhatsAppOrders />} />
+              <Route path="sessions" element={<AdminSessions />} />
               <Route path="settings" element={<AdminSettings />} />
             </Route>
           </Routes>

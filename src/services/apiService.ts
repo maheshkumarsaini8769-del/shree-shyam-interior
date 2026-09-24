@@ -261,6 +261,20 @@ export interface BrandingSEOData {
   };
 }
 
+export interface AdminSession {
+  id: string;
+  adminEmail: string;
+  deviceType: 'Desktop' | 'Mobile' | 'Tablet';
+  deviceName: string;
+  browser: string;
+  os: string;
+  ip: string;
+  location?: string;
+  loginTime: string;
+  lastActive: string;
+  isCurrent?: boolean;
+}
+
 export type FestivalType = 'normal' | 'diwali' | 'holi' | 'navratri' | 'newyear' | 'patriot' | 'custom';
 
 export interface FestivalCampaignConfig {
@@ -582,20 +596,25 @@ export const apiService = {
     return data;
   },
 
-  logout() {
-    localStorage.removeItem(TOKEN_KEY);
+  async logout() {
+    try {
+      await apiFetch('/auth/logout', { method: 'POST' }).catch(() => {});
+    } finally {
+      localStorage.removeItem(TOKEN_KEY);
+      sessionStorage.clear();
+    }
   },
 
   isAuthenticated(): boolean {
     return !!localStorage.getItem(TOKEN_KEY);
   },
 
-  async verifyAuth(): Promise<boolean> {
+  async verifyAuth(): Promise<{ valid: boolean; revoked?: boolean }> {
     try {
-      const data = await apiFetch<{ valid: boolean }>('/auth/verify');
-      return !!data.valid;
-    } catch {
-      return false;
+      const data = await apiFetch<{ valid: boolean; revoked?: boolean }>('/auth/verify');
+      return data;
+    } catch (err: any) {
+      return { valid: false, revoked: true };
     }
   },
 
@@ -603,6 +622,29 @@ export const apiService = {
     return apiFetch<{ success: boolean; message: string }>('/auth/change-password', {
       method: 'POST',
       body: JSON.stringify({ currentPassword, newPassword })
+    });
+  },
+
+  // Active Login Sessions Management (Remote Devices & Security)
+  async getSessions(): Promise<AdminSession[]> {
+    try {
+      const res = await apiFetch<{ success: boolean; sessions: AdminSession[] }>('/admin/sessions');
+      return res.sessions || [];
+    } catch (e) {
+      console.error('Failed to fetch active sessions:', e);
+      return [];
+    }
+  },
+
+  async revokeSession(sessionId: string): Promise<{ success: boolean; wasCurrent: boolean }> {
+    return apiFetch<{ success: boolean; message: string; wasCurrent: boolean }>(`/admin/sessions/${sessionId}`, {
+      method: 'DELETE'
+    });
+  },
+
+  async revokeAllOtherSessions(): Promise<{ success: boolean; remainingCount: number }> {
+    return apiFetch<{ success: boolean; message: string; remainingCount: number }>('/admin/sessions/revoke-all-others', {
+      method: 'POST'
     });
   },
 

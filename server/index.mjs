@@ -64,8 +64,53 @@ app.post('/api/upload', upload.single('image'), async (req, res) => {
   }
 });
 
+function parseUserAgent(ua = '') {
+  let browser = 'Unknown Browser';
+  let os = 'Unknown OS';
+  let deviceType = 'Desktop';
+
+  if (/mobile/i.test(ua)) {
+    deviceType = 'Mobile';
+  } else if (/tablet|ipad/i.test(ua)) {
+    deviceType = 'Tablet';
+  }
+
+  if (/windows nt 10/i.test(ua)) os = 'Windows 10/11';
+  else if (/windows/i.test(ua)) os = 'Windows';
+  else if (/android/i.test(ua)) {
+    os = 'Android';
+    deviceType = 'Mobile';
+  } else if (/iphone/i.test(ua)) {
+    os = 'iOS (iPhone)';
+    deviceType = 'Mobile';
+  } else if (/ipad/i.test(ua)) {
+    os = 'iPadOS';
+    deviceType = 'Tablet';
+  } else if (/macintosh|mac os x/i.test(ua)) os = 'macOS';
+  else if (/linux/i.test(ua)) os = 'Linux';
+
+  if (/edg/i.test(ua)) browser = 'Microsoft Edge';
+  else if (/opr|opera/i.test(ua)) browser = 'Opera';
+  else if (/chrome|crios/i.test(ua)) browser = 'Google Chrome';
+  else if (/firefox|fxios/i.test(ua)) browser = 'Mozilla Firefox';
+  else if (/safari/i.test(ua) && !/chrome/i.test(ua)) browser = 'Apple Safari';
+
+  return { browser, os, deviceType };
+}
+
+function getClientIp(req) {
+  const forwarded = req.headers['x-forwarded-for'];
+  if (forwarded) {
+    const ip = forwarded.split(',')[0].trim();
+    return ip.replace(/^::ffff:/, '');
+  }
+  const raw = req.socket?.remoteAddress || req.ip || '127.0.0.1';
+  const clean = raw.replace(/^::ffff:/, '');
+  return clean === '::1' ? '127.0.0.1' : clean;
+}
+
 // -------------------------------------------------------------
-// Authentication Endpoints
+// Authentication & Active Session Management Endpoints
 // -------------------------------------------------------------
 app.post('/api/auth/login', async (req, res) => {
   const { email, username, password } = req.body;
@@ -76,10 +121,38 @@ app.post('/api/auth/login', async (req, res) => {
   const validPassword = settings.adminPassword || 'mahesh99830';
 
   if (inputIdentifier === validEmail && password === validPassword) {
-    const token = `ssi_token_${Buffer.from(`${validEmail}:${Date.now()}`).toString('base64')}`;
+    const sessionId = `sess_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
+    const token = `ssi_token_${Buffer.from(`${validEmail}:${Date.now()}:${sessionId}`).toString('base64')}`;
+
+    const ua = req.headers['user-agent'] || '';
+    const parsed = parseUserAgent(ua);
+    const clientIp = getClientIp(req);
+
+    const newSession = {
+      id: sessionId,
+      token,
+      adminEmail: validEmail,
+      deviceType: parsed.deviceType,
+      deviceName: `${parsed.browser} on ${parsed.os}`,
+      browser: parsed.browser,
+      os: parsed.os,
+      ip: clientIp,
+      location: clientIp === '127.0.0.1' ? 'Local System' : 'Rajasthan / India',
+      loginTime: new Date().toISOString(),
+      lastActive: new Date().toISOString()
+    };
+
+    let sessions = (await readData('sessions.json')) || [];
+    if (!Array.isArray(sessions)) sessions = [];
+    sessions.unshift(newSession);
+    if (sessions.length > 25) sessions = sessions.slice(0, 25);
+    await writeData('sessions.json', sessions);
+
     return res.json({
       success: true,
       token,
+      sessionId,
+      session: { ...newSession, isCurrent: true, token: undefined },
       user: { email: validEmail, username: validEmail }
     });
   }
@@ -87,12 +160,116 @@ app.post('/api/auth/login', async (req, res) => {
   res.status(401).json({ success: false, error: 'Invalid email or password. Access restricted.' });
 });
 
-app.get('/api/auth/verify', (req, res) => {
+app.get('/api/auth/verify', async (req, res) => {
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith('Bearer ssi_token_')) {
+    return res.status(401).json({ valid: false, error: 'Authentication required' });
+  }
+
+  const token = authHeader.replace('Bearer ', '').trim();
+  let sessions = (await readData('sessions.json')) || [];
+  if (!Array.isArray(sessions)) sessions = [];
+
+  const session = sessions.find((s) => s.token === token);
+  if (!session) {
+    return res.status(401).json({
+      valid: false,
+      revoked: true,
+      error: 'Session has been revoked or logged out from another device. Please login again.'
+    });
+  }
+
+  session.lastActive = new Date().toISOString();
+  await writeData('sessions.json', sessions);
+
+  res.json({
+    valid: true,
+    session: { ...session, isCurrent: true, token: undefined }
+  });
+});
+
+app.post('/api/auth/logout', async (req, res) => {
   const authHeader = req.headers.authorization;
   if (authHeader && authHeader.startsWith('Bearer ssi_token_')) {
-    return res.json({ valid: true });
+    const token = authHeader.replace('Bearer ', '').trim();
+    let sessions = (await readData('sessions.json')) || [];
+    if (Array.isArray(sessions)) {
+      sessions = sessions.filter((s) => s.token !== token);
+      await writeData('sessions.json', sessions);
+    }
   }
-  res.status(401).json({ valid: false });
+  res.json({ success: true, message: 'Logged out successfully' });
+});
+
+// List all active devices & login sessions
+app.get('/api/admin/sessions', async (req, res) => {
+  const authHeader = req.headers.authorization;
+  const currentToken = authHeader && authHeader.startsWith('Bearer ') ? authHeader.replace('Bearer ', '').trim() : '';
+
+  let sessions = (await readData('sessions.json')) || [];
+  if (!Array.isArray(sessions)) sessions = [];
+
+  const thirtyDaysAgo = Date.now() - 30 * 24 * 60 * 60 * 1000;
+  sessions = sessions.filter((s) => new Date(s.lastActive || s.loginTime).getTime() > thirtyDaysAgo);
+
+  const formattedSessions = sessions.map((s) => ({
+    id: s.id,
+    adminEmail: s.adminEmail,
+    deviceType: s.deviceType || 'Desktop',
+    deviceName: s.deviceName || `${s.browser || 'Browser'} on ${s.os || 'Device'}`,
+    browser: s.browser || 'Unknown Browser',
+    os: s.os || 'Unknown OS',
+    ip: s.ip || '127.0.0.1',
+    location: s.location || 'India',
+    loginTime: s.loginTime,
+    lastActive: s.lastActive,
+    isCurrent: s.token === currentToken
+  }));
+
+  res.json({ success: true, sessions: formattedSessions });
+});
+
+// Revoke a specific device session
+app.delete('/api/admin/sessions/:id', async (req, res) => {
+  const { id } = req.params;
+  const authHeader = req.headers.authorization;
+  const currentToken = authHeader && authHeader.startsWith('Bearer ') ? authHeader.replace('Bearer ', '').trim() : '';
+
+  let sessions = (await readData('sessions.json')) || [];
+  if (!Array.isArray(sessions)) sessions = [];
+
+  const target = sessions.find((s) => s.id === id);
+  if (!target) {
+    return res.status(404).json({ error: 'Session not found' });
+  }
+
+  const wasCurrent = target.token === currentToken;
+  sessions = sessions.filter((s) => s.id !== id);
+  await writeData('sessions.json', sessions);
+
+  res.json({
+    success: true,
+    message: wasCurrent ? 'Current session logged out' : 'Device session revoked successfully',
+    wasCurrent
+  });
+});
+
+// Revoke all other device sessions
+app.post('/api/admin/sessions/revoke-all-others', async (req, res) => {
+  const authHeader = req.headers.authorization;
+  const currentToken = authHeader && authHeader.startsWith('Bearer ') ? authHeader.replace('Bearer ', '').trim() : '';
+
+  let sessions = (await readData('sessions.json')) || [];
+  if (!Array.isArray(sessions)) sessions = [];
+
+  const remaining = sessions.filter((s) => s.token === currentToken);
+  await writeData('sessions.json', remaining);
+
+  res.json({
+    success: true,
+    message: 'All other devices have been logged out successfully',
+    remainingCount: remaining.length
+  });
 });
 
 app.post('/api/auth/change-password', async (req, res) => {

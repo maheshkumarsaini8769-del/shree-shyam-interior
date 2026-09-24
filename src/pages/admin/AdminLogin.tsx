@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Lock, Mail, ArrowRight } from 'lucide-react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { Lock, Mail, ArrowRight, ShieldAlert } from 'lucide-react';
 import { apiService } from '../../services/apiService';
 import { useToast } from '../../context/ToastContext';
 
@@ -10,6 +10,8 @@ export const AdminLogin: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const wasRevoked = searchParams.get('revoked') === 'true';
   const { showToast } = useToast();
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -52,6 +54,16 @@ export const AdminLogin: React.FC = () => {
             Secure administrative control center for management & customization
           </p>
         </div>
+
+        {wasRevoked && (
+          <div className="mb-6 p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs font-semibold leading-relaxed flex items-start gap-2.5 text-left animate-in fade-in duration-300">
+            <ShieldAlert className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
+            <div>
+              <span className="font-bold block text-amber-200 mb-0.5">Session Terminated (रिमोट लॉगआउट)</span>
+              Aapka session kisi doosre device se logout kar diya gaya hai. Kripya apna authorized email aur password lagakar dobara login karein.
+            </div>
+          </div>
+        )}
 
         {error && (
           <div className="mb-6 p-3.5 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-xs font-semibold text-center">
