@@ -37,6 +37,23 @@ export const AdminLayout: React.FC = () => {
     }
   }, [navigate, location.pathname]);
 
+  // Close mobile drawer on route transition
+  useEffect(() => {
+    setMobileMenuOpen(false);
+  }, [location.pathname]);
+
+  // Lock background scroll when mobile drawer is open
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [mobileMenuOpen]);
+
   const handleLogout = () => {
     apiService.logout();
     navigate('/admin/login');
@@ -59,18 +76,21 @@ export const AdminLayout: React.FC = () => {
     { label: 'Business Settings', path: '/admin/settings', icon: Settings },
   ];
 
-
   return (
-    <div className="min-h-screen bg-cream-50 dark:bg-[#0B0F15] text-charcoal-900 dark:text-cream-50 flex transition-colors duration-200">
-      {/* Sidebar Desktop */}
-      <aside className="hidden lg:flex flex-col w-64 bg-white dark:bg-[#121720] border-r border-cream-200 dark:border-cream-200/10 shrink-0 sticky top-0 h-screen z-30">
+    <div className="h-screen h-[100dvh] w-full bg-cream-50 dark:bg-[#0B0F15] text-charcoal-900 dark:text-cream-50 flex overflow-hidden transition-colors duration-200">
+      
+      {/* Sidebar Desktop - Fully Independent Isolated Scroll */}
+      <aside className="hidden lg:flex flex-col w-64 xl:w-72 bg-white dark:bg-[#121720] border-r border-cream-200 dark:border-cream-200/10 shrink-0 h-full overflow-hidden z-30 select-none">
         {/* Brand Header */}
-        <div className="p-5 border-b border-cream-200 dark:border-cream-200/10 flex items-center justify-between">
+        <div className="p-4 sm:p-5 border-b border-cream-200 dark:border-cream-200/10 flex items-center justify-between shrink-0">
           <div className="flex items-center gap-3">
             <img
               src="/logo.jpg"
               alt="Shree Shyam Interior Logo"
               className="w-10 h-10 rounded-xl object-cover border border-copper-500/40 shadow-soft shrink-0"
+              onError={(e) => {
+                e.currentTarget.src = '/logo.jpg';
+              }}
             />
             <div>
               <h2 className="font-serif font-bold text-base text-forest-950 dark:text-cream-50 tracking-tight leading-tight">
@@ -83,8 +103,8 @@ export const AdminLayout: React.FC = () => {
           </div>
         </div>
 
-        {/* Navigation Links */}
-        <div className="flex-1 overflow-y-auto py-4 px-3 space-y-1 scrollbar-none">
+        {/* Navigation Links - Finger & Mouse Independent Smooth Scroll */}
+        <div className="flex-1 overflow-y-auto overscroll-contain py-4 px-3 space-y-1 admin-scrollbar touch-pan-y">
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = item.exact
@@ -109,7 +129,7 @@ export const AdminLayout: React.FC = () => {
         </div>
 
         {/* Footer Quick Links & Logout */}
-        <div className="p-4 border-t border-cream-200 dark:border-cream-200/10 space-y-2">
+        <div className="p-4 border-t border-cream-200 dark:border-cream-200/10 space-y-2 shrink-0 bg-white/50 dark:bg-[#121720]/50 backdrop-blur-sm">
           <a
             href="/"
             target="_blank"
@@ -125,7 +145,7 @@ export const AdminLayout: React.FC = () => {
 
           <button
             onClick={handleLogout}
-            className="w-full flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold text-red-500 hover:bg-red-500/10 transition-colors"
+            className="w-full flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold text-red-500 hover:bg-red-500/10 transition-colors cursor-pointer"
           >
             <LogOut className="w-4 h-4" />
             <span>Sign Out</span>
@@ -133,27 +153,41 @@ export const AdminLayout: React.FC = () => {
         </div>
       </aside>
 
-      {/* Mobile Drawer */}
+      {/* Mobile Drawer (Touch-Optimized Independent Finger Scroll) */}
       {mobileMenuOpen && (
-        <div className="fixed inset-0 z-50 lg:hidden flex">
+        <div className="fixed inset-0 z-50 lg:hidden overflow-hidden">
+          {/* Backdrop */}
           <div
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm"
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity"
             onClick={() => setMobileMenuOpen(false)}
           />
-          <div className="relative w-64 bg-white dark:bg-[#121720] h-full flex flex-col z-10 p-4 shadow-2xl border-r border-cream-200 dark:border-cream-200/10">
-            <div className="flex items-center justify-between pb-4 border-b border-cream-200 dark:border-cream-200/10">
-              <span className="font-serif font-bold text-base text-forest-950 dark:text-cream-50">
-                Admin Menu
-              </span>
+          {/* Slide-out Panel */}
+          <div className="fixed inset-y-0 left-0 w-72 sm:w-80 max-w-[85vw] bg-white dark:bg-[#121720] h-full flex flex-col z-50 shadow-2xl border-r border-cream-200 dark:border-cream-200/10 overflow-hidden animate-in slide-in-from-left duration-200">
+            <div className="flex items-center justify-between p-4 border-b border-cream-200 dark:border-cream-200/10 shrink-0">
+              <div className="flex items-center gap-2.5">
+                <img
+                  src="/logo.jpg"
+                  alt="Logo"
+                  className="w-8 h-8 rounded-lg object-cover border border-copper-500/40 shrink-0"
+                  onError={(e) => {
+                    e.currentTarget.src = '/logo.jpg';
+                  }}
+                />
+                <span className="font-serif font-bold text-base text-forest-950 dark:text-cream-50">
+                  Admin Menu
+                </span>
+              </div>
               <button
                 onClick={() => setMobileMenuOpen(false)}
-                className="p-2 rounded-lg bg-cream-100 dark:bg-[#1A212C]"
+                className="p-1.5 rounded-lg bg-cream-100 dark:bg-[#1A212C] text-charcoal-600 dark:text-cream-200 cursor-pointer"
+                aria-label="Close Menu"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
-            <div className="flex-1 overflow-y-auto py-4 space-y-1">
+            {/* Mobile Nav Links with Finger Scroll */}
+            <div className="flex-1 overflow-y-auto overscroll-contain py-4 px-3 space-y-1 admin-scrollbar touch-pan-y">
               {navItems.map((item) => {
                 const Icon = item.icon;
                 const isActive = item.exact
@@ -165,20 +199,20 @@ export const AdminLayout: React.FC = () => {
                     key={item.path}
                     to={item.path}
                     onClick={() => setMobileMenuOpen(false)}
-                    className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold ${
+                    className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all ${
                       isActive
-                        ? 'bg-copper-500 text-white font-bold'
+                        ? 'bg-copper-500 text-white font-bold shadow-md'
                         : 'text-charcoal-600 dark:text-cream-200/80 hover:bg-cream-100 dark:hover:bg-[#1A212C]'
                     }`}
                   >
-                    <Icon className="w-4 h-4" />
+                    <Icon className="w-4 h-4 shrink-0" />
                     <span>{item.label}</span>
                   </Link>
                 );
               })}
             </div>
 
-            <div className="pt-3 border-t border-cream-200 dark:border-cream-200/10 space-y-2">
+            <div className="p-4 border-t border-cream-200 dark:border-cream-200/10 space-y-2 shrink-0 bg-white/50 dark:bg-[#121720]/50">
               <a
                 href="/"
                 target="_blank"
@@ -190,7 +224,7 @@ export const AdminLayout: React.FC = () => {
               </a>
               <button
                 onClick={handleLogout}
-                className="w-full flex items-center gap-2 px-3.5 py-2 text-xs font-semibold text-red-500"
+                className="w-full flex items-center gap-2 px-3.5 py-2 text-xs font-semibold text-red-500 hover:bg-red-500/10 rounded-xl transition-colors cursor-pointer"
               >
                 <LogOut className="w-4 h-4" />
                 <span>Sign Out</span>
@@ -200,14 +234,15 @@ export const AdminLayout: React.FC = () => {
         </div>
       )}
 
-      {/* Main Content Area */}
-      <div className="flex-1 flex flex-col min-w-0">
+      {/* Main Content Area - Fully Independent Isolated Scroll */}
+      <div className="flex-1 flex flex-col h-full min-w-0 overflow-hidden">
         {/* Topbar */}
-        <header className="h-16 bg-white/80 dark:bg-[#121720]/80 backdrop-blur-md border-b border-cream-200 dark:border-cream-200/10 px-4 sm:px-8 flex items-center justify-between sticky top-0 z-20">
+        <header className="h-16 bg-white/90 dark:bg-[#121720]/90 backdrop-blur-md border-b border-cream-200 dark:border-cream-200/10 px-4 sm:px-8 flex items-center justify-between shrink-0 z-20">
           <div className="flex items-center gap-3">
             <button
               onClick={() => setMobileMenuOpen(true)}
-              className="lg:hidden p-2 rounded-xl bg-cream-100 dark:bg-[#1A212C] text-charcoal-600 dark:text-cream-200"
+              className="lg:hidden p-2 rounded-xl bg-cream-100 dark:bg-[#1A212C] text-charcoal-600 dark:text-cream-200 cursor-pointer"
+              aria-label="Open Admin Menu"
             >
               <Menu className="w-5 h-5" />
             </button>
@@ -222,7 +257,7 @@ export const AdminLayout: React.FC = () => {
             {/* Theme Toggle */}
             <button
               onClick={toggleTheme}
-              className="p-2 rounded-xl bg-cream-100 dark:bg-[#1A212C] text-charcoal-600 dark:text-cream-200 hover:text-copper-500 transition-colors"
+              className="p-2 rounded-xl bg-cream-100 dark:bg-[#1A212C] text-charcoal-600 dark:text-cream-200 hover:text-copper-500 transition-colors cursor-pointer"
               title="Toggle Theme"
             >
               {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
@@ -254,11 +289,36 @@ export const AdminLayout: React.FC = () => {
           </div>
         </header>
 
-        {/* Dynamic Page Body */}
-        <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto">
-          <Outlet />
+        {/* Dynamic Page Body - Independent Smooth Scroll Container */}
+        <main className="flex-1 overflow-y-auto overflow-x-hidden overscroll-contain p-4 sm:p-6 lg:p-8 admin-scrollbar touch-pan-y">
+          <div className="max-w-7xl w-full mx-auto pb-16">
+            <Outlet />
+          </div>
         </main>
       </div>
+
+      {/* Embedded Styles for Isolated Scroll & Smooth Touch Behavior */}
+      <style>{`
+        .admin-scrollbar {
+          -webkit-overflow-scrolling: touch;
+          overscroll-behavior: contain;
+          touch-action: pan-y;
+        }
+        .admin-scrollbar::-webkit-scrollbar {
+          width: 5px;
+          height: 5px;
+        }
+        .admin-scrollbar::-webkit-scrollbar-track {
+          background: transparent;
+        }
+        .admin-scrollbar::-webkit-scrollbar-thumb {
+          background: rgba(181, 119, 49, 0.25);
+          border-radius: 9999px;
+        }
+        .admin-scrollbar::-webkit-scrollbar-thumb:hover {
+          background: rgba(181, 119, 49, 0.55);
+        }
+      `}</style>
     </div>
   );
 };
