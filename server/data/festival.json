@@ -9,6 +9,11 @@
   "discountPercentage": 15,
   "highlightColor": "#F59E0B",
   "enableAmbientEffects": true,
+  "enableSparklerTrail": true,
+  "showCountdownTimer": true,
+  "countdownEndDate": "2026-11-15T23:59:59",
+  "showSurpriseGiftBox": true,
+  "surpriseGiftText": "Free 3D Architectural VR Walkthrough + Physical Swatch Box",
   "showGreetingModal": true,
   "autoSchedule": false
 }

@@ -1,13 +1,146 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { Sparkles, X, Copy, Check, Gift, ArrowRight, Flame } from 'lucide-react';
+import { Sparkles, X, Copy, Check, Gift, ArrowRight, Clock, Award, Star } from 'lucide-react';
 import { apiService, FestivalCampaignConfig } from '../../services/apiService';
 
+// =========================================================================
+// 1. INTERACTIVE PHOOLJHADI / SPARKLER CANVAS TRAIL (60FPS LIGHTWEIGHT)
+// =========================================================================
+const SparklerCanvas: React.FC<{ festival: string; color: string }> = ({ festival, color }) => {
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    let animId: number;
+    let width = (canvas.width = window.innerWidth);
+    let height = (canvas.height = window.innerHeight);
+
+    const handleResize = () => {
+      if (!canvas) return;
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = window.innerHeight;
+    };
+    window.addEventListener('resize', handleResize);
+
+    interface Particle {
+      x: number;
+      y: number;
+      vx: number;
+      vy: number;
+      alpha: number;
+      size: number;
+      color: string;
+      life: number;
+    }
+
+    const particles: Particle[] = [];
+    const colors =
+      festival === 'holi'
+        ? ['#EC4899', '#FBBF24', '#14B8A6', '#8B5CF6', '#F43F5E']
+        : ['#F59E0B', '#FBBF24', '#FEF08A', '#F97316', '#FFFFFF'];
+
+    const addSparkles = (x: number, y: number, count = 2) => {
+      for (let i = 0; i < count; i++) {
+        const angle = Math.random() * Math.PI * 2;
+        const speed = Math.random() * 2.2 + 0.4;
+        particles.push({
+          x,
+          y,
+          vx: Math.cos(angle) * speed,
+          vy: Math.sin(angle) * speed - 0.4,
+          alpha: 1,
+          size: Math.random() * 2 + 1,
+          color: colors[Math.floor(Math.random() * colors.length)],
+          life: 0.94
+        });
+      }
+    };
+
+    let lastTime = 0;
+    const handlePointerMove = (e: MouseEvent | TouchEvent) => {
+      const now = performance.now();
+      if (now - lastTime < 16) return;
+      lastTime = now;
+
+      let clientX = 0;
+      let clientY = 0;
+      if ('touches' in e && e.touches.length > 0) {
+        clientX = e.touches[0].clientX;
+        clientY = e.touches[0].clientY;
+      } else if ('clientX' in e) {
+        clientX = (e as MouseEvent).clientX;
+        clientY = (e as MouseEvent).clientY;
+      }
+
+      addSparkles(clientX, clientY, 2);
+    };
+
+    window.addEventListener('mousemove', handlePointerMove, { passive: true });
+    window.addEventListener('touchmove', handlePointerMove, { passive: true });
+
+    const render = () => {
+      ctx.clearRect(0, 0, width, height);
+
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vy += 0.03; // light gravity
+        p.alpha *= p.life;
+
+        if (p.alpha < 0.05) {
+          particles.splice(i, 1);
+          continue;
+        }
+
+        ctx.save();
+        ctx.globalAlpha = p.alpha;
+        ctx.fillStyle = p.color;
+        ctx.shadowColor = p.color;
+        ctx.shadowBlur = 4;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+
+      animId = requestAnimationFrame(render);
+    };
+
+    render();
+
+    return () => {
+      cancelAnimationFrame(animId);
+      window.removeEventListener('resize', handleResize);
+      window.removeEventListener('mousemove', handlePointerMove);
+      window.removeEventListener('touchmove', handlePointerMove);
+    };
+  }, [festival, color]);
+
+  return (
+    <canvas
+      ref={canvasRef}
+      className="pointer-events-none fixed inset-0 z-40 overflow-hidden select-none"
+      style={{ opacity: 0.8 }}
+    />
+  );
+};
+
+export { FestiveCountdown } from './FestiveCountdown';
+
+// =========================================================================
+// 3. MAIN FESTIVE EFFECTS COMPONENT
+// =========================================================================
 export const FestiveEffects: React.FC = () => {
   const [config, setConfig] = useState<FestivalCampaignConfig | null>(null);
   const [showModal, setShowModal] = useState(false);
   const [copied, setCopied] = useState(false);
   const [isDiyaPopped, setIsDiyaPopped] = useState(false);
+  const [isGiftRevealed, setIsGiftRevealed] = useState(false);
 
   useEffect(() => {
     // Initial fetch
@@ -83,12 +216,17 @@ export const FestiveEffects: React.FC = () => {
     return null;
   }
 
-  const { activeFestival, enableAmbientEffects } = config;
+  const { activeFestival, enableAmbientEffects, enableSparklerTrail } = config;
 
   return (
     <>
+      {/* PHOOLJHADI SPARKLER TRAIL EFFECT */}
+      {enableSparklerTrail && (
+        <SparklerCanvas festival={activeFestival} color={config.highlightColor} />
+      )}
+
       {/* ========================================================================= */}
-      {/* 1. IN-WEBSITE FESTIVE VISUAL DECORATIONS (TRADITIONAL TORAN, DIYAS, COLORS) */}
+      {/* IN-WEBSITE FESTIVE VISUAL DECORATIONS (TRADITIONAL TORAN, DIYAS, COLORS) */}
       {/* ========================================================================= */}
       {enableAmbientEffects && (
         <div className="pointer-events-none fixed inset-0 z-40 overflow-hidden select-none">
@@ -96,7 +234,7 @@ export const FestiveEffects: React.FC = () => {
           {activeFestival === 'diwali' && (
             <>
               {/* Top Traditional Hanging Toran (Marigold Flowers & Clay Diyas) */}
-              <div className="absolute top-[64px] sm:top-[72px] left-0 right-0 z-40 pointer-events-none overflow-hidden h-7 sm:h-9 flex justify-around opacity-95">
+              <div className="absolute top-[60px] sm:top-[68px] left-0 right-0 z-40 pointer-events-none overflow-hidden h-7 sm:h-9 flex justify-around opacity-95">
                 {[...Array(14)].map((_, i) => (
                   <div key={i} className="flex flex-col items-center animate-festive-float" style={{ animationDelay: `${i * 0.25}s` }}>
                     {/* Hanging String */}
@@ -120,24 +258,15 @@ export const FestiveEffects: React.FC = () => {
               <div className="absolute -bottom-10 -left-10 w-52 h-52 rounded-full bg-amber-500/20 blur-3xl animate-pulse pointer-events-none" />
               <div className="absolute -bottom-10 -right-10 w-52 h-52 rounded-full bg-orange-500/20 blur-3xl animate-pulse pointer-events-none" />
 
-              {/* Floating Golden Sparks Drifting Up */}
-              <div className="absolute inset-0 opacity-40">
-                <div className="absolute top-[18%] left-[7%] w-1.5 h-1.5 rounded-full bg-amber-300 blur-[0.5px] animate-ping duration-1000" />
-                <div className="absolute top-[32%] right-[8%] w-2 h-2 rounded-full bg-yellow-400 blur-[0.5px] animate-pulse duration-700" />
-                <div className="absolute top-[55%] left-[12%] w-1.5 h-1.5 rounded-full bg-amber-400 blur-[0.5px] animate-ping duration-1000" />
-                <div className="absolute top-[78%] right-[14%] w-2 h-2 rounded-full bg-yellow-300 blur-[0.5px] animate-pulse duration-700" />
-              </div>
-
               {/* Bottom Left Interactive Floating Diya Widget */}
               <div className="fixed bottom-20 lg:bottom-8 left-4 sm:left-6 z-40 pointer-events-auto">
                 <div
                   onClick={() => setIsDiyaPopped(!isDiyaPopped)}
-                  className="flex items-center gap-2 px-3 py-2 rounded-2xl bg-[#140D07]/90 backdrop-blur-md border border-amber-500/50 text-amber-300 shadow-glow-copper cursor-pointer hover:scale-105 active:scale-95 transition-all group select-none"
-                  title="Click to view Deepawali Offer"
+                  className="flex items-center gap-2 px-3.5 py-2 rounded-2xl bg-[#140D07]/90 backdrop-blur-md border border-amber-500/50 text-amber-300 shadow-glow-copper cursor-pointer hover:scale-105 active:scale-95 transition-all group select-none"
+                  title="Click to view Deepawali Offer & Secret Gift"
                 >
-                  {/* Flickering Diya Icon */}
                   <div className="relative flex flex-col items-center justify-center w-6 h-6">
-                    <span className="text-lg leading-none animate-flame">🪔</span>
+                    <span className="text-xl leading-none animate-flame">🪔</span>
                   </div>
                   <div className="flex flex-col">
                     <span className="font-serif font-bold text-xs text-amber-300 leading-none">
@@ -151,24 +280,54 @@ export const FestiveEffects: React.FC = () => {
 
                 {/* Expanded Micro-card on click */}
                 {isDiyaPopped && (
-                  <div className="absolute bottom-14 left-0 w-64 p-4 rounded-2xl bg-white dark:bg-[#151D28] border-2 border-amber-500 shadow-2xl text-left space-y-2.5 animate-scale-up z-50">
+                  <div className="absolute bottom-14 left-0 w-72 p-4 rounded-2xl bg-white dark:bg-[#151D28] border-2 border-amber-500 shadow-2xl text-left space-y-3 animate-scale-up z-50">
                     <div className="flex items-center justify-between">
-                      <span className="text-xs font-serif font-bold text-amber-600 dark:text-amber-400">
-                        🪔 Diwali Special Offer
+                      <span className="text-xs font-serif font-bold text-amber-600 dark:text-amber-400 flex items-center gap-1">
+                        <span>🪔</span>
+                        <span>Diwali Special Benefits</span>
                       </span>
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
                           setIsDiyaPopped(false);
                         }}
-                        className="p-1 rounded-md text-charcoal-400 hover:bg-cream-100 dark:hover:bg-[#1A212C]"
+                        className="p-1 rounded-md text-charcoal-400 hover:bg-cream-100 dark:hover:bg-[#1A212C] cursor-pointer"
                       >
                         <X className="w-3.5 h-3.5" />
                       </button>
                     </div>
+
                     <p className="text-[11px] text-charcoal-600 dark:text-cream-200/80 leading-snug">
                       Flat {config.discountPercentage}% OFF on Turnkey Interiors + Free 3D Walkthrough!
                     </p>
+
+                    {/* Secret Lucky Gift Box */}
+                    {config.showSurpriseGiftBox && (
+                      <div className="p-2.5 rounded-xl bg-gradient-to-r from-amber-500/15 via-orange-500/10 to-amber-500/15 border border-amber-500/30 text-xs">
+                        {isGiftRevealed ? (
+                          <div className="space-y-1">
+                            <span className="text-[10px] font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider block">
+                              🎉 Extra Festive Gift Unlocked!
+                            </span>
+                            <span className="font-bold text-forest-950 dark:text-cream-50 text-[11px] block">
+                              {config.surpriseGiftText || 'Free 3D VR Architectural Render'}
+                            </span>
+                          </div>
+                        ) : (
+                          <button
+                            onClick={() => setIsGiftRevealed(true)}
+                            className="w-full flex items-center justify-between text-left text-amber-700 dark:text-amber-300 font-bold hover:underline cursor-pointer"
+                          >
+                            <span className="flex items-center gap-1.5 text-[11px]">
+                              <Gift className="w-3.5 h-3.5 text-amber-500" />
+                              Tap to Reveal Secret Bonus Gift!
+                            </span>
+                            <Sparkles className="w-3 h-3 text-amber-500 animate-spin" />
+                          </button>
+                        )}
+                      </div>
+                    )}
+
                     {config.couponCode && (
                       <div className="flex items-center justify-between p-2 rounded-xl bg-amber-500/10 border border-amber-500/30">
                         <span className="font-mono font-bold text-xs text-amber-700 dark:text-amber-400">
@@ -176,19 +335,29 @@ export const FestiveEffects: React.FC = () => {
                         </span>
                         <button
                           onClick={() => handleCopyCode(config.couponCode)}
-                          className="px-2 py-1 rounded bg-amber-500 text-white text-[10px] font-bold"
+                          className="px-2.5 py-1 rounded bg-amber-500 hover:bg-amber-600 text-white text-[10px] font-bold cursor-pointer transition-colors"
                         >
-                          {copied ? 'Copied!' : 'Copy'}
+                          {copied ? 'Copied!' : 'Copy Code'}
                         </button>
                       </div>
                     )}
-                    <Link
-                      to="/site-visit"
-                      onClick={() => setIsDiyaPopped(false)}
-                      className="block w-full py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-[11px] font-bold text-center uppercase tracking-wider transition-colors"
-                    >
-                      Book Site Visit →
-                    </Link>
+
+                    <div className="flex gap-2">
+                      <Link
+                        to="/site-visit"
+                        onClick={() => setIsDiyaPopped(false)}
+                        className="flex-1 py-2 rounded-xl bg-copper-500 hover:bg-copper-600 text-white text-[11px] font-bold text-center uppercase tracking-wider transition-colors shadow-sm"
+                      >
+                        Book Visit
+                      </Link>
+                      <Link
+                        to="/quote"
+                        onClick={() => setIsDiyaPopped(false)}
+                        className="flex-1 py-2 rounded-xl bg-cream-100 dark:bg-[#1A212C] text-charcoal-700 dark:text-cream-100 text-[11px] font-bold text-center uppercase tracking-wider transition-colors"
+                      >
+                        View Bill
+                      </Link>
+                    </div>
                   </div>
                 )}
               </div>
@@ -198,7 +367,6 @@ export const FestiveEffects: React.FC = () => {
           {/* HOLI: Vibrant Gulal Splashes & Color Bursts */}
           {activeFestival === 'holi' && (
             <>
-              {/* Top and corner organic gulal powder glows */}
               <div className="absolute -top-12 -left-12 w-64 h-64 rounded-full bg-pink-500/20 blur-3xl pointer-events-none" />
               <div className="absolute -bottom-12 -right-12 w-64 h-64 rounded-full bg-yellow-500/20 blur-3xl pointer-events-none" />
               <div className="absolute top-1/3 -right-12 w-48 h-48 rounded-full bg-teal-500/20 blur-3xl pointer-events-none" />
@@ -281,32 +449,6 @@ export const FestiveEffects: React.FC = () => {
               </div>
             </>
           )}
-
-          {/* NAVRATRI & DUSSEHRA */}
-          {activeFestival === 'navratri' && (
-            <div className="fixed bottom-20 lg:bottom-8 left-4 sm:left-6 z-40 pointer-events-auto">
-              <div className="flex items-center gap-2 px-3 py-2 rounded-2xl bg-red-950/90 backdrop-blur-md border border-amber-500/40 text-amber-200 shadow-card text-xs">
-                <span className="text-lg">✨</span>
-                <div className="flex flex-col">
-                  <span className="font-bold text-xs text-amber-300">Shubh Navratri</span>
-                  <span className="text-[10px] text-amber-200/70">Griha Pravesh Offers</span>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* PATRIOT (Independence / Republic Day) */}
-          {activeFestival === 'patriot' && (
-            <div className="fixed bottom-20 lg:bottom-8 left-4 sm:left-6 z-40 pointer-events-auto">
-              <div className="flex items-center gap-2 px-3 py-2 rounded-2xl bg-emerald-950/90 backdrop-blur-md border border-orange-500/40 text-cream-100 shadow-card text-xs">
-                <span className="text-lg">🇮🇳</span>
-                <div className="flex flex-col">
-                  <span className="font-bold text-xs text-orange-300">Made in India</span>
-                  <span className="text-[10px] text-cream-200/70">Factory Direct Ply</span>
-                </div>
-              </div>
-            </div>
-          )}
         </div>
       )}
 
@@ -367,7 +509,7 @@ export const FestiveEffects: React.FC = () => {
               </p>
             </div>
 
-            {/* Coupon Card (if code provided) */}
+            {/* Coupon Card */}
             {config.couponCode && (
               <div className="p-3.5 sm:p-4 rounded-2xl bg-cream-50 dark:bg-[#1A212C] border border-dashed border-amber-500/50 space-y-2">
                 <div className="flex items-center justify-between text-xs">

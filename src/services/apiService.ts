@@ -274,6 +274,11 @@ export interface FestivalCampaignConfig {
   discountPercentage: number;
   highlightColor: string;
   enableAmbientEffects: boolean;
+  enableSparklerTrail: boolean;
+  showCountdownTimer: boolean;
+  countdownEndDate?: string;
+  showSurpriseGiftBox: boolean;
+  surpriseGiftText?: string;
   showGreetingModal: boolean;
   autoSchedule: boolean;
   startDate?: string;
@@ -293,6 +298,10 @@ export const FESTIVAL_PRESETS: Record<FestivalType, FestivalCampaignConfig> = {
     discountPercentage: 0,
     highlightColor: '#B57731',
     enableAmbientEffects: false,
+    enableSparklerTrail: false,
+    showCountdownTimer: false,
+    showSurpriseGiftBox: false,
+    surpriseGiftText: '',
     showGreetingModal: false,
     autoSchedule: false
   },
@@ -307,6 +316,11 @@ export const FESTIVAL_PRESETS: Record<FestivalType, FestivalCampaignConfig> = {
     discountPercentage: 15,
     highlightColor: '#F59E0B',
     enableAmbientEffects: true,
+    enableSparklerTrail: true,
+    showCountdownTimer: true,
+    countdownEndDate: '2026-11-15T23:59:59',
+    showSurpriseGiftBox: true,
+    surpriseGiftText: 'Free 3D Architectural VR Walkthrough + Material Swatch Kit',
     showGreetingModal: true,
     autoSchedule: false
   },
@@ -321,6 +335,11 @@ export const FESTIVAL_PRESETS: Record<FestivalType, FestivalCampaignConfig> = {
     discountPercentage: 12,
     highlightColor: '#EC4899',
     enableAmbientEffects: true,
+    enableSparklerTrail: true,
+    showCountdownTimer: true,
+    countdownEndDate: '2026-03-25T23:59:59',
+    showSurpriseGiftBox: true,
+    surpriseGiftText: 'Free Häfele Matrix Drawer Soft-Close Upgrade',
     showGreetingModal: true,
     autoSchedule: false
   },
@@ -335,6 +354,10 @@ export const FESTIVAL_PRESETS: Record<FestivalType, FestivalCampaignConfig> = {
     discountPercentage: 10,
     highlightColor: '#EF4444',
     enableAmbientEffects: true,
+    enableSparklerTrail: true,
+    showCountdownTimer: true,
+    showSurpriseGiftBox: true,
+    surpriseGiftText: 'Free Solid Teakwood Temple Carving Panel',
     showGreetingModal: false,
     autoSchedule: false
   },
@@ -349,6 +372,11 @@ export const FESTIVAL_PRESETS: Record<FestivalType, FestivalCampaignConfig> = {
     discountPercentage: 10,
     highlightColor: '#38BDF8',
     enableAmbientEffects: true,
+    enableSparklerTrail: true,
+    showCountdownTimer: true,
+    countdownEndDate: '2026-01-05T23:59:59',
+    showSurpriseGiftBox: true,
+    surpriseGiftText: '₹25,000 Modular Furniture Voucher',
     showGreetingModal: true,
     autoSchedule: false
   },
@@ -363,6 +391,9 @@ export const FESTIVAL_PRESETS: Record<FestivalType, FestivalCampaignConfig> = {
     discountPercentage: 10,
     highlightColor: '#F97316',
     enableAmbientEffects: true,
+    enableSparklerTrail: false,
+    showCountdownTimer: false,
+    showSurpriseGiftBox: false,
     showGreetingModal: false,
     autoSchedule: false
   },
@@ -377,6 +408,10 @@ export const FESTIVAL_PRESETS: Record<FestivalType, FestivalCampaignConfig> = {
     discountPercentage: 10,
     highlightColor: '#D97706',
     enableAmbientEffects: true,
+    enableSparklerTrail: true,
+    showCountdownTimer: true,
+    showSurpriseGiftBox: true,
+    surpriseGiftText: 'Special Turnkey Consultation Gift',
     showGreetingModal: false,
     autoSchedule: false
   }

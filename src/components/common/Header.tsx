@@ -27,6 +27,7 @@ import { useQuote } from '../../context/QuoteContext';
 import { useTheme } from '../../context/ThemeContext';
 const SearchModal = React.lazy(() => import('./SearchModal').then((m) => ({ default: m.SearchModal })));
 import { apiService, BrandingSEOData, FestivalCampaignConfig } from '../../services/apiService';
+import { FestiveCountdown } from './FestiveCountdown';
 
 export const Header: React.FC = () => {
   const { isScrolled } = useScrollDirection();
@@ -197,6 +198,10 @@ export const Header: React.FC = () => {
                       <span className="opacity-80">({festival.discountPercentage}% OFF)</span>
                     )}
                   </button>
+                )}
+
+                {festival.showCountdownTimer && (
+                  <FestiveCountdown targetDate={festival.countdownEndDate} />
                 )}
 
                 <Link
