@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, NavLink, Outlet, useNavigate, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard,
@@ -30,6 +30,7 @@ export const AdminLayout: React.FC = () => {
   const location = useLocation();
   const { theme, toggleTheme } = useTheme();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const mainScrollRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     if (!apiService.isAuthenticated()) {
@@ -37,9 +38,12 @@ export const AdminLayout: React.FC = () => {
     }
   }, [navigate, location.pathname]);
 
-  // Close mobile drawer on route transition
+  // Reset scroll on main panel when route changes
   useEffect(() => {
     setMobileMenuOpen(false);
+    if (mainScrollRef.current) {
+      mainScrollRef.current.scrollTop = 0;
+    }
   }, [location.pathname]);
 
   // Lock background scroll when mobile drawer is open
@@ -80,7 +84,7 @@ export const AdminLayout: React.FC = () => {
     <div className="h-screen h-[100dvh] w-full bg-cream-50 dark:bg-[#0B0F15] text-charcoal-900 dark:text-cream-50 flex overflow-hidden transition-colors duration-200">
       
       {/* Sidebar Desktop - Fully Independent Isolated Scroll */}
-      <aside className="hidden lg:flex flex-col w-64 xl:w-72 bg-white dark:bg-[#121720] border-r border-cream-200 dark:border-cream-200/10 shrink-0 h-full overflow-hidden z-30 select-none">
+      <aside className="hidden lg:flex flex-col w-64 xl:w-72 bg-white dark:bg-[#121720] border-r border-cream-200 dark:border-cream-200/10 shrink-0 h-full min-h-0 overflow-hidden z-30 select-none">
         {/* Brand Header */}
         <div className="p-4 sm:p-5 border-b border-cream-200 dark:border-cream-200/10 flex items-center justify-between shrink-0">
           <div className="flex items-center gap-3">
@@ -104,7 +108,11 @@ export const AdminLayout: React.FC = () => {
         </div>
 
         {/* Navigation Links - Finger & Mouse Independent Smooth Scroll */}
-        <div className="flex-1 overflow-y-auto overscroll-contain py-4 px-3 space-y-1 admin-scrollbar touch-pan-y">
+        <div
+          className="flex-1 min-h-0 overflow-y-auto overscroll-contain py-4 px-3 space-y-1 admin-scrollbar"
+          style={{ WebkitOverflowScrolling: 'touch', touchAction: 'pan-y' }}
+          data-lenis-prevent
+        >
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = item.exact
@@ -187,7 +195,11 @@ export const AdminLayout: React.FC = () => {
             </div>
 
             {/* Mobile Nav Links with Finger Scroll */}
-            <div className="flex-1 overflow-y-auto overscroll-contain py-4 px-3 space-y-1 admin-scrollbar touch-pan-y">
+            <div
+              className="flex-1 min-h-0 overflow-y-auto overscroll-contain py-4 px-3 space-y-1 admin-scrollbar"
+              style={{ WebkitOverflowScrolling: 'touch', touchAction: 'pan-y' }}
+              data-lenis-prevent
+            >
               {navItems.map((item) => {
                 const Icon = item.icon;
                 const isActive = item.exact
@@ -235,7 +247,7 @@ export const AdminLayout: React.FC = () => {
       )}
 
       {/* Main Content Area - Fully Independent Isolated Scroll */}
-      <div className="flex-1 flex flex-col h-full min-w-0 overflow-hidden">
+      <div className="flex-1 flex flex-col h-full min-w-0 min-h-0 overflow-hidden">
         {/* Topbar */}
         <header className="h-16 bg-white/90 dark:bg-[#121720]/90 backdrop-blur-md border-b border-cream-200 dark:border-cream-200/10 px-4 sm:px-8 flex items-center justify-between shrink-0 z-20">
           <div className="flex items-center gap-3">
@@ -290,8 +302,13 @@ export const AdminLayout: React.FC = () => {
         </header>
 
         {/* Dynamic Page Body - Independent Smooth Scroll Container */}
-        <main className="flex-1 overflow-y-auto overflow-x-hidden overscroll-contain p-4 sm:p-6 lg:p-8 admin-scrollbar touch-pan-y">
-          <div className="max-w-7xl w-full mx-auto pb-16">
+        <main
+          ref={mainScrollRef}
+          className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden overscroll-contain p-4 sm:p-6 lg:p-8 admin-scrollbar"
+          style={{ WebkitOverflowScrolling: 'touch', touchAction: 'pan-y' }}
+          data-lenis-prevent
+        >
+          <div className="max-w-7xl w-full mx-auto pb-24">
             <Outlet />
           </div>
         </main>
@@ -305,18 +322,21 @@ export const AdminLayout: React.FC = () => {
           touch-action: pan-y;
         }
         .admin-scrollbar::-webkit-scrollbar {
-          width: 5px;
-          height: 5px;
+          width: 6px;
+          height: 6px;
         }
         .admin-scrollbar::-webkit-scrollbar-track {
-          background: transparent;
+          background: rgba(0, 0, 0, 0.05);
+        }
+        .dark .admin-scrollbar::-webkit-scrollbar-track {
+          background: rgba(255, 255, 255, 0.03);
         }
         .admin-scrollbar::-webkit-scrollbar-thumb {
-          background: rgba(181, 119, 49, 0.25);
+          background: rgba(181, 119, 49, 0.4);
           border-radius: 9999px;
         }
         .admin-scrollbar::-webkit-scrollbar-thumb:hover {
-          background: rgba(181, 119, 49, 0.55);
+          background: rgba(181, 119, 49, 0.8);
         }
       `}</style>
     </div>

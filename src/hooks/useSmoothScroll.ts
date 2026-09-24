@@ -1,7 +1,15 @@
 import { useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 
 export const useSmoothScroll = () => {
+  const location = useLocation();
+
   useEffect(() => {
+    // Never run Lenis on admin routes - ensures 100% native independent scrolling on admin panel
+    if (location.pathname.startsWith('/admin')) {
+      return;
+    }
+
     // Respect prefers-reduced-motion
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (prefersReducedMotion) return;
@@ -14,6 +22,11 @@ export const useSmoothScroll = () => {
     let animationFrameId: number;
 
     import('lenis').then(({ default: Lenis }) => {
+      // Re-verify that user did not navigate to admin while import was resolving
+      if (window.location.pathname.startsWith('/admin')) {
+        return;
+      }
+
       lenisInstance = new Lenis({
         duration: 1.2,
         easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
@@ -38,5 +51,5 @@ export const useSmoothScroll = () => {
         lenisInstance.destroy();
       }
     };
-  }, []);
+  }, [location.pathname]);
 };
