@@ -8,6 +8,8 @@ import { BrandMarquee } from '../components/home/BrandMarquee';
 import { SiteVisitSection } from '../components/home/SiteVisitSection';
 import { TestimonialsAndShowroomRow } from '../components/home/TestimonialsAndShowroomRow';
 import { AISearchKnowledgeSection } from '../components/home/AISearchKnowledgeSection';
+import { VirtualTour360 } from '../components/common/VirtualTour360';
+import { SiteVideoReelsSection } from '../components/home/SiteVideoReelsSection';
 import { SEOHead } from '../components/common/SEOHead';
 
 export const HomePage: React.FC = () => {
@@ -82,8 +84,18 @@ export const HomePage: React.FC = () => {
       {/* 4. AI Room Visualizer + Instant Cost Estimate (Side-by-Side 2-Card Row) */}
       <AIVisualizerAndEstimatorRow />
 
+      {/* 4.5. Interactive 360° Virtual Panoramic Walkthrough */}
+      <section className="py-12 bg-cream-50 dark:bg-forest-900 transition-colors">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <VirtualTour360 />
+        </div>
+      </section>
+
       {/* 5. Featured Projects (3 Cards with Filter Chips) */}
       <FeaturedProjectsSection />
+
+      {/* 5.5. Completed Sites Video Walkthroughs in Sikar */}
+      <SiteVideoReelsSection />
 
       {/* 6. Top Brands We Deal In (8 Brands Grid) */}
       <BrandMarquee />

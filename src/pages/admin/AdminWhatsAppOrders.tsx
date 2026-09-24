@@ -193,7 +193,8 @@ export const AdminWhatsAppOrders: React.FC = () => {
         <div className="space-y-4">
           {filtered.map((order) => {
             const cleanPhone = order.phone?.replace(/\D/g, '') || '';
-            const waLink = cleanPhone ? `https://wa.me/91${cleanPhone.startsWith('91') ? cleanPhone.slice(2) : cleanPhone}` : null;
+            const msg = `Namaste ${order.customerName || 'ji'}! Shree Shyam Interior Sikar se baat kar rahe hain. Aapka WhatsApp order/inquiry (${order.orderType}${order.totalAmount ? ` - ₹${order.totalAmount.toLocaleString('en-IN')}` : ''}) mila hai. Aapse detailed requirement discuss karne ke liye kab baat karein?`;
+            const waLink = cleanPhone ? `https://wa.me/91${cleanPhone.startsWith('91') ? cleanPhone.slice(2) : cleanPhone}?text=${encodeURIComponent(msg)}` : null;
 
             return (
               <div

@@ -9,16 +9,20 @@ import {
   Search,
   DollarSign,
   Clock,
-  CheckCircle2
+  CheckCircle2,
+  Printer,
+  MessageSquare
 } from 'lucide-react';
 import { apiService, QuoteRequest } from '../../services/apiService';
 import { useToast } from '../../context/ToastContext';
+import { QuotationPDFModal } from '../../components/common/QuotationPDFModal';
 
 export const AdminQuotes: React.FC = () => {
   const [quotes, setQuotes] = useState<QuoteRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [search, setSearch] = useState('');
+  const [selectedQuoteForPdf, setSelectedQuoteForPdf] = useState<QuoteRequest | null>(null);
   const { showToast } = useToast();
 
   useEffect(() => {
@@ -232,10 +236,19 @@ export const AdminQuotes: React.FC = () => {
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-2.5">
+                  <div className="flex items-center gap-2">
                     <span className="font-serif font-bold text-base sm:text-lg text-copper-600 dark:text-copper-400 mr-2">
                       ₹{q.totalAmount?.toLocaleString('en-IN') || '0'}
                     </span>
+
+                    {/* Official Branded PDF / Print Quote */}
+                    <button
+                      onClick={() => setSelectedQuoteForPdf(q)}
+                      className="p-2 rounded-xl bg-copper-500/10 text-copper-600 dark:text-copper-400 hover:bg-copper-500 hover:text-white transition-colors"
+                      title="View & Print Official Letterhead PDF Quote"
+                    >
+                      <Printer className="w-4 h-4" />
+                    </button>
 
                     {/* Quick Call */}
                     {q.phone && (
@@ -248,16 +261,18 @@ export const AdminQuotes: React.FC = () => {
                       </a>
                     )}
 
-                    {/* Quick WhatsApp */}
-                    {waLink && (
+                    {/* Quick Smart WhatsApp */}
+                    {cleanPhone && (
                       <a
-                        href={waLink}
+                        href={`https://wa.me/91${cleanPhone.startsWith('91') ? cleanPhone.slice(2) : cleanPhone}?text=${encodeURIComponent(
+                          `Namaste ${q.customerName || 'ji'}! Shree Shyam Interior Sikar se baat kar rahe hain. Aapka requested material quotation (₹${(q.totalAmount || 0).toLocaleString('en-IN')}) hamare paas prapt hua hai. Aapse detailed scope discuss karne ke liye kab baat karein?`
+                        )}`}
                         target="_blank"
                         rel="noreferrer"
                         className="p-2 rounded-xl bg-[#25D366]/15 text-[#25D366] hover:bg-[#25D366] hover:text-white transition-colors"
-                        title="Message on WhatsApp"
+                        title="Send WhatsApp Message to Customer"
                       >
-                        <ExternalLink className="w-4 h-4" />
+                        <MessageSquare className="w-4 h-4" />
                       </a>
                     )}
 
@@ -318,6 +333,22 @@ export const AdminQuotes: React.FC = () => {
             );
           })}
         </div>
+      )}
+
+      {/* Official PDF Letterhead Quotation Modal */}
+      {selectedQuoteForPdf && (
+        <QuotationPDFModal
+          isOpen={!!selectedQuoteForPdf}
+          onClose={() => setSelectedQuoteForPdf(null)}
+          quoteId={selectedQuoteForPdf.id}
+          customerName={selectedQuoteForPdf.customerName}
+          customerPhone={selectedQuoteForPdf.phone}
+          customerCity={selectedQuoteForPdf.city || 'Sikar, Rajasthan'}
+          items={selectedQuoteForPdf.items || []}
+          subtotal={Math.round((selectedQuoteForPdf.totalAmount || 0) / 1.18)}
+          gstAmount={Math.round((selectedQuoteForPdf.totalAmount || 0) - ((selectedQuoteForPdf.totalAmount || 0) / 1.18))}
+          grandTotal={selectedQuoteForPdf.totalAmount || 0}
+        />
       )}
     </div>
   );

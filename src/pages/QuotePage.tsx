@@ -17,6 +17,7 @@ import { generateWhatsAppQuoteUrl } from '../services/quoteService';
 import { useToast } from '../context/ToastContext';
 import { SEOHead } from '../components/common/SEOHead';
 import { apiService } from '../services/apiService';
+import { QuotationPDFModal } from '../components/common/QuotationPDFModal';
 
 export const QuotePage: React.FC = () => {
   const { items, removeItem, updateQuantity, clearQuote, subtotal, gstAmount, grandTotal } = useQuote();
@@ -27,10 +28,10 @@ export const QuotePage: React.FC = () => {
   const [siteCity, setSiteCity] = useState('Sikar');
   const [isSent, setIsSent] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [isPdfModalOpen, setIsPdfModalOpen] = useState(false);
 
   const handlePrint = () => {
-    window.print();
-    showToast('Print dialog triggered for quotation sheet', 'info');
+    setIsPdfModalOpen(true);
   };
 
   const handleSendWhatsApp = async () => {
@@ -350,6 +351,19 @@ export const QuotePage: React.FC = () => {
           </div>
         )}
       </div>
+
+      {/* Official Letterhead PDF Modal */}
+      <QuotationPDFModal
+        isOpen={isPdfModalOpen}
+        onClose={() => setIsPdfModalOpen(false)}
+        customerName={customerName || 'Valued Client'}
+        customerPhone={customerPhone}
+        customerCity={siteCity}
+        items={items}
+        subtotal={subtotal}
+        gstAmount={gstAmount}
+        grandTotal={grandTotal}
+      />
     </div>
   );
 };
