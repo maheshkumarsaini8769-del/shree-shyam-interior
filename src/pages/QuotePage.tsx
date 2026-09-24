@@ -10,7 +10,9 @@ import {
   ArrowRight,
   ShieldCheck,
   Building,
-  CheckCircle2
+  CheckCircle2,
+  Gift,
+  Sparkles
 } from 'lucide-react';
 import { useQuote } from '../context/QuoteContext';
 import { generateWhatsAppQuoteUrl } from '../services/quoteService';
@@ -20,8 +22,22 @@ import { apiService } from '../services/apiService';
 import { QuotationPDFModal } from '../components/common/QuotationPDFModal';
 
 export const QuotePage: React.FC = () => {
-  const { items, removeItem, updateQuantity, clearQuote, subtotal, gstAmount, grandTotal } = useQuote();
+  const {
+    items,
+    removeItem,
+    updateQuantity,
+    clearQuote,
+    subtotal,
+    discountPercent,
+    discountAmount,
+    appliedCoupon,
+    applyCoupon,
+    removeCoupon,
+    gstAmount,
+    grandTotal
+  } = useQuote();
   const { showToast } = useToast();
+  const [inputCoupon, setInputCoupon] = useState('');
 
   const [customerName, setCustomerName] = useState('');
   const [customerPhone, setCustomerPhone] = useState('');
@@ -268,16 +284,20 @@ export const QuotePage: React.FC = () => {
                     </span>
                   </div>
 
+                  {discountAmount > 0 && (
+                    <div className="flex justify-between text-emerald-400 font-semibold bg-emerald-950/40 p-2 rounded-xl border border-emerald-500/30">
+                      <span>Festive Discount ({discountPercent}%):</span>
+                      <span className="font-mono font-bold">
+                        -₹{discountAmount.toLocaleString('en-IN')}
+                      </span>
+                    </div>
+                  )}
+
                   <div className="flex justify-between text-cream-200">
                     <span>GST (18% Applicable):</span>
                     <span className="font-mono font-bold text-copper-300">
                       ₹{gstAmount.toLocaleString('en-IN')}
                     </span>
-                  </div>
-
-                  <div className="flex justify-between text-cream-200">
-                    <span>Discount (Festival Offer):</span>
-                    <span className="font-mono font-bold text-green-400">Included on Booking</span>
                   </div>
 
                   <div className="pt-3 border-t border-cream-200/10 flex justify-between items-baseline">
@@ -286,6 +306,75 @@ export const QuotePage: React.FC = () => {
                       ₹{grandTotal.toLocaleString('en-IN')}
                     </span>
                   </div>
+                </div>
+
+                {/* Festive Coupon Input Box */}
+                <div className="pt-3 border-t border-cream-200/10 space-y-2 print:hidden">
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="font-semibold text-copper-300 flex items-center gap-1.5">
+                      <Gift className="w-3.5 h-3.5 text-copper-400" />
+                      Apply Festive Promo Coupon
+                    </span>
+                    {appliedCoupon && (
+                      <span className="text-[10px] text-emerald-400 font-bold">
+                        ✓ {discountPercent}% OFF ACTIVE
+                      </span>
+                    )}
+                  </div>
+
+                  {appliedCoupon ? (
+                    <div className="flex items-center justify-between p-2.5 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-xs">
+                      <div className="flex items-center gap-2">
+                        <span className="font-mono font-black text-emerald-300 tracking-wider">
+                          {appliedCoupon}
+                        </span>
+                        <span className="text-[11px] text-cream-200/80">
+                          (-₹{discountAmount.toLocaleString('en-IN')})
+                        </span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={removeCoupon}
+                        className="text-[11px] font-bold text-red-400 hover:text-red-300 underline cursor-pointer"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="space-y-1.5">
+                      <div className="flex gap-2">
+                        <input
+                          type="text"
+                          placeholder="e.g. DIWALI2026"
+                          value={inputCoupon}
+                          onChange={(e) => setInputCoupon(e.target.value.toUpperCase())}
+                          className="flex-1 bg-forest-900 border border-cream-200/20 rounded-xl px-3 py-2 text-cream-100 text-xs font-mono uppercase focus:outline-none focus:border-copper-400 placeholder:text-cream-200/30"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (inputCoupon) applyCoupon(inputCoupon);
+                          }}
+                          className="px-4 py-2 rounded-xl bg-copper-500 hover:bg-copper-600 text-white font-bold text-xs uppercase tracking-wider transition-all active:scale-95 cursor-pointer shrink-0"
+                        >
+                          Apply
+                        </button>
+                      </div>
+
+                      {/* 1-Click Suggestion Pill */}
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setInputCoupon('DIWALI2026');
+                          applyCoupon('DIWALI2026');
+                        }}
+                        className="text-[10px] text-amber-300 hover:text-amber-200 flex items-center gap-1 cursor-pointer pt-0.5 text-left"
+                      >
+                        <Sparkles className="w-3 h-3 text-amber-400 shrink-0" />
+                        <span>Click to apply: <strong className="underline font-mono">DIWALI2026</strong> (Flat 15% OFF)</span>
+                      </button>
+                    </div>
+                  )}
                 </div>
 
                 {/* Customer Details Input */}

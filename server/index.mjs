@@ -548,6 +548,25 @@ app.put('/api/branding-seo', async (req, res) => {
   res.json(updated);
 });
 
+// -------------------------------------------------------------
+// Festival Themes & Campaign Mode Settings
+// -------------------------------------------------------------
+app.get('/api/festival', async (req, res) => {
+  const festivalData = (await readData('festival.json')) || {};
+  res.json(festivalData);
+});
+
+app.put('/api/festival', async (req, res) => {
+  const current = (await readData('festival.json')) || {};
+  const updated = {
+    ...current,
+    ...req.body,
+    updatedAt: new Date().toISOString()
+  };
+  await writeData('festival.json', updated);
+  res.json(updated);
+});
+
 // Diagnostic endpoint to test DB and Cloud Store connectivity
 app.get('/api/test-db', async (req, res) => {
   try {

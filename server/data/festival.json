@@ -1,0 +1,14 @@
+{
+  "activeFestival": "diwali",
+  "festivalName": "Diwali (दीपावली महोत्सव)",
+  "badgeText": "🪔 SHUBH DEEPAWALI OFFER",
+  "bannerText": "Shubh Deepawali Special: Flat 15% OFF on Turnkey Interiors + Free 3D VR Walkthrough! Use code DIWALI2026",
+  "greetingTitle": "🪔 Shubh Deepawali from Shree Shyam Interior!",
+  "greetingSubtitle": "May your home illuminate with master woodwork, luxury finishes, and everlasting prosperity.",
+  "couponCode": "DIWALI2026",
+  "discountPercentage": 15,
+  "highlightColor": "#F59E0B",
+  "enableAmbientEffects": true,
+  "showGreetingModal": true,
+  "autoSchedule": false
+}

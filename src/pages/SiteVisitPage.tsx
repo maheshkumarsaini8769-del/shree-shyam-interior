@@ -19,6 +19,7 @@ export const SiteVisitPage: React.FC = () => {
     approxArea: '1450',
     preferredDate: '',
     preferredTime: 'Morning (10:00 AM - 1:00 PM)',
+    promoCode: '',
     additionalNotes: ''
   });
 
@@ -41,7 +42,7 @@ export const SiteVisitPage: React.FC = () => {
         date: formData.preferredDate,
         slot: formData.preferredTime,
         roomType: formData.propertyType,
-        notes: `Area: ${formData.approxArea} sq ft. ${formData.additionalNotes}`.trim(),
+        notes: `Area: ${formData.approxArea} sq ft. ${formData.promoCode ? 'Promo Code: ' + formData.promoCode + '. ' : ''}${formData.additionalNotes}`.trim(),
       });
     } catch (_) {
       // Non-blocking — WhatsApp + local confirmation still proceed
@@ -232,11 +233,33 @@ export const SiteVisitPage: React.FC = () => {
                       className="w-full bg-cream-50 border border-cream-200 rounded-xl px-4 py-3 text-forest-950 focus:outline-none focus:border-copper-500"
                     />
                   </div>
+
+                  <div>
+                    <div className="flex items-center justify-between mb-1">
+                      <label className="block font-bold text-forest-950">
+                        Festive Coupon / Referral Code (Optional)
+                      </label>
+                      <button
+                        type="button"
+                        onClick={() => setFormData({ ...formData, promoCode: 'DIWALI2026' })}
+                        className="text-[11px] font-bold text-copper-600 hover:underline cursor-pointer"
+                      >
+                        Apply DIWALI2026
+                      </button>
+                    </div>
+                    <input
+                      type="text"
+                      placeholder="e.g. DIWALI2026"
+                      value={formData.promoCode}
+                      onChange={(e) => setFormData({ ...formData, promoCode: e.target.value.toUpperCase() })}
+                      className="w-full bg-cream-50 border border-cream-200 rounded-xl px-4 py-3 text-forest-950 font-mono uppercase focus:outline-none focus:border-copper-500 placeholder:normal-case placeholder:font-sans"
+                    />
+                  </div>
                 </div>
 
                 <button
                   type="submit"
-                  className="w-full py-4 rounded-xl bg-copper-500 hover:bg-copper-600 text-white font-bold text-xs uppercase tracking-wider shadow-glow-copper transition-all mt-4"
+                  className="w-full py-4 rounded-xl bg-copper-500 hover:bg-copper-600 text-white font-bold text-xs uppercase tracking-wider shadow-glow-copper transition-all mt-4 cursor-pointer"
                 >
                   Confirm Free Site Visit Booking
                 </button>

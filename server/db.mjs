@@ -188,7 +188,8 @@ export async function initDb() {
       'settings.json',
       'siteContent.json',
       'brandingSeo.json',
-      'configurator.json'
+      'configurator.json',
+      'festival.json'
     ];
 
     // Seed cloud data if present
