@@ -261,6 +261,127 @@ export interface BrandingSEOData {
   };
 }
 
+export type FestivalType = 'normal' | 'diwali' | 'holi' | 'navratri' | 'newyear' | 'patriot' | 'custom';
+
+export interface FestivalCampaignConfig {
+  activeFestival: FestivalType;
+  festivalName: string;
+  badgeText: string;
+  bannerText: string;
+  greetingTitle: string;
+  greetingSubtitle: string;
+  couponCode: string;
+  discountPercentage: number;
+  highlightColor: string;
+  enableAmbientEffects: boolean;
+  showGreetingModal: boolean;
+  autoSchedule: boolean;
+  startDate?: string;
+  endDate?: string;
+  updatedAt?: string;
+}
+
+export const FESTIVAL_PRESETS: Record<FestivalType, FestivalCampaignConfig> = {
+  normal: {
+    activeFestival: 'normal',
+    festivalName: 'Normal (Standard Luxury Days)',
+    badgeText: 'SHOWROOM VISIT',
+    bannerText: 'Book a 1-on-1 architect consultation in Sikar & get 3D layout rendering free.',
+    greetingTitle: 'Welcome to Shree Shyam Interior',
+    greetingSubtitle: "Rajasthan's premier turnkey luxury interior design atelier.",
+    couponCode: '',
+    discountPercentage: 0,
+    highlightColor: '#B57731',
+    enableAmbientEffects: false,
+    showGreetingModal: false,
+    autoSchedule: false
+  },
+  diwali: {
+    activeFestival: 'diwali',
+    festivalName: 'Diwali (दीपावली महोत्सव)',
+    badgeText: '🪔 SHUBH DEEPAWALI OFFER',
+    bannerText: 'Shubh Deepawali Special: Flat 15% OFF on Turnkey Interiors + Free 3D VR Walkthrough! Use code DIWALI2026',
+    greetingTitle: '🪔 Shubh Deepawali from Shree Shyam Interior!',
+    greetingSubtitle: 'May your home illuminate with master woodwork, luxury finishes, and everlasting prosperity.',
+    couponCode: 'DIWALI2026',
+    discountPercentage: 15,
+    highlightColor: '#F59E0B',
+    enableAmbientEffects: true,
+    showGreetingModal: true,
+    autoSchedule: false
+  },
+  holi: {
+    activeFestival: 'holi',
+    festivalName: 'Holi (रंगों का त्यौहार)',
+    badgeText: '🎨 HOLI DHAMAKA',
+    bannerText: 'Rangon Ka Tyohar Special: Complimentary German Soft-Close Hardware Upgrade on Kitchens! Use code HOLI2026',
+    greetingTitle: '🎨 Happy & Colorful Holi!',
+    greetingSubtitle: 'Add vibrant architectural colors, premium veneers, and durable finishes to your dream home.',
+    couponCode: 'HOLI2026',
+    discountPercentage: 12,
+    highlightColor: '#EC4899',
+    enableAmbientEffects: true,
+    showGreetingModal: true,
+    autoSchedule: false
+  },
+  navratri: {
+    activeFestival: 'navratri',
+    festivalName: 'Navratri & Dussehra (शुभ नवरात्रि)',
+    badgeText: '✨ NAVRATRI UTSAV',
+    bannerText: 'Auspicious Griha Pravesh Offers: Flat 10% OFF on Living & Puja Room Teakwood Paneling! Use code SHUBHLABH',
+    greetingTitle: '✨ Shubh Navratri & Dussehra!',
+    greetingSubtitle: 'Invoke divine grace and artisanal wooden sanctity into your living spaces.',
+    couponCode: 'SHUBHLABH',
+    discountPercentage: 10,
+    highlightColor: '#EF4444',
+    enableAmbientEffects: true,
+    showGreetingModal: false,
+    autoSchedule: false
+  },
+  newyear: {
+    activeFestival: 'newyear',
+    festivalName: 'New Year (नया साल)',
+    badgeText: '🎉 NEW YEAR 2026',
+    bannerText: 'Transform Your Home for 2026: Book a Full Villa Package & Receive ₹25,000 Material Gift Voucher! Code: NEWYEAR26',
+    greetingTitle: '🎉 Happy New Year 2026!',
+    greetingSubtitle: 'Fresh beginnings with bespoke architectural designs and lifetime durability.',
+    couponCode: 'NEWYEAR26',
+    discountPercentage: 10,
+    highlightColor: '#38BDF8',
+    enableAmbientEffects: true,
+    showGreetingModal: true,
+    autoSchedule: false
+  },
+  patriot: {
+    activeFestival: 'patriot',
+    festivalName: 'Independence & Republic Day (राष्ट्रीय पर्व)',
+    badgeText: '🇮🇳 DESH KA INTERIOR',
+    bannerText: '100% Genuine Made in India Century Marine Ply & Teakwood Interiors at Factory Direct Rates. Code: BHARAT79',
+    greetingTitle: '🇮🇳 Proudly Handcrafted in Rajasthan',
+    greetingSubtitle: 'Celebrating Indian architectural legacy with modern precision craftsmanship.',
+    couponCode: 'BHARAT79',
+    discountPercentage: 10,
+    highlightColor: '#F97316',
+    enableAmbientEffects: true,
+    showGreetingModal: false,
+    autoSchedule: false
+  },
+  custom: {
+    activeFestival: 'custom',
+    festivalName: 'Custom Festive Campaign',
+    badgeText: 'FESTIVE SPECIAL',
+    bannerText: 'Special Celebration Offer: Exclusive discounts on modular turnkey interiors for a limited period!',
+    greetingTitle: 'Special Festive Greetings',
+    greetingSubtitle: 'Luxury bespoke living spaces crafted by Shree Shyam Interior.',
+    couponCode: 'FESTIVE26',
+    discountPercentage: 10,
+    highlightColor: '#D97706',
+    enableAmbientEffects: true,
+    showGreetingModal: false,
+    autoSchedule: false
+  }
+};
+
 const fallbackBrandingSEO: BrandingSEOData = {
   logo: {
     type: 'both',
@@ -1339,6 +1460,76 @@ export const apiService = {
       method: 'PUT',
       body: JSON.stringify(data)
     });
+  },
+
+  // 1-Click Festival Theme & Festive Campaigns Engine
+  async getFestivalCampaign(): Promise<FestivalCampaignConfig> {
+    const STORAGE_KEY = 'ssi_festival_campaign_v1';
+    let currentConfig: FestivalCampaignConfig = FESTIVAL_PRESETS.normal;
+
+    // Check localStorage cache first
+    try {
+      const cached = localStorage.getItem(STORAGE_KEY);
+      if (cached) {
+        currentConfig = JSON.parse(cached);
+      }
+    } catch {
+      // ignore
+    }
+
+    // Auto-schedule check: If festival is scheduled and current date is past endDate, auto-revert to normal!
+    if (currentConfig.autoSchedule && currentConfig.endDate && currentConfig.activeFestival !== 'normal') {
+      const now = new Date();
+      const end = new Date(currentConfig.endDate);
+      // Set end of the day for end date
+      end.setHours(23, 59, 59, 999);
+      if (now > end) {
+        currentConfig = {
+          ...FESTIVAL_PRESETS.normal,
+          updatedAt: new Date().toISOString()
+        };
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(currentConfig));
+          window.dispatchEvent(new CustomEvent('ssi_festival_changed', { detail: currentConfig }));
+        } catch {
+          // ignore
+        }
+      }
+    }
+
+    // Try API if available in backend
+    try {
+      const remote = await apiFetch<FestivalCampaignConfig>('/festival');
+      if (remote && remote.activeFestival) {
+        currentConfig = remote;
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(remote));
+      }
+    } catch {
+      // Backend not implemented yet, using local persistence
+    }
+
+    return currentConfig;
+  },
+
+  async updateFestivalCampaign(data: FestivalCampaignConfig): Promise<FestivalCampaignConfig> {
+    const STORAGE_KEY = 'ssi_festival_campaign_v1';
+    const payload = { ...data, updatedAt: new Date().toISOString() };
+
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+      window.dispatchEvent(new CustomEvent('ssi_festival_changed', { detail: payload }));
+    } catch {
+      // ignore
+    }
+
+    try {
+      return await apiFetch<FestivalCampaignConfig>('/festival', {
+        method: 'PUT',
+        body: JSON.stringify(payload)
+      });
+    } catch {
+      return payload;
+    }
   }
 };
 

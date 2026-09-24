@@ -72,6 +72,8 @@ const AdminSettings = lazyWithRetry(() => import('./pages/admin/AdminSettings').
 const Admin3DStudio = lazyWithRetry(() => import('./pages/admin/Admin3DStudio').then((m) => ({ default: m.Admin3DStudio })));
 const AdminBrandingSEO = lazyWithRetry(() => import('./pages/admin/AdminBrandingSEO').then((m) => ({ default: m.AdminBrandingSEO })));
 const AdminSocialLinks = lazyWithRetry(() => import('./pages/admin/AdminSocialLinks').then((m) => ({ default: m.AdminSocialLinks })));
+const AdminFestiveCampaigns = lazyWithRetry(() => import('./pages/admin/AdminFestiveCampaigns').then((m) => ({ default: m.AdminFestiveCampaigns })));
+const FestiveEffects = lazyWithRetry(() => import('./components/common/FestiveEffects').then((m) => ({ default: m.FestiveEffects })));
 
 
 // Scroll to top helper on route transition with smooth hash anchor support
@@ -162,6 +164,7 @@ const AppContent: React.FC = () => {
             <Route path="/admin" element={<AdminLayout />}>
               <Route index element={<AdminDashboard />} />
               <Route path="3d-studio" element={<Admin3DStudio />} />
+              <Route path="festive" element={<AdminFestiveCampaigns />} />
               <Route path="social-links" element={<AdminSocialLinks />} />
               <Route path="seo-branding" element={<AdminBrandingSEO />} />
               <Route path="products" element={<AdminProducts />} />
@@ -185,6 +188,9 @@ const AppContent: React.FC = () => {
     <div className="flex flex-col min-h-screen relative">
       <ScrollToTop />
       <ScrollProgress />
+      <Suspense fallback={null}>
+        <FestiveEffects />
+      </Suspense>
       <Header />
 
       <main className="flex-1">

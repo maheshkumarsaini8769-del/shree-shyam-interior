@@ -17,13 +17,16 @@ import {
   Phone,
   Layers,
   Star,
-  Compass
+  Compass,
+  Gift,
+  Copy,
+  Check
 } from 'lucide-react';
 import { useScrollDirection } from '../../hooks/useScrollDirection';
 import { useQuote } from '../../context/QuoteContext';
 import { useTheme } from '../../context/ThemeContext';
 const SearchModal = React.lazy(() => import('./SearchModal').then((m) => ({ default: m.SearchModal })));
-import { apiService, BrandingSEOData } from '../../services/apiService';
+import { apiService, BrandingSEOData, FestivalCampaignConfig } from '../../services/apiService';
 
 export const Header: React.FC = () => {
   const { isScrolled } = useScrollDirection();
@@ -32,6 +35,8 @@ export const Header: React.FC = () => {
   const [isMoreOpen, setIsMoreOpen] = useState(false);
   const [announcementDismissed, setAnnouncementDismissed] = useState(false);
   const [branding, setBranding] = useState<BrandingSEOData | null>(null);
+  const [festival, setFestival] = useState<FestivalCampaignConfig | null>(null);
+  const [copiedCoupon, setCopiedCoupon] = useState(false);
   const { totalItemCount } = useQuote();
   const { theme, toggleTheme } = useTheme();
   const location = useLocation();
@@ -52,6 +57,23 @@ export const Header: React.FC = () => {
         }
       }
     });
+
+    apiService.getFestivalCampaign().then((data) => {
+      if (data) {
+        setFestival(data);
+      }
+    });
+
+    const handleFestivalChange = (e: CustomEvent<FestivalCampaignConfig>) => {
+      if (e.detail) {
+        setFestival(e.detail);
+      }
+    };
+
+    window.addEventListener('ssi_festival_changed' as any, handleFestivalChange);
+    return () => {
+      window.removeEventListener('ssi_festival_changed' as any, handleFestivalChange);
+    };
   }, []);
 
   // Close More dropdown on click outside
@@ -137,8 +159,65 @@ export const Header: React.FC = () => {
             : 'bg-white/90 dark:bg-forest-950/80 backdrop-blur-sm border-b border-cream-200/40 dark:border-transparent'
         }`}
       >
-        {/* Top Dynamic Announcement Bar */}
-        {showAnnouncement && (
+        {/* Top Dynamic Announcement Bar (Festive Campaign or Standard) */}
+        {festival && festival.activeFestival !== 'normal' && !announcementDismissed ? (
+          <div
+            className="text-white px-4 py-1.5 border-b text-xs transition-colors"
+            style={{
+              background: `linear-gradient(90deg, #090E17 0%, ${festival.highlightColor}33 45%, #090E17 100%)`,
+              borderColor: `${festival.highlightColor}44`
+            }}
+          >
+            <div className="max-w-7xl mx-auto flex items-center justify-between gap-3">
+              <div className="flex flex-wrap items-center gap-2 overflow-hidden mx-auto sm:mx-0">
+                <span
+                  className="px-2 py-0.5 rounded text-[10px] font-black text-black uppercase tracking-wider shrink-0"
+                  style={{ backgroundColor: festival.highlightColor }}
+                >
+                  {festival.badgeText}
+                </span>
+
+                <span className="truncate text-cream-100 font-normal text-[11px] sm:text-xs">
+                  {festival.bannerText}
+                </span>
+
+                {festival.couponCode && (
+                  <button
+                    onClick={() => {
+                      navigator.clipboard.writeText(festival.couponCode);
+                      setCopiedCoupon(true);
+                      setTimeout(() => setCopiedCoupon(false), 2000);
+                    }}
+                    className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-white/20 hover:bg-white/30 text-white font-mono font-bold text-[10px] border border-white/30 transition-all cursor-pointer shrink-0"
+                    title="Click to copy coupon code"
+                  >
+                    {copiedCoupon ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
+                    <span>{festival.couponCode}</span>
+                    {festival.discountPercentage > 0 && (
+                      <span className="opacity-80">({festival.discountPercentage}% OFF)</span>
+                    )}
+                  </button>
+                )}
+
+                <Link
+                  to="/site-visit"
+                  className="inline-flex items-center gap-1 font-semibold text-amber-300 hover:text-amber-200 underline underline-offset-2 ml-1 shrink-0 text-[11px]"
+                >
+                  <span>Book Visit →</span>
+                </Link>
+              </div>
+
+              <button
+                onClick={() => setAnnouncementDismissed(true)}
+                className="text-cream-300/70 hover:text-cream-100 p-0.5 rounded-full hover:bg-white/10 transition-colors shrink-0 hidden sm:block cursor-pointer"
+                title="Dismiss announcement"
+                aria-label="Dismiss"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          </div>
+        ) : showAnnouncement ? (
           <div className="bg-gradient-to-r from-forest-950 via-forest-900 to-forest-950 text-cream-100 px-4 py-1.5 border-b border-forest-800/60 text-xs">
             <div className="max-w-7xl mx-auto flex items-center justify-between gap-3">
               <div className="flex items-center gap-2 overflow-hidden mx-auto sm:mx-0">
@@ -171,7 +250,7 @@ export const Header: React.FC = () => {
               </button>
             </div>
           </div>
-        )}
+        ) : null}
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between py-3">
           {/* Left: Brand Logo & Tagline */}
@@ -186,12 +265,23 @@ export const Header: React.FC = () => {
             />
 
             <div className="flex flex-col">
-              <span className="font-serif font-black text-forest-950 dark:text-cream-50 text-base sm:text-lg tracking-tight leading-none uppercase group-hover:text-copper-600 dark:group-hover:text-copper-400 transition-colors">
-                {branding?.logo?.text || 'SHREE SHYAM'}{' '}
-                <span className="text-xs font-sans font-extrabold tracking-widest text-copper-600 dark:text-copper-400">
-                  {branding?.logo?.tagline || 'INTERIOR'}
+              <div className="flex items-center">
+                <span className="font-serif font-black text-forest-950 dark:text-cream-50 text-base sm:text-lg tracking-tight leading-none uppercase group-hover:text-copper-600 dark:group-hover:text-copper-400 transition-colors">
+                  {branding?.logo?.text || 'SHREE SHYAM'}{' '}
+                  <span className="text-xs font-sans font-extrabold tracking-widest text-copper-600 dark:text-copper-400">
+                    {branding?.logo?.tagline || 'INTERIOR'}
+                  </span>
                 </span>
-              </span>
+                {festival && festival.activeFestival !== 'normal' && (
+                  <span
+                    className="hidden sm:inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider text-black ml-2"
+                    style={{ backgroundColor: festival.highlightColor }}
+                  >
+                    <Sparkles className="w-2.5 h-2.5" />
+                    <span>{festival.activeFestival === 'diwali' ? 'Diwali' : festival.activeFestival === 'holi' ? 'Holi' : 'Festive'}</span>
+                  </span>
+                )}
+              </div>
               <span className="text-[10px] font-sans text-charcoal-500 dark:text-cream-300/80 font-medium tracking-normal mt-0.5">
                 घर सजाते हैं, दिल से !
               </span>

@@ -20,7 +20,8 @@ import {
   Moon,
   Box,
   Sparkles,
-  Share2
+  Share2,
+  PartyPopper
 } from 'lucide-react';
 import { apiService } from '../../services/apiService';
 import { useTheme } from '../../context/ThemeContext';
@@ -69,6 +70,7 @@ export const AdminLayout: React.FC = () => {
     { label: 'Material Quotes', path: '/admin/quotes', icon: FileText },
     { label: 'WhatsApp Orders', path: '/admin/whatsapp-orders', icon: MessageSquare },
     { label: '3D Studio Finishes', path: '/admin/3d-studio', icon: Box },
+    { label: 'Festival Themes (त्यौहार)', path: '/admin/festive', icon: PartyPopper },
     { label: 'Social Media Links', path: '/admin/social-links', icon: Share2 },
     { label: 'Logo, SEO & Banners', path: '/admin/seo-branding', icon: Sparkles },
     { label: 'Products & Materials', path: '/admin/products', icon: Package },
