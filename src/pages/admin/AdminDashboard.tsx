@@ -36,9 +36,10 @@ export const AdminDashboard: React.FC = () => {
   });
 
   const [activeTab, setActiveTab] = useState<'bookings' | 'quotes' | 'whatsapp'>('bookings');
-  const [recentLeads, setRecentLeads] = useState<Lead[]>([]);
-  const [recentQuotes, setRecentQuotes] = useState<QuoteRequest[]>([]);
-  const [recentWhatsAppOrders, setRecentWhatsAppOrders] = useState<WhatsAppOrder[]>([]);
+  const [allLeads, setAllLeads] = useState<Lead[]>([]);
+  const [allQuotes, setAllQuotes] = useState<QuoteRequest[]>([]);
+  const [allWhatsAppOrders, setAllWhatsAppOrders] = useState<WhatsAppOrder[]>([]);
+  const [rowLimit, setRowLimit] = useState<'all' | 5 | 10>('all');
   const [loading, setLoading] = useState(true);
   const { showToast } = useToast();
 
@@ -76,9 +77,10 @@ export const AdminDashboard: React.FC = () => {
         newOrdersCount: newOrders
       });
 
-      setRecentLeads(leads.slice(0, 5));
-      setRecentQuotes(quotes.slice(0, 5));
-      setRecentWhatsAppOrders(orders.slice(0, 5));
+      // Keep full arrays so all bookings (e.g. 7 of 7) are accessible on dashboard
+      setAllLeads(leads);
+      setAllQuotes(quotes);
+      setAllWhatsAppOrders(orders);
     } catch (err) {
       console.error(err);
     } finally {
@@ -89,14 +91,23 @@ export const AdminDashboard: React.FC = () => {
   const handleLeadStatusChange = async (id: string, newStatus: Lead['status']) => {
     try {
       await apiService.updateLeadStatus(id, { status: newStatus });
-      setRecentLeads((prev) =>
-        prev.map((lead) => (lead.id === id ? { ...lead, status: newStatus } : lead))
-      );
+      setAllLeads((prev) => {
+        const updated = prev.map((lead) => (lead.id === id ? { ...lead, status: newStatus } : lead));
+        setStats((prevStats) => ({
+          ...prevStats,
+          newLeadsCount: updated.filter((l) => l.status === 'New').length
+        }));
+        return updated;
+      });
       showToast(`Booking status updated to ${newStatus}`, 'success');
     } catch {
       showToast('Failed to update booking status', 'error');
     }
   };
+
+  const displayedLeads = rowLimit === 'all' ? allLeads : allLeads.slice(0, rowLimit);
+  const displayedQuotes = rowLimit === 'all' ? allQuotes : allQuotes.slice(0, rowLimit);
+  const displayedWhatsAppOrders = rowLimit === 'all' ? allWhatsAppOrders : allWhatsAppOrders.slice(0, rowLimit);
 
   return (
     <div className="space-y-8">
@@ -239,262 +250,368 @@ export const AdminDashboard: React.FC = () => {
             })}
           </div>
 
-          <Link
-            to={activeTab === 'bookings' ? '/admin/leads' : activeTab === 'quotes' ? '/admin/quotes' : '/admin/whatsapp-orders'}
-            className="text-xs font-bold text-copper-600 dark:text-copper-400 hover:underline flex items-center gap-1 self-start sm:self-auto"
-          >
-            <span>Open Dedicated Section</span>
-            <ArrowRight className="w-3.5 h-3.5" />
-          </Link>
+          <div className="flex flex-wrap items-center gap-3 self-start sm:self-auto">
+            {/* Row limit toggle */}
+            <div className="inline-flex items-center gap-1 bg-cream-100 dark:bg-[#1A212C] p-1 rounded-xl text-xs border border-cream-200/50 dark:border-cream-200/10">
+              <span className="text-[10px] font-bold text-charcoal-400 dark:text-cream-200/60 px-2 uppercase tracking-wider">
+                Show:
+              </span>
+              <button
+                type="button"
+                onClick={() => setRowLimit('all')}
+                className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                  rowLimit === 'all'
+                    ? 'bg-copper-500 text-white shadow-sm'
+                    : 'text-charcoal-600 dark:text-cream-200/70 hover:text-forest-950 dark:hover:text-cream-50'
+                }`}
+              >
+                All
+              </button>
+              <button
+                type="button"
+                onClick={() => setRowLimit(5)}
+                className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                  rowLimit === 5
+                    ? 'bg-copper-500 text-white shadow-sm'
+                    : 'text-charcoal-600 dark:text-cream-200/70 hover:text-forest-950 dark:hover:text-cream-50'
+                }`}
+              >
+                Top 5
+              </button>
+            </div>
+
+            <Link
+              to={activeTab === 'bookings' ? '/admin/leads' : activeTab === 'quotes' ? '/admin/quotes' : '/admin/whatsapp-orders'}
+              className="text-xs font-bold text-copper-600 dark:text-copper-400 hover:underline flex items-center gap-1"
+            >
+              <span>Open Dedicated Section</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </Link>
+          </div>
         </div>
 
         {/* Tab 1: Bookings */}
         {activeTab === 'bookings' && (
-          <div>
-            {recentLeads.length === 0 ? (
+          <div className="space-y-4">
+            {allLeads.length === 0 ? (
               <div className="py-12 text-center text-charcoal-400 dark:text-cream-200/60">
                 <CalendarCheck2 className="w-10 h-10 mx-auto mb-2 opacity-30 text-copper-500" />
-                <p className="text-sm font-semibold">No recent bookings</p>
+                <p className="text-sm font-semibold">No bookings found</p>
                 <p className="text-xs">When visitors submit a booking on /site-visit, they appear here.</p>
               </div>
             ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full text-left text-xs">
-                  <thead>
-                    <tr className="border-b border-cream-200 dark:border-cream-200/10 text-charcoal-400 dark:text-cream-200/60 uppercase tracking-wider text-[10px]">
-                      <th className="pb-3 font-bold">Client Name</th>
-                      <th className="pb-3 font-bold">Contact Phone</th>
-                      <th className="pb-3 font-bold">Preferred Slot</th>
-                      <th className="pb-3 font-bold">Property Details</th>
-                      <th className="pb-3 font-bold">Status</th>
-                      <th className="pb-3 font-bold text-right">Quick Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-cream-100 dark:divide-cream-200/5">
-                    {recentLeads.map((lead) => (
-                      <tr key={lead.id} className="hover:bg-cream-50 dark:hover:bg-[#1A212C]/50 transition-colors">
-                        <td className="py-3.5 font-bold text-forest-950 dark:text-cream-50">
-                          {lead.name}
-                          {lead.address && (
-                            <span className="block text-[11px] font-normal text-charcoal-400 dark:text-cream-200/60 truncate max-w-xs">
-                              {lead.address}
-                            </span>
-                          )}
-                        </td>
-                        <td className="py-3.5 font-mono text-charcoal-600 dark:text-cream-200/80">
-                          {lead.phone}
-                        </td>
-                        <td className="py-3.5 text-charcoal-600 dark:text-cream-200/80">
-                          <div>{lead.date || 'Flexible'}</div>
-                          <span className="text-[10px] text-charcoal-400 dark:text-cream-200/60">{lead.slot || 'Morning'}</span>
-                        </td>
-                        <td className="py-3.5 text-charcoal-600 dark:text-cream-200/80">
-                          <span className="capitalize">{lead.roomType || 'Apartment'}</span>
-                          {lead.budget && (
-                            <span className="block text-[10px] text-copper-500 font-semibold">{lead.budget}</span>
-                          )}
-                        </td>
-                        <td className="py-3.5">
-                          <select
-                            value={lead.status}
-                            onChange={(e) => handleLeadStatusChange(lead.id, e.target.value as any)}
-                            className="bg-cream-50 dark:bg-[#1A212C] border border-cream-200 dark:border-cream-200/20 rounded-lg px-2.5 py-1 text-xs font-semibold text-forest-950 dark:text-cream-50"
-                          >
-                            <option value="New">New</option>
-                            <option value="Contacted">Contacted</option>
-                            <option value="Visit Scheduled">Visit Scheduled</option>
-                            <option value="Quotation Shared">Quotation Shared</option>
-                            <option value="Completed">Completed</option>
-                            <option value="Cancelled">Cancelled</option>
-                          </select>
-                        </td>
-                        <td className="py-3.5 text-right">
-                          <div className="inline-flex items-center gap-2">
-                            <a
-                              href={`https://wa.me/91${lead.phone.replace(/[^0-9]/g, '')}?text=Namaste%20${encodeURIComponent(lead.name)},%20this%20is%20Shree%20Shyam%20Interior%20team%20regarding%20your%20site%20visit%20request.`}
-                              target="_blank"
-                              rel="noreferrer"
-                              className="p-1.5 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-500 transition-colors"
-                              title="Chat on WhatsApp"
-                            >
-                              <MessageCircle className="w-4 h-4" />
-                            </a>
-                            <a
-                              href={`tel:${lead.phone}`}
-                              className="p-1.5 rounded-lg bg-copper-500/10 hover:bg-copper-500/20 text-copper-500 transition-colors"
-                              title="Call Customer"
-                            >
-                              <Phone className="w-4 h-4" />
-                            </a>
-                          </div>
-                        </td>
+              <>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-xs">
+                    <thead>
+                      <tr className="border-b border-cream-200 dark:border-cream-200/10 text-charcoal-400 dark:text-cream-200/60 uppercase tracking-wider text-[10px]">
+                        <th className="pb-3 font-bold">Client Name</th>
+                        <th className="pb-3 font-bold">Contact Phone</th>
+                        <th className="pb-3 font-bold">Preferred Slot</th>
+                        <th className="pb-3 font-bold">Property Details</th>
+                        <th className="pb-3 font-bold">Status</th>
+                        <th className="pb-3 font-bold text-right">Quick Actions</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+                    </thead>
+                    <tbody className="divide-y divide-cream-100 dark:divide-cream-200/5">
+                      {displayedLeads.map((lead) => (
+                        <tr key={lead.id} className="hover:bg-cream-50 dark:hover:bg-[#1A212C]/50 transition-colors">
+                          <td className="py-3.5 font-bold text-forest-950 dark:text-cream-50">
+                            {lead.name}
+                            {lead.address && (
+                              <span className="block text-[11px] font-normal text-charcoal-400 dark:text-cream-200/60 truncate max-w-xs">
+                                {lead.address}
+                              </span>
+                            )}
+                          </td>
+                          <td className="py-3.5 font-mono text-charcoal-600 dark:text-cream-200/80">
+                            {lead.phone}
+                          </td>
+                          <td className="py-3.5 text-charcoal-600 dark:text-cream-200/80">
+                            <div>{lead.date || 'Flexible'}</div>
+                            <span className="text-[10px] text-charcoal-400 dark:text-cream-200/60">{lead.slot || 'Morning'}</span>
+                          </td>
+                          <td className="py-3.5 text-charcoal-600 dark:text-cream-200/80">
+                            <span className="capitalize">{lead.roomType || 'Apartment'}</span>
+                            {lead.budget && (
+                              <span className="block text-[10px] text-copper-500 font-semibold">{lead.budget}</span>
+                            )}
+                          </td>
+                          <td className="py-3.5">
+                            <select
+                              value={lead.status}
+                              onChange={(e) => handleLeadStatusChange(lead.id, e.target.value as any)}
+                              className="bg-cream-50 dark:bg-[#1A212C] border border-cream-200 dark:border-cream-200/20 rounded-lg px-2.5 py-1 text-xs font-semibold text-forest-950 dark:text-cream-50 cursor-pointer"
+                            >
+                              <option value="New">New</option>
+                              <option value="Contacted">Contacted</option>
+                              <option value="Visit Scheduled">Visit Scheduled</option>
+                              <option value="Quotation Shared">Quotation Shared</option>
+                              <option value="Completed">Completed</option>
+                              <option value="Cancelled">Cancelled</option>
+                            </select>
+                          </td>
+                          <td className="py-3.5 text-right">
+                            <div className="inline-flex items-center gap-2">
+                              <a
+                                href={`https://wa.me/91${lead.phone.replace(/[^0-9]/g, '')}?text=Namaste%20${encodeURIComponent(lead.name)},%20this%20is%20Shree%20Shyam%20Interior%20team%20regarding%20your%20site%20visit%20request.`}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="p-1.5 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-500 transition-colors"
+                                title="Chat on WhatsApp"
+                              >
+                                <MessageCircle className="w-4 h-4" />
+                              </a>
+                              <a
+                                href={`tel:${lead.phone}`}
+                                className="p-1.5 rounded-lg bg-copper-500/10 hover:bg-copper-500/20 text-copper-500 transition-colors"
+                                title="Call Customer"
+                              >
+                                <Phone className="w-4 h-4" />
+                              </a>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* Footer Count Bar */}
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-3 border-t border-cream-200 dark:border-cream-200/10 text-xs text-charcoal-500 dark:text-cream-200/70">
+                  <div>
+                    Showing <span className="font-bold text-forest-950 dark:text-cream-50">{displayedLeads.length}</span> of <span className="font-bold text-forest-950 dark:text-cream-50">{allLeads.length}</span> bookings
+                    {rowLimit !== 'all' && allLeads.length > displayedLeads.length && (
+                      <button
+                        type="button"
+                        onClick={() => setRowLimit('all')}
+                        className="ml-2 text-copper-600 dark:text-copper-400 font-bold hover:underline cursor-pointer"
+                      >
+                        (Show all {allLeads.length})
+                      </button>
+                    )}
+                  </div>
+                  <Link
+                    to="/admin/leads"
+                    className="font-bold text-copper-600 dark:text-copper-400 hover:underline flex items-center gap-1 self-start sm:self-auto"
+                  >
+                    <span>Open Full Bookings Page</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </Link>
+                </div>
+              </>
             )}
           </div>
         )}
 
         {/* Tab 2: Material Quotes */}
         {activeTab === 'quotes' && (
-          <div>
-            {recentQuotes.length === 0 ? (
+          <div className="space-y-4">
+            {allQuotes.length === 0 ? (
               <div className="py-12 text-center text-charcoal-400 dark:text-cream-200/60">
                 <FileText className="w-10 h-10 mx-auto mb-2 opacity-30 text-amber-500" />
-                <p className="text-sm font-semibold">No recent material quotes</p>
+                <p className="text-sm font-semibold">No material quotes found</p>
                 <p className="text-xs">When customers generate a BOQ cart on /quote, it appears here.</p>
               </div>
             ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full text-left text-xs">
-                  <thead>
-                    <tr className="border-b border-cream-200 dark:border-cream-200/10 text-charcoal-400 dark:text-cream-200/60 uppercase tracking-wider text-[10px]">
-                      <th className="pb-3 font-bold">Customer Name</th>
-                      <th className="pb-3 font-bold">Contact Phone</th>
-                      <th className="pb-3 font-bold">Materials Selected</th>
-                      <th className="pb-3 font-bold">Quoted Value</th>
-                      <th className="pb-3 font-bold">Status</th>
-                      <th className="pb-3 font-bold text-right">Quick Contact</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-cream-100 dark:divide-cream-200/5">
-                    {recentQuotes.map((q) => (
-                      <tr key={q.id} className="hover:bg-cream-50 dark:hover:bg-[#1A212C]/50 transition-colors">
-                        <td className="py-3.5 font-bold text-forest-950 dark:text-cream-50">
-                          {q.customerName || 'Anonymous Customer'}
-                          {q.city && (
-                            <span className="block text-[11px] font-normal text-charcoal-400 dark:text-cream-200/60">
-                              City: {q.city}
-                            </span>
-                          )}
-                        </td>
-                        <td className="py-3.5 font-mono text-charcoal-600 dark:text-cream-200/80">
-                          {q.phone || 'N/A'}
-                        </td>
-                        <td className="py-3.5 text-charcoal-600 dark:text-cream-200/80">
-                          <span className="font-semibold">{q.items?.length || 0} Products</span>
-                        </td>
-                        <td className="py-3.5 font-serif font-bold text-copper-600 dark:text-copper-400">
-                          ₹{q.totalAmount?.toLocaleString('en-IN') || '0'}
-                        </td>
-                        <td className="py-3.5">
-                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-copper-500/15 text-copper-600 border border-copper-500/30 uppercase">
-                            {q.status || 'New'}
-                          </span>
-                        </td>
-                        <td className="py-3.5 text-right">
-                          <div className="inline-flex items-center gap-2">
-                            {q.phone && (
-                              <a
-                                href={`tel:${q.phone}`}
-                                className="p-1.5 rounded-lg bg-copper-500/10 hover:bg-copper-500/20 text-copper-500 transition-colors"
-                                title="Call Customer"
-                              >
-                                <Phone className="w-4 h-4" />
-                              </a>
-                            )}
-                            <Link
-                              to="/admin/quotes"
-                              className="p-1.5 rounded-lg bg-cream-100 dark:bg-[#1A212C] text-charcoal-600 dark:text-cream-200 hover:text-copper-600 transition-colors"
-                              title="View Quote Details"
-                            >
-                              <ExternalLink className="w-4 h-4" />
-                            </Link>
-                          </div>
-                        </td>
+              <>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-xs">
+                    <thead>
+                      <tr className="border-b border-cream-200 dark:border-cream-200/10 text-charcoal-400 dark:text-cream-200/60 uppercase tracking-wider text-[10px]">
+                        <th className="pb-3 font-bold">Customer Name</th>
+                        <th className="pb-3 font-bold">Contact Phone</th>
+                        <th className="pb-3 font-bold">Materials Selected</th>
+                        <th className="pb-3 font-bold">Quoted Value</th>
+                        <th className="pb-3 font-bold">Status</th>
+                        <th className="pb-3 font-bold text-right">Quick Contact</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* Tab 3: WhatsApp Orders */}
-        {activeTab === 'whatsapp' && (
-          <div>
-            {recentWhatsAppOrders.length === 0 ? (
-              <div className="py-12 text-center text-charcoal-400 dark:text-cream-200/60">
-                <MessageSquare className="w-10 h-10 mx-auto mb-2 opacity-30 text-[#25D366]" />
-                <p className="text-sm font-semibold">No recent WhatsApp orders</p>
-                <p className="text-xs">When users dispatch inquiries via WhatsApp Desk, they appear here.</p>
-              </div>
-            ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full text-left text-xs">
-                  <thead>
-                    <tr className="border-b border-cream-200 dark:border-cream-200/10 text-charcoal-400 dark:text-cream-200/60 uppercase tracking-wider text-[10px]">
-                      <th className="pb-3 font-bold">Customer Name</th>
-                      <th className="pb-3 font-bold">Contact Phone</th>
-                      <th className="pb-3 font-bold">Order Type</th>
-                      <th className="pb-3 font-bold">Value / Details</th>
-                      <th className="pb-3 font-bold">Status</th>
-                      <th className="pb-3 font-bold text-right">Direct Chat</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-cream-100 dark:divide-cream-200/5">
-                    {recentWhatsAppOrders.map((o) => {
-                      const cleanPhone = o.phone?.replace(/\D/g, '') || '';
-                      const waLink = cleanPhone ? `https://wa.me/91${cleanPhone.startsWith('91') ? cleanPhone.slice(2) : cleanPhone}` : null;
-
-                      return (
-                        <tr key={o.id} className="hover:bg-cream-50 dark:hover:bg-[#1A212C]/50 transition-colors">
+                    </thead>
+                    <tbody className="divide-y divide-cream-100 dark:divide-cream-200/5">
+                      {displayedQuotes.map((q) => (
+                        <tr key={q.id} className="hover:bg-cream-50 dark:hover:bg-[#1A212C]/50 transition-colors">
                           <td className="py-3.5 font-bold text-forest-950 dark:text-cream-50">
-                            {o.customerName || 'WhatsApp Client'}
+                            {q.customerName || 'Anonymous Customer'}
+                            {q.city && (
+                              <span className="block text-[11px] font-normal text-charcoal-400 dark:text-cream-200/60">
+                                City: {q.city}
+                              </span>
+                            )}
                           </td>
                           <td className="py-3.5 font-mono text-charcoal-600 dark:text-cream-200/80">
-                            {o.phone || 'N/A'}
+                            {q.phone || 'N/A'}
                           </td>
                           <td className="py-3.5 text-charcoal-600 dark:text-cream-200/80">
-                            <span className="font-semibold">{o.orderType}</span>
+                            <span className="font-semibold">{q.items?.length || 0} Products</span>
                           </td>
-                          <td className="py-3.5 text-charcoal-600 dark:text-cream-200/80">
-                            {o.totalAmount ? (
-                              <span className="font-serif font-bold text-copper-600 dark:text-copper-400">
-                                ₹{o.totalAmount.toLocaleString('en-IN')}
-                              </span>
-                            ) : (
-                              <span className="text-charcoal-400">{o.message || 'Direct Chat'}</span>
-                            )}
+                          <td className="py-3.5 font-serif font-bold text-copper-600 dark:text-copper-400">
+                            ₹{q.totalAmount?.toLocaleString('en-IN') || '0'}
                           </td>
                           <td className="py-3.5">
-                            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#25D366]/15 text-[#25D366] border border-[#25D366]/30 uppercase">
-                              {o.status || 'New'}
+                            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-copper-500/15 text-copper-600 border border-copper-500/30 uppercase">
+                              {q.status || 'New'}
                             </span>
                           </td>
                           <td className="py-3.5 text-right">
                             <div className="inline-flex items-center gap-2">
-                              {waLink && (
+                              {q.phone && (
                                 <a
-                                  href={waLink}
-                                  target="_blank"
-                                  rel="noreferrer"
-                                  className="p-1.5 rounded-lg bg-[#25D366]/15 hover:bg-[#25D366]/25 text-[#25D366] transition-colors"
-                                  title="Chat on WhatsApp"
-                                >
-                                  <MessageSquare className="w-4 h-4" />
-                                </a>
-                              )}
-                              {o.phone && (
-                                <a
-                                  href={`tel:${o.phone}`}
+                                  href={`tel:${q.phone}`}
                                   className="p-1.5 rounded-lg bg-copper-500/10 hover:bg-copper-500/20 text-copper-500 transition-colors"
                                   title="Call Customer"
                                 >
                                   <Phone className="w-4 h-4" />
                                 </a>
                               )}
+                              <Link
+                                to="/admin/quotes"
+                                className="p-1.5 rounded-lg bg-cream-100 dark:bg-[#1A212C] text-charcoal-600 dark:text-cream-200 hover:text-copper-600 transition-colors"
+                                title="View Quote Details"
+                              >
+                                <ExternalLink className="w-4 h-4" />
+                              </Link>
                             </div>
                           </td>
                         </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* Footer Count Bar */}
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-3 border-t border-cream-200 dark:border-cream-200/10 text-xs text-charcoal-500 dark:text-cream-200/70">
+                  <div>
+                    Showing <span className="font-bold text-forest-950 dark:text-cream-50">{displayedQuotes.length}</span> of <span className="font-bold text-forest-950 dark:text-cream-50">{allQuotes.length}</span> quotes
+                    {rowLimit !== 'all' && allQuotes.length > displayedQuotes.length && (
+                      <button
+                        type="button"
+                        onClick={() => setRowLimit('all')}
+                        className="ml-2 text-copper-600 dark:text-copper-400 font-bold hover:underline cursor-pointer"
+                      >
+                        (Show all {allQuotes.length})
+                      </button>
+                    )}
+                  </div>
+                  <Link
+                    to="/admin/quotes"
+                    className="font-bold text-copper-600 dark:text-copper-400 hover:underline flex items-center gap-1 self-start sm:self-auto"
+                  >
+                    <span>Open Full Quotes Page</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </Link>
+                </div>
+              </>
+            )}
+          </div>
+        )}
+
+        {/* Tab 3: WhatsApp Orders */}
+        {activeTab === 'whatsapp' && (
+          <div className="space-y-4">
+            {allWhatsAppOrders.length === 0 ? (
+              <div className="py-12 text-center text-charcoal-400 dark:text-cream-200/60">
+                <MessageSquare className="w-10 h-10 mx-auto mb-2 opacity-30 text-[#25D366]" />
+                <p className="text-sm font-semibold">No WhatsApp orders found</p>
+                <p className="text-xs">When users dispatch inquiries via WhatsApp Desk, they appear here.</p>
               </div>
+            ) : (
+              <>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-xs">
+                    <thead>
+                      <tr className="border-b border-cream-200 dark:border-cream-200/10 text-charcoal-400 dark:text-cream-200/60 uppercase tracking-wider text-[10px]">
+                        <th className="pb-3 font-bold">Customer Name</th>
+                        <th className="pb-3 font-bold">Contact Phone</th>
+                        <th className="pb-3 font-bold">Order Type</th>
+                        <th className="pb-3 font-bold">Value / Details</th>
+                        <th className="pb-3 font-bold">Status</th>
+                        <th className="pb-3 font-bold text-right">Direct Chat</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-cream-100 dark:divide-cream-200/5">
+                      {displayedWhatsAppOrders.map((o) => {
+                        const cleanPhone = o.phone?.replace(/\D/g, '') || '';
+                        const waLink = cleanPhone ? `https://wa.me/91${cleanPhone.startsWith('91') ? cleanPhone.slice(2) : cleanPhone}` : null;
+
+                        return (
+                          <tr key={o.id} className="hover:bg-cream-50 dark:hover:bg-[#1A212C]/50 transition-colors">
+                            <td className="py-3.5 font-bold text-forest-950 dark:text-cream-50">
+                              {o.customerName || 'WhatsApp Client'}
+                            </td>
+                            <td className="py-3.5 font-mono text-charcoal-600 dark:text-cream-200/80">
+                              {o.phone || 'N/A'}
+                            </td>
+                            <td className="py-3.5 text-charcoal-600 dark:text-cream-200/80">
+                              <span className="font-semibold">{o.orderType}</span>
+                            </td>
+                            <td className="py-3.5 text-charcoal-600 dark:text-cream-200/80">
+                              {o.totalAmount ? (
+                                <span className="font-serif font-bold text-copper-600 dark:text-copper-400">
+                                  ₹{o.totalAmount.toLocaleString('en-IN')}
+                                </span>
+                              ) : (
+                                <span className="text-charcoal-400">{o.message || 'Direct Chat'}</span>
+                              )}
+                            </td>
+                            <td className="py-3.5">
+                              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#25D366]/15 text-[#25D366] border border-[#25D366]/30 uppercase">
+                                {o.status || 'New'}
+                              </span>
+                            </td>
+                            <td className="py-3.5 text-right">
+                              <div className="inline-flex items-center gap-2">
+                                {waLink && (
+                                  <a
+                                    href={waLink}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="p-1.5 rounded-lg bg-[#25D366]/15 hover:bg-[#25D366]/25 text-[#25D366] transition-colors"
+                                    title="Chat on WhatsApp"
+                                  >
+                                    <MessageSquare className="w-4 h-4" />
+                                  </a>
+                                )}
+                                {o.phone && (
+                                  <a
+                                    href={`tel:${o.phone}`}
+                                    className="p-1.5 rounded-lg bg-copper-500/10 hover:bg-copper-500/20 text-copper-500 transition-colors"
+                                    title="Call Customer"
+                                  >
+                                    <Phone className="w-4 h-4" />
+                                  </a>
+                                )}
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* Footer Count Bar */}
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-3 border-t border-cream-200 dark:border-cream-200/10 text-xs text-charcoal-500 dark:text-cream-200/70">
+                  <div>
+                    Showing <span className="font-bold text-forest-950 dark:text-cream-50">{displayedWhatsAppOrders.length}</span> of <span className="font-bold text-forest-950 dark:text-cream-50">{allWhatsAppOrders.length}</span> orders
+                    {rowLimit !== 'all' && allWhatsAppOrders.length > displayedWhatsAppOrders.length && (
+                      <button
+                        type="button"
+                        onClick={() => setRowLimit('all')}
+                        className="ml-2 text-copper-600 dark:text-copper-400 font-bold hover:underline cursor-pointer"
+                      >
+                        (Show all {allWhatsAppOrders.length})
+                      </button>
+                    )}
+                  </div>
+                  <Link
+                    to="/admin/whatsapp-orders"
+                    className="font-bold text-copper-600 dark:text-copper-400 hover:underline flex items-center gap-1 self-start sm:self-auto"
+                  >
+                    <span>Open Full WhatsApp Orders Page</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </Link>
+                </div>
+              </>
             )}
           </div>
         )}
