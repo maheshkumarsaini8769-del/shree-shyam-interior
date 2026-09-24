@@ -57,7 +57,7 @@
     color: #000000 !important;
   }
 
-  header, footer, aside, .print\\:hidden, [role="navigation"] {
+  header, footer, aside, .print\:hidden, [role="navigation"] {
     display: none !important;
   }
 
@@ -66,3 +66,116 @@
     border: 1px solid #E5E7EB !important;
   }
 }
+
+/* Festival Theme Animations & Color Overrides */
+@keyframes flameFlicker {
+  0%, 100% {
+    transform: scale(1) rotate(-1deg);
+    opacity: 0.95;
+    filter: drop-shadow(0 0 6px rgba(245, 158, 11, 0.95));
+  }
+  25% {
+    transform: scale(1.08, 0.95) rotate(1deg);
+    opacity: 1;
+    filter: drop-shadow(0 0 10px rgba(251, 191, 36, 1));
+  }
+  50% {
+    transform: scale(0.96, 1.05) rotate(-2deg);
+    opacity: 0.88;
+    filter: drop-shadow(0 0 5px rgba(234, 88, 12, 0.8));
+  }
+  75% {
+    transform: scale(1.04, 1.02) rotate(2deg);
+    opacity: 1;
+    filter: drop-shadow(0 0 8px rgba(245, 158, 11, 0.95));
+  }
+}
+
+.animate-flame {
+  animation: flameFlicker 1.8s ease-in-out infinite;
+  transform-origin: bottom center;
+}
+
+@keyframes festiveFloat {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-6px) rotate(1.5deg);
+  }
+}
+
+.animate-festive-float {
+  animation: festiveFloat 4s ease-in-out infinite;
+}
+
+/* Diwali Warm Gold & Amber Theme Overrides */
+html[data-festival-theme="diwali"] .text-copper-400,
+html[data-festival-theme="diwali"] .text-copper-500,
+html[data-festival-theme="diwali"] .text-copper-600 {
+  color: #F59E0B !important;
+}
+
+html[data-festival-theme="diwali"] .bg-copper-500 {
+  background-color: #D97706 !important;
+}
+
+html[data-festival-theme="diwali"] .bg-copper-500:hover {
+  background-color: #B45309 !important;
+}
+
+html[data-festival-theme="diwali"] .border-copper-500,
+html[data-festival-theme="diwali"] .border-copper-500\/30 {
+  border-color: rgba(245, 158, 11, 0.4) !important;
+}
+
+html[data-festival-theme="diwali"] .shadow-glow-copper {
+  box-shadow: 0 0 25px rgba(245, 158, 11, 0.45) !important;
+}
+
+/* Holi Playful Vibrant Pink & Violet Theme Overrides */
+html[data-festival-theme="holi"] .text-copper-400,
+html[data-festival-theme="holi"] .text-copper-500,
+html[data-festival-theme="holi"] .text-copper-600 {
+  color: #EC4899 !important;
+}
+
+html[data-festival-theme="holi"] .bg-copper-500 {
+  background-color: #DB2777 !important;
+}
+
+html[data-festival-theme="holi"] .bg-copper-500:hover {
+  background-color: #BE185D !important;
+}
+
+html[data-festival-theme="holi"] .border-copper-500,
+html[data-festival-theme="holi"] .border-copper-500\/30 {
+  border-color: rgba(236, 72, 153, 0.45) !important;
+}
+
+html[data-festival-theme="holi"] .shadow-glow-copper {
+  box-shadow: 0 0 25px rgba(236, 72, 153, 0.4) !important;
+}
+
+/* Navratri & Dussehra Auspicious Kumkum Crimson Overrides */
+html[data-festival-theme="navratri"] .text-copper-400,
+html[data-festival-theme="navratri"] .text-copper-500,
+html[data-festival-theme="navratri"] .text-copper-600 {
+  color: #EF4444 !important;
+}
+
+html[data-festival-theme="navratri"] .bg-copper-500 {
+  background-color: #DC2626 !important;
+}
+
+/* New Year Champagne Star Overrides */
+html[data-festival-theme="newyear"] .text-copper-400,
+html[data-festival-theme="newyear"] .text-copper-500,
+html[data-festival-theme="newyear"] .text-copper-600 {
+  color: #38BDF8 !important;
+}
+
+html[data-festival-theme="newyear"] .bg-copper-500 {
+  background-color: #0284C7 !important;
+}
+
