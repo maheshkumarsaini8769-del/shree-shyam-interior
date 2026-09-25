@@ -1,7 +1,35 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { Sparkles, X, Copy, Check, Gift, ArrowRight, Clock, Award, Star } from 'lucide-react';
-import { apiService, FestivalCampaignConfig } from '../../services/apiService';
+import { apiService, FestivalCampaignConfig, FestivalType } from '../../services/apiService';
+
+// =========================================================================
+// PLEASANT WEB AUDIO CHIME (ZERO EXTERNAL ASSETS / ZERO LATENCY)
+// =========================================================================
+const playFestiveChime = () => {
+  try {
+    const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
+    if (!AudioCtx) return;
+    const ctx = new AudioCtx();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'triangle';
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    
+    // Joyful sparkling chord
+    const now = ctx.currentTime;
+    osc.frequency.setValueAtTime(587.33, now); // D5
+    osc.frequency.exponentialRampToValueAtTime(880, now + 0.12); // A5
+    osc.frequency.exponentialRampToValueAtTime(1174.66, now + 0.28); // D6
+    
+    gain.gain.setValueAtTime(0.08, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
+    
+    osc.start(now);
+    osc.stop(now + 0.45);
+  } catch (_) {}
+};
 
 // =========================================================================
 // 1. INTERACTIVE PHOOLJHADI / SPARKLER CANVAS TRAIL (60FPS LIGHTWEIGHT)
@@ -38,10 +66,20 @@ const SparklerCanvas: React.FC<{ festival: string; color: string }> = ({ festiva
     }
 
     const particles: Particle[] = [];
-    const colors =
-      festival === 'holi'
-        ? ['#EC4899', '#FBBF24', '#14B8A6', '#8B5CF6', '#F43F5E']
-        : ['#F59E0B', '#FBBF24', '#FEF08A', '#F97316', '#FFFFFF'];
+    
+    // Festival specific curated palettes
+    let colors = ['#F59E0B', '#FBBF24', '#FEF08A', '#F97316', '#FFFFFF'];
+    if (festival === 'holi') {
+      colors = ['#EC4899', '#FBBF24', '#14B8A6', '#8B5CF6', '#F43F5E', '#06B6D4'];
+    } else if (festival === 'navratri') {
+      colors = ['#EF4444', '#DC2626', '#F59E0B', '#FBBF24', '#F43F5E', '#FFFFFF'];
+    } else if (festival === 'newyear') {
+      colors = ['#38BDF8', '#60A5FA', '#FBBF24', '#F472B6', '#A78BFA', '#FFFFFF'];
+    } else if (festival === 'patriot') {
+      colors = ['#FF9933', '#FFFFFF', '#138808', '#2563EB'];
+    } else if (color) {
+      colors = [color, '#FBBF24', '#FFFFFF'];
+    }
 
     const addSparkles = (x: number, y: number, count = 2) => {
       for (let i = 0; i < count; i++) {
@@ -53,9 +91,27 @@ const SparklerCanvas: React.FC<{ festival: string; color: string }> = ({ festiva
           vx: Math.cos(angle) * speed,
           vy: Math.sin(angle) * speed - 0.4,
           alpha: 1,
-          size: Math.random() * 2 + 1,
+          size: Math.random() * 2.2 + 1,
           color: colors[Math.floor(Math.random() * colors.length)],
           life: 0.94
+        });
+      }
+    };
+
+    // Celebration burst on click / tap anywhere!
+    const addBurst = (x: number, y: number, count = 16) => {
+      for (let i = 0; i < count; i++) {
+        const angle = Math.random() * Math.PI * 2;
+        const speed = Math.random() * 3.8 + 1.2;
+        particles.push({
+          x,
+          y,
+          vx: Math.cos(angle) * speed,
+          vy: Math.sin(angle) * speed - 1.2,
+          alpha: 1,
+          size: Math.random() * 3 + 1.2,
+          color: colors[Math.floor(Math.random() * colors.length)],
+          life: 0.95
         });
       }
     };
@@ -79,8 +135,13 @@ const SparklerCanvas: React.FC<{ festival: string; color: string }> = ({ festiva
       addSparkles(clientX, clientY, 2);
     };
 
+    const handlePointerClick = (e: MouseEvent) => {
+      addBurst(e.clientX, e.clientY, 15);
+    };
+
     window.addEventListener('mousemove', handlePointerMove, { passive: true });
     window.addEventListener('touchmove', handlePointerMove, { passive: true });
+    window.addEventListener('click', handlePointerClick, { passive: true });
 
     const render = () => {
       ctx.clearRect(0, 0, width, height);
@@ -89,7 +150,7 @@ const SparklerCanvas: React.FC<{ festival: string; color: string }> = ({ festiva
         const p = particles[i];
         p.x += p.vx;
         p.y += p.vy;
-        p.vy += 0.03; // light gravity
+        p.vy += 0.035; // gravity
         p.alpha *= p.life;
 
         if (p.alpha < 0.05) {
@@ -118,6 +179,7 @@ const SparklerCanvas: React.FC<{ festival: string; color: string }> = ({ festiva
       window.removeEventListener('resize', handleResize);
       window.removeEventListener('mousemove', handlePointerMove);
       window.removeEventListener('touchmove', handlePointerMove);
+      window.removeEventListener('click', handlePointerClick);
     };
   }, [festival, color]);
 
@@ -125,7 +187,7 @@ const SparklerCanvas: React.FC<{ festival: string; color: string }> = ({ festiva
     <canvas
       ref={canvasRef}
       className="pointer-events-none fixed inset-0 z-40 overflow-hidden select-none"
-      style={{ opacity: 0.8 }}
+      style={{ opacity: 0.85 }}
     />
   );
 };
@@ -133,7 +195,7 @@ const SparklerCanvas: React.FC<{ festival: string; color: string }> = ({ festiva
 export { FestiveCountdown } from './FestiveCountdown';
 
 // =========================================================================
-// 3. MAIN FESTIVE EFFECTS COMPONENT
+// 2. MAIN FESTIVE EFFECTS COMPONENT
 // =========================================================================
 export const FestiveEffects: React.FC = () => {
   const [config, setConfig] = useState<FestivalCampaignConfig | null>(null);
@@ -191,10 +253,9 @@ export const FestiveEffects: React.FC = () => {
       cfg.showGreetingModal &&
       !sessionStorage.getItem(`ssi_festive_modal_dismissed_${cfg.activeFestival}`)
     ) {
-      // Delay modal slightly so user first sees the site smoothly
       const timer = setTimeout(() => {
         setShowModal(true);
-      }, 1200);
+      }, 1000);
       return () => clearTimeout(timer);
     }
   };
@@ -208,6 +269,7 @@ export const FestiveEffects: React.FC = () => {
 
   const handleCopyCode = (code: string) => {
     navigator.clipboard.writeText(code);
+    playFestiveChime();
     setCopied(true);
     setTimeout(() => setCopied(false), 2500);
   };
@@ -218,247 +280,269 @@ export const FestiveEffects: React.FC = () => {
 
   const { activeFestival, enableAmbientEffects, enableSparklerTrail } = config;
 
+  // Visual metadata per festival
+  const getFestivalMeta = (type: FestivalType) => {
+    switch (type) {
+      case 'diwali':
+        return {
+          icon: '🪔',
+          title: 'Shubh Deepawali',
+          badge: 'DIWALI DHAMAKA',
+          glowClass: 'bg-amber-500/20',
+          gradient: 'from-amber-950/90 via-[#181109]/95 to-amber-950/90',
+          borderColor: 'border-amber-500/50',
+          textColor: 'text-amber-300'
+        };
+      case 'holi':
+        return {
+          icon: '🎨',
+          title: 'Happy Holi Utsav',
+          badge: 'HOLI DHAMAKA',
+          glowClass: 'bg-pink-500/20',
+          gradient: 'from-pink-950/90 via-purple-950/90 to-pink-950/90',
+          borderColor: 'border-pink-500/50',
+          textColor: 'text-pink-300'
+        };
+      case 'navratri':
+        return {
+          icon: '✨',
+          title: 'Shubh Navratri',
+          badge: 'NAVRATRI UTSAV',
+          glowClass: 'bg-red-500/20',
+          gradient: 'from-red-950/90 via-orange-950/90 to-red-950/90',
+          borderColor: 'border-red-500/50',
+          textColor: 'text-red-300'
+        };
+      case 'newyear':
+        return {
+          icon: '🎉',
+          title: 'Happy New Year 2026',
+          badge: 'NEW YEAR CELEBRATION',
+          glowClass: 'bg-sky-500/20',
+          gradient: 'from-sky-950/90 via-slate-950/90 to-sky-950/90',
+          borderColor: 'border-sky-400/50',
+          textColor: 'text-sky-300'
+        };
+      case 'patriot':
+        return {
+          icon: '🇮🇳',
+          title: 'Desh Ka Interior',
+          badge: 'AZADI SPECIAL',
+          glowClass: 'bg-orange-500/20',
+          gradient: 'from-orange-950/90 via-slate-950/90 to-green-950/90',
+          borderColor: 'border-orange-500/50',
+          textColor: 'text-orange-300'
+        };
+      default:
+        return {
+          icon: '🎁',
+          title: config.festivalName || 'Special Festive Mode',
+          badge: 'FESTIVE SPECIAL',
+          glowClass: 'bg-amber-500/20',
+          gradient: 'from-forest-950/90 via-copper-950/90 to-forest-950/90',
+          borderColor: 'border-copper-500/50',
+          textColor: 'text-copper-300'
+        };
+    }
+  };
+
+  const meta = getFestivalMeta(activeFestival);
+
   return (
     <>
-      {/* PHOOLJHADI SPARKLER TRAIL EFFECT */}
+      {/* 1. 60FPS PHOOLJHADI SPARKLER & BURST TRAIL */}
       {enableSparklerTrail && (
         <SparklerCanvas festival={activeFestival} color={config.highlightColor} />
       )}
 
-      {/* ========================================================================= */}
-      {/* IN-WEBSITE FESTIVE VISUAL DECORATIONS (TRADITIONAL TORAN, DIYAS, COLORS) */}
-      {/* ========================================================================= */}
+      {/* 2. IN-WEBSITE FESTIVE VISUAL DECORATIONS */}
       {enableAmbientEffects && (
         <div className="pointer-events-none fixed inset-0 z-40 overflow-hidden select-none">
-          {/* DIWALI: Traditional Hanging Toran Garland & Flickering Brass Diyas */}
+          {/* Top Traditional Hanging Toran Garland (Diwali & Navratri) */}
+          {(activeFestival === 'diwali' || activeFestival === 'navratri') && (
+            <div className="absolute top-[58px] sm:top-[68px] left-0 right-0 z-40 pointer-events-none overflow-hidden h-7 sm:h-9 flex justify-around opacity-95">
+              {[...Array(16)].map((_, i) => (
+                <div
+                  key={i}
+                  className="flex flex-col items-center animate-festive-float"
+                  style={{ animationDelay: `${i * 0.22}s` }}
+                >
+                  <div className="w-[1px] h-2 sm:h-3 bg-amber-600/60" />
+                  {i % 2 === 0 ? (
+                    <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-gradient-to-br from-amber-400 via-orange-500 to-amber-600 shadow-sm border border-amber-300/40" />
+                  ) : (
+                    <div className="relative flex flex-col items-center">
+                      <div className="w-1.5 h-2 rounded-full bg-yellow-300 animate-flame" />
+                      <div className="w-2.5 h-1.5 rounded-b-full bg-amber-800 border-t border-amber-500" />
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Festival Specific Ambient Aura Orbs */}
           {activeFestival === 'diwali' && (
             <>
-              {/* Top Traditional Hanging Toran (Marigold Flowers & Clay Diyas) */}
-              <div className="absolute top-[60px] sm:top-[68px] left-0 right-0 z-40 pointer-events-none overflow-hidden h-7 sm:h-9 flex justify-around opacity-95">
-                {[...Array(14)].map((_, i) => (
-                  <div key={i} className="flex flex-col items-center animate-festive-float" style={{ animationDelay: `${i * 0.25}s` }}>
-                    {/* Hanging String */}
-                    <div className="w-[1px] h-2 sm:h-3 bg-amber-600/60" />
-                    {/* Marigold Flower Ball / Diya */}
-                    {i % 2 === 0 ? (
-                      <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-gradient-to-br from-amber-400 via-orange-500 to-amber-600 shadow-sm border border-amber-300/40" />
-                    ) : (
-                      <div className="relative flex flex-col items-center">
-                        {/* Flickering Flame */}
-                        <div className="w-1.5 h-2 rounded-full bg-yellow-300 animate-flame" />
-                        {/* Clay Base */}
-                        <div className="w-2.5 h-1.5 rounded-b-full bg-amber-800 border-t border-amber-500" />
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
-
-              {/* Bottom Glowing Ambience */}
-              <div className="absolute -bottom-10 -left-10 w-52 h-52 rounded-full bg-amber-500/20 blur-3xl animate-pulse pointer-events-none" />
-              <div className="absolute -bottom-10 -right-10 w-52 h-52 rounded-full bg-orange-500/20 blur-3xl animate-pulse pointer-events-none" />
-
-              {/* Bottom Left Interactive Floating Diya Widget */}
-              <div className="fixed bottom-20 lg:bottom-8 left-4 sm:left-6 z-40 pointer-events-auto">
-                <div
-                  onClick={() => setIsDiyaPopped(!isDiyaPopped)}
-                  className="flex items-center gap-2 px-3.5 py-2 rounded-2xl bg-[#140D07]/90 backdrop-blur-md border border-amber-500/50 text-amber-300 shadow-glow-copper cursor-pointer hover:scale-105 active:scale-95 transition-all group select-none"
-                  title="Click to view Deepawali Offer & Secret Gift"
-                >
-                  <div className="relative flex flex-col items-center justify-center w-6 h-6">
-                    <span className="text-xl leading-none animate-flame">🪔</span>
-                  </div>
-                  <div className="flex flex-col">
-                    <span className="font-serif font-bold text-xs text-amber-300 leading-none">
-                      Shubh Deepawali
-                    </span>
-                    <span className="text-[10px] text-amber-200/70 font-mono mt-0.5">
-                      {config.couponCode ? `Code: ${config.couponCode}` : 'Festive Deals'}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Expanded Micro-card on click */}
-                {isDiyaPopped && (
-                  <div className="absolute bottom-14 left-0 w-72 p-4 rounded-2xl bg-white dark:bg-[#151D28] border-2 border-amber-500 shadow-2xl text-left space-y-3 animate-scale-up z-50">
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-serif font-bold text-amber-600 dark:text-amber-400 flex items-center gap-1">
-                        <span>🪔</span>
-                        <span>Diwali Special Benefits</span>
-                      </span>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setIsDiyaPopped(false);
-                        }}
-                        className="p-1 rounded-md text-charcoal-400 hover:bg-cream-100 dark:hover:bg-[#1A212C] cursor-pointer"
-                      >
-                        <X className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-
-                    <p className="text-[11px] text-charcoal-600 dark:text-cream-200/80 leading-snug">
-                      Flat {config.discountPercentage}% OFF on Turnkey Interiors + Free 3D Walkthrough!
-                    </p>
-
-                    {/* Secret Lucky Gift Box */}
-                    {config.showSurpriseGiftBox && (
-                      <div className="p-2.5 rounded-xl bg-gradient-to-r from-amber-500/15 via-orange-500/10 to-amber-500/15 border border-amber-500/30 text-xs">
-                        {isGiftRevealed ? (
-                          <div className="space-y-1">
-                            <span className="text-[10px] font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider block">
-                              🎉 Extra Festive Gift Unlocked!
-                            </span>
-                            <span className="font-bold text-forest-950 dark:text-cream-50 text-[11px] block">
-                              {config.surpriseGiftText || 'Free 3D VR Architectural Render'}
-                            </span>
-                          </div>
-                        ) : (
-                          <button
-                            onClick={() => setIsGiftRevealed(true)}
-                            className="w-full flex items-center justify-between text-left text-amber-700 dark:text-amber-300 font-bold hover:underline cursor-pointer"
-                          >
-                            <span className="flex items-center gap-1.5 text-[11px]">
-                              <Gift className="w-3.5 h-3.5 text-amber-500" />
-                              Tap to Reveal Secret Bonus Gift!
-                            </span>
-                            <Sparkles className="w-3 h-3 text-amber-500 animate-spin" />
-                          </button>
-                        )}
-                      </div>
-                    )}
-
-                    {config.couponCode && (
-                      <div className="flex items-center justify-between p-2 rounded-xl bg-amber-500/10 border border-amber-500/30">
-                        <span className="font-mono font-bold text-xs text-amber-700 dark:text-amber-400">
-                          {config.couponCode}
-                        </span>
-                        <button
-                          onClick={() => handleCopyCode(config.couponCode)}
-                          className="px-2.5 py-1 rounded bg-amber-500 hover:bg-amber-600 text-white text-[10px] font-bold cursor-pointer transition-colors"
-                        >
-                          {copied ? 'Copied!' : 'Copy Code'}
-                        </button>
-                      </div>
-                    )}
-
-                    <div className="flex gap-2">
-                      <Link
-                        to="/site-visit"
-                        onClick={() => setIsDiyaPopped(false)}
-                        className="flex-1 py-2 rounded-xl bg-copper-500 hover:bg-copper-600 text-white text-[11px] font-bold text-center uppercase tracking-wider transition-colors shadow-sm"
-                      >
-                        Book Visit
-                      </Link>
-                      <Link
-                        to="/quote"
-                        onClick={() => setIsDiyaPopped(false)}
-                        className="flex-1 py-2 rounded-xl bg-cream-100 dark:bg-[#1A212C] text-charcoal-700 dark:text-cream-100 text-[11px] font-bold text-center uppercase tracking-wider transition-colors"
-                      >
-                        View Bill
-                      </Link>
-                    </div>
-                  </div>
-                )}
-              </div>
+              <div className="absolute -bottom-10 -left-10 w-60 h-60 rounded-full bg-amber-500/20 blur-3xl animate-pulse pointer-events-none" />
+              <div className="absolute -bottom-10 -right-10 w-60 h-60 rounded-full bg-orange-500/20 blur-3xl animate-pulse pointer-events-none" />
             </>
           )}
 
-          {/* HOLI: Vibrant Gulal Splashes & Color Bursts */}
           {activeFestival === 'holi' && (
             <>
               <div className="absolute -top-12 -left-12 w-64 h-64 rounded-full bg-pink-500/20 blur-3xl pointer-events-none" />
               <div className="absolute -bottom-12 -right-12 w-64 h-64 rounded-full bg-yellow-500/20 blur-3xl pointer-events-none" />
               <div className="absolute top-1/3 -right-12 w-48 h-48 rounded-full bg-teal-500/20 blur-3xl pointer-events-none" />
               <div className="absolute bottom-1/3 -left-12 w-48 h-48 rounded-full bg-purple-500/20 blur-3xl pointer-events-none" />
-
-              {/* Bottom Left Floating Holi Widget */}
-              <div className="fixed bottom-20 lg:bottom-8 left-4 sm:left-6 z-40 pointer-events-auto">
-                <div
-                  onClick={() => setIsDiyaPopped(!isDiyaPopped)}
-                  className="flex items-center gap-2 px-3 py-2 rounded-2xl bg-gradient-to-r from-pink-950/90 via-purple-950/90 to-pink-950/90 backdrop-blur-md border border-pink-500/50 text-pink-200 shadow-card cursor-pointer hover:scale-105 active:scale-95 transition-all group select-none"
-                >
-                  <span className="text-xl animate-bounce">🎨</span>
-                  <div className="flex flex-col">
-                    <span className="font-bold text-xs text-pink-300 leading-none">
-                      Happy Holi Utsav!
-                    </span>
-                    <span className="text-[10px] text-pink-200/70 font-mono mt-0.5">
-                      {config.couponCode ? `Code: ${config.couponCode}` : 'Color Offers'}
-                    </span>
-                  </div>
-                </div>
-
-                {isDiyaPopped && (
-                  <div className="absolute bottom-14 left-0 w-64 p-4 rounded-2xl bg-white dark:bg-[#151D28] border-2 border-pink-500 shadow-2xl text-left space-y-2.5 animate-scale-up z-50">
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-serif font-bold text-pink-600 dark:text-pink-400">
-                        🎨 Rangon Ka Tyohar Special
-                      </span>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setIsDiyaPopped(false);
-                        }}
-                        className="p-1 rounded-md text-charcoal-400 hover:bg-cream-100 dark:hover:bg-[#1A212C]"
-                      >
-                        <X className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-                    <p className="text-[11px] text-charcoal-600 dark:text-cream-200/80 leading-snug">
-                      Complimentary German Soft-Close Hardware Upgrade on Modular Kitchens!
-                    </p>
-                    {config.couponCode && (
-                      <div className="flex items-center justify-between p-2 rounded-xl bg-pink-500/10 border border-pink-500/30">
-                        <span className="font-mono font-bold text-xs text-pink-700 dark:text-pink-400">
-                          {config.couponCode}
-                        </span>
-                        <button
-                          onClick={() => handleCopyCode(config.couponCode)}
-                          className="px-2 py-1 rounded bg-pink-500 text-white text-[10px] font-bold"
-                        >
-                          {copied ? 'Copied!' : 'Copy'}
-                        </button>
-                      </div>
-                    )}
-                    <Link
-                      to="/quote"
-                      onClick={() => setIsDiyaPopped(false)}
-                      className="block w-full py-2 rounded-xl bg-pink-600 hover:bg-pink-700 text-white text-[11px] font-bold text-center uppercase tracking-wider transition-colors"
-                    >
-                      Calculate Cost →
-                    </Link>
-                  </div>
-                )}
-              </div>
             </>
           )}
 
-          {/* NEW YEAR: Confetti & Starlight */}
+          {activeFestival === 'navratri' && (
+            <>
+              <div className="absolute -top-10 -left-10 w-60 h-60 rounded-full bg-red-500/20 blur-3xl pointer-events-none" />
+              <div className="absolute -bottom-10 -right-10 w-60 h-60 rounded-full bg-amber-500/20 blur-3xl pointer-events-none" />
+            </>
+          )}
+
           {activeFestival === 'newyear' && (
             <>
-              <div className="absolute -top-10 left-1/4 w-72 h-72 rounded-full bg-sky-400/15 blur-3xl pointer-events-none" />
-              <div className="fixed bottom-20 lg:bottom-8 left-4 sm:left-6 z-40 pointer-events-auto">
-                <div className="flex items-center gap-2 px-3 py-2 rounded-2xl bg-slate-900/90 backdrop-blur-md border border-sky-400/40 text-sky-200 shadow-card text-xs">
-                  <span className="text-lg">🎉</span>
-                  <div className="flex flex-col">
-                    <span className="font-bold text-xs text-sky-300">New Year 2026</span>
-                    <span className="text-[10px] text-sky-200/70 font-mono">Special Vouchers</span>
-                  </div>
-                </div>
-              </div>
+              <div className="absolute -top-10 left-1/4 w-72 h-72 rounded-full bg-sky-400/20 blur-3xl pointer-events-none" />
+              <div className="absolute -bottom-10 right-1/4 w-72 h-72 rounded-full bg-purple-400/20 blur-3xl pointer-events-none" />
             </>
           )}
+
+          {activeFestival === 'patriot' && (
+            <>
+              <div className="absolute -top-10 left-0 w-60 h-60 rounded-full bg-orange-500/20 blur-3xl pointer-events-none" />
+              <div className="absolute -bottom-10 right-0 w-60 h-60 rounded-full bg-green-500/20 blur-3xl pointer-events-none" />
+            </>
+          )}
+
+          {/* 3. UNIVERSAL INTERACTIVE FLOATING CELEBRATION WIDGET (Bottom-Left) */}
+          <div className="fixed bottom-20 lg:bottom-8 left-4 sm:left-6 z-40 pointer-events-auto">
+            <div
+              onClick={() => {
+                setIsDiyaPopped(!isDiyaPopped);
+                playFestiveChime();
+              }}
+              className={`flex items-center gap-2.5 px-3.5 py-2 rounded-2xl bg-gradient-to-r ${meta.gradient} backdrop-blur-md border ${meta.borderColor} ${meta.textColor} shadow-glow-copper cursor-pointer hover:scale-105 active:scale-95 transition-all group select-none`}
+              title="Click to view Festive Offer & Secret Gift"
+            >
+              <span className={`text-xl leading-none ${activeFestival === 'diwali' ? 'animate-flame' : 'animate-bounce'}`}>
+                {meta.icon}
+              </span>
+              <div className="flex flex-col">
+                <span className={`font-serif font-bold text-xs ${meta.textColor} leading-none`}>
+                  {meta.title}
+                </span>
+                <span className="text-[10px] opacity-80 font-mono mt-0.5">
+                  {config.couponCode ? `Code: ${config.couponCode}` : 'Festive Deals'}
+                </span>
+              </div>
+            </div>
+
+            {/* Expanded Interactive Card on Click */}
+            {isDiyaPopped && (
+              <div className="absolute bottom-14 left-0 w-72 sm:w-80 p-4 sm:p-5 rounded-3xl bg-white dark:bg-[#151D28] border-2 shadow-2xl text-left space-y-3 animate-scale-up z-50 select-none" style={{ borderColor: config.highlightColor || '#F59E0B' }}>
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-serif font-bold text-forest-950 dark:text-cream-50 flex items-center gap-1.5">
+                    <span>{meta.icon}</span>
+                    <span>{config.greetingTitle || `${meta.title} Specials`}</span>
+                  </span>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setIsDiyaPopped(false);
+                    }}
+                    className="p-1 rounded-md text-charcoal-400 hover:bg-cream-100 dark:hover:bg-[#1A212C] cursor-pointer"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+
+                <p className="text-xs text-charcoal-600 dark:text-cream-200/80 leading-relaxed">
+                  {config.greetingSubtitle || 'Enjoy turnkey interior execution benefits & certified genuine materials.'}
+                </p>
+
+                {/* Secret Lucky Gift Box Reveal */}
+                {config.showSurpriseGiftBox && (
+                  <div className="p-3 rounded-2xl bg-gradient-to-r from-amber-500/15 via-orange-500/10 to-amber-500/15 border border-amber-500/30 text-xs">
+                    {isGiftRevealed ? (
+                      <div className="space-y-1">
+                        <span className="text-[10px] font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider block">
+                          🎉 Extra Festive Gift Unlocked!
+                        </span>
+                        <span className="font-bold text-forest-950 dark:text-cream-50 text-[11px] block">
+                          {config.surpriseGiftText || 'Free 3D Architectural VR Walkthrough'}
+                        </span>
+                      </div>
+                    ) : (
+                      <button
+                        onClick={() => {
+                          setIsGiftRevealed(true);
+                          playFestiveChime();
+                        }}
+                        className="w-full flex items-center justify-between text-left text-amber-700 dark:text-amber-300 font-bold hover:underline cursor-pointer"
+                      >
+                        <span className="flex items-center gap-1.5 text-xs">
+                          <Gift className="w-4 h-4 text-amber-500" />
+                          Tap to Reveal Secret Bonus Gift!
+                        </span>
+                        <Sparkles className="w-3.5 h-3.5 text-amber-500 animate-spin" />
+                      </button>
+                    )}
+                  </div>
+                )}
+
+                {/* Coupon Code Section */}
+                {config.couponCode && (
+                  <div className="flex items-center justify-between p-2.5 rounded-xl bg-cream-50 dark:bg-[#1A212C] border border-dashed border-amber-500/50">
+                    <div className="flex flex-col">
+                      <span className="text-[10px] uppercase font-semibold text-charcoal-400 dark:text-cream-200/60">
+                        Promo Code
+                      </span>
+                      <span className="font-mono font-black text-sm text-forest-950 dark:text-amber-400 tracking-wider">
+                        {config.couponCode}
+                      </span>
+                    </div>
+                    <button
+                      onClick={() => handleCopyCode(config.couponCode)}
+                      className="px-3 py-1.5 rounded-lg bg-copper-500 hover:bg-copper-600 text-white text-xs font-bold transition-all active:scale-95 cursor-pointer shadow-sm"
+                    >
+                      {copied ? 'Copied!' : 'Copy Code'}
+                    </button>
+                  </div>
+                )}
+
+                <div className="flex gap-2 pt-1">
+                  <Link
+                    to="/site-visit"
+                    onClick={() => setIsDiyaPopped(false)}
+                    className="flex-1 py-2.5 rounded-xl bg-copper-500 hover:bg-copper-600 text-white text-[11px] font-bold text-center uppercase tracking-wider transition-colors shadow-sm"
+                  >
+                    Book Visit
+                  </Link>
+                  <Link
+                    to="/quote"
+                    onClick={() => setIsDiyaPopped(false)}
+                    className="flex-1 py-2.5 rounded-xl bg-cream-100 dark:bg-[#1A212C] text-charcoal-700 dark:text-cream-100 text-[11px] font-bold text-center uppercase tracking-wider transition-colors"
+                  >
+                    View Bill
+                  </Link>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       )}
 
       {/* ========================================================================= */}
-      {/* 2. FESTIVE GREETING MODAL (POPUP) - FULLY OPTIMIZED FOR MOBILE SCREENS    */}
+      {/* 4. FESTIVE GREETING MODAL (POPUP) - FULLY OPTIMIZED FOR MOBILE & DESKTOP */}
       {/* ========================================================================= */}
       {showModal && (
         <div
           onClick={(e) => {
-            // Dismiss if clicking outside the modal box
             if (e.target === e.currentTarget) {
               handleDismissModal();
             }
