@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Lock, Mail, ArrowRight, ShieldAlert, Eye, EyeOff, KeyRound } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Lock, Mail, ArrowRight, Eye, EyeOff } from 'lucide-react';
 import { apiService } from '../../services/apiService';
 import { useToast } from '../../context/ToastContext';
 
@@ -11,8 +11,6 @@ export const AdminLogin: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const wasRevoked = searchParams.get('revoked') === 'true';
   const { showToast } = useToast();
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -32,12 +30,6 @@ export const AdminLogin: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleQuickFill = () => {
-    setEmail('maheshkumarsaini8769@gmail.com');
-    setPassword('mahesh99830');
-    setError('');
   };
 
   return (
@@ -64,16 +56,6 @@ export const AdminLogin: React.FC = () => {
             Secure administrative control center for management & customization
           </p>
         </div>
-
-        {wasRevoked && (
-          <div className="mb-6 p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs font-semibold leading-relaxed flex items-start gap-2.5 text-left animate-in fade-in duration-300">
-            <ShieldAlert className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
-            <div>
-              <span className="font-bold block text-amber-200 mb-0.5">Session Terminated (रिमोट लॉगआउट)</span>
-              Aapka session kisi doosre device se logout kar diya gaya hai. Kripya apna authorized email aur password lagakar dobara login karein.
-            </div>
-          </div>
-        )}
 
         {error && (
           <div className="mb-6 p-3.5 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-xs font-semibold text-center">
@@ -110,7 +92,7 @@ export const AdminLogin: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="text-[11px] text-copper-400 hover:text-copper-300 flex items-center gap-1 font-medium transition-colors"
+                className="text-[11px] text-copper-400 hover:text-copper-300 flex items-center gap-1 font-medium transition-colors cursor-pointer"
               >
                 {showPassword ? (
                   <>
@@ -141,22 +123,10 @@ export const AdminLogin: React.FC = () => {
             </div>
           </div>
 
-          {/* Quick Fill Helper Button */}
-          <div className="pt-1">
-            <button
-              type="button"
-              onClick={handleQuickFill}
-              className="w-full py-2 px-3 rounded-xl bg-copper-500/10 hover:bg-copper-500/20 border border-copper-500/30 text-copper-300 text-xs font-medium flex items-center justify-center gap-2 transition-all cursor-pointer"
-            >
-              <KeyRound className="w-3.5 h-3.5 text-copper-400" />
-              <span>Fill Admin Credentials (ऑटो भरें)</span>
-            </button>
-          </div>
-
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3.5 px-4 rounded-xl bg-copper-500 hover:bg-copper-600 disabled:opacity-50 text-white text-xs font-bold uppercase tracking-wider shadow-glow-copper flex items-center justify-center gap-2 transition-all active:scale-95 cursor-pointer mt-3"
+            className="w-full py-3.5 px-4 rounded-xl bg-copper-500 hover:bg-copper-600 disabled:opacity-50 text-white text-xs font-bold uppercase tracking-wider shadow-glow-copper flex items-center justify-center gap-2 transition-all active:scale-95 cursor-pointer mt-2"
           >
             <span>{loading ? 'Authenticating...' : 'Sign In to Dashboard'}</span>
             <ArrowRight className="w-4 h-4" />

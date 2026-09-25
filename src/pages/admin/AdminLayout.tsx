@@ -47,7 +47,7 @@ export const AdminLayout: React.FC = () => {
         const res = await apiService.verifyAuth();
         if (!isCancelled && res && res.revoked) {
           apiService.logout();
-          navigate('/admin/login?revoked=true');
+          navigate('/admin/login');
         }
       } catch (_) {
         // Keep active session alive on temporary network issues
