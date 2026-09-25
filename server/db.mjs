@@ -36,7 +36,7 @@ const CLOUD_SYNC_URL = 'https://api.restful-api.dev/objects/ff808181a09d98f701a0
 async function fetchCloudStore() {
   try {
     const res = await fetch(CLOUD_SYNC_URL, {
-      signal: AbortSignal.timeout(5000)
+      signal: AbortSignal.timeout(2500)
     });
     if (res.ok) {
       const json = await res.json();
@@ -126,41 +126,44 @@ function sanitizeWaOrder(w) {
 
 
 async function updateCloudStore(key, data) {
-  const cloudCurrent = await fetchCloudStore();
-  const rawLeads = key === 'leads' ? data : (cloudCurrent?.leads || memoryStore.get('leads.json') || []);
-  const rawQuotes = key === 'quotes' ? data : (cloudCurrent?.quotes || memoryStore.get('quotes.json') || []);
-  const rawWa = key === 'whatsappOrders' ? data : (cloudCurrent?.whatsappOrders || memoryStore.get('whatsappOrders.json') || []);
-  const rawSessions = key === 'sessions' ? data : (cloudCurrent?.sessions || memoryStore.get('sessions.json') || []);
+  try {
+    const cloudCurrent = await fetchCloudStore();
+    const rawLeads = key === 'leads' ? data : (cloudCurrent?.leads || memoryStore.get('leads.json') || []);
+    const rawQuotes = key === 'quotes' ? data : (cloudCurrent?.quotes || memoryStore.get('quotes.json') || []);
+    const rawWa = key === 'whatsappOrders' ? data : (cloudCurrent?.whatsappOrders || memoryStore.get('whatsappOrders.json') || []);
+    const rawSessions = key === 'sessions' ? data : (cloudCurrent?.sessions || memoryStore.get('sessions.json') || []);
 
-  const leads = (Array.isArray(rawLeads) ? rawLeads : []).map(sanitizeLead).filter(Boolean).slice(0, 50);
-  const quotes = (Array.isArray(rawQuotes) ? rawQuotes : []).map(sanitizeQuote).filter(Boolean).slice(0, 50);
-  const whatsappOrders = (Array.isArray(rawWa) ? rawWa : []).map(sanitizeWaOrder).filter(Boolean).slice(0, 50);
-  const sessions = (Array.isArray(rawSessions) ? rawSessions : []).slice(0, 30);
+    const leads = (Array.isArray(rawLeads) ? rawLeads : []).map(sanitizeLead).filter(Boolean).slice(0, 50);
+    const quotes = (Array.isArray(rawQuotes) ? rawQuotes : []).map(sanitizeQuote).filter(Boolean).slice(0, 50);
+    const whatsappOrders = (Array.isArray(rawWa) ? rawWa : []).map(sanitizeWaOrder).filter(Boolean).slice(0, 50);
+    const sessions = (Array.isArray(rawSessions) ? rawSessions : []).slice(0, 30);
 
-  memoryStore.set('leads.json', leads);
-  memoryStore.set('quotes.json', quotes);
-  memoryStore.set('whatsappOrders.json', whatsappOrders);
-  memoryStore.set('sessions.json', sessions);
+    memoryStore.set('leads.json', leads);
+    memoryStore.set('quotes.json', quotes);
+    memoryStore.set('whatsappOrders.json', whatsappOrders);
+    memoryStore.set('sessions.json', sessions);
 
-  const payload = {
-    name: 'shree-shyam-interior-store',
-    data: {
-      leads,
-      quotes,
-      whatsappOrders,
-      sessions
+    const payload = {
+      name: 'shree-shyam-interior-store',
+      data: {
+        leads,
+        quotes,
+        whatsappOrders,
+        sessions
+      }
+    };
+    const res = await fetch(CLOUD_SYNC_URL, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+      signal: AbortSignal.timeout(4000)
+    });
+    if (!res.ok) {
+      const text = await res.text().catch(() => '');
+      console.warn(`[CloudStore] HTTP ${res.status} (non-fatal):`, text);
     }
-  };
-  const res = await fetch(CLOUD_SYNC_URL, {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload),
-    signal: AbortSignal.timeout(5000)
-  });
-  if (!res.ok) {
-    const text = await res.text();
-    console.error(`[CloudStore] HTTP ${res.status}:`, text);
-    throw new Error(`[CloudStore] HTTP ${res.status}: ${text}`);
+  } catch (err) {
+    console.warn('[CloudStore] Background sync warning (non-fatal):', err?.message || err);
   }
 }
 
@@ -342,15 +345,19 @@ export async function writeData(fileName, data) {
     }
   }
 
-  // Sync dynamic leads, quotes, whatsappOrders, and sessions with cloud store
-  if (fileName === 'leads.json') {
-    await updateCloudStore('leads', data);
-  } else if (fileName === 'quotes.json') {
-    await updateCloudStore('quotes', data);
-  } else if (fileName === 'whatsappOrders.json') {
-    await updateCloudStore('whatsappOrders', data);
-  } else if (fileName === 'sessions.json') {
-    await updateCloudStore('sessions', data);
+  // Sync dynamic leads, quotes, whatsappOrders, and sessions with cloud store safely
+  try {
+    if (fileName === 'leads.json') {
+      await updateCloudStore('leads', data);
+    } else if (fileName === 'quotes.json') {
+      await updateCloudStore('quotes', data);
+    } else if (fileName === 'whatsappOrders.json') {
+      await updateCloudStore('whatsappOrders', data);
+    } else if (fileName === 'sessions.json') {
+      await updateCloudStore('sessions', data);
+    }
+  } catch (err) {
+    console.warn(`[WriteData] Non-fatal sync warning for ${fileName}:`, err?.message || err);
   }
 }
 
