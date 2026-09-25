@@ -383,7 +383,7 @@ export const QuotePage: React.FC = () => {
                     <label className="block text-copper-400 font-semibold mb-1">Your Name</label>
                     <input
                       type="text"
-                      placeholder="e.g. Ramesh Soni"
+                      placeholder="Enter your name"
                       value={customerName}
                       onChange={(e) => setCustomerName(e.target.value)}
                       className="w-full bg-forest-900 border border-cream-200/20 rounded-xl px-3 py-2 text-cream-100 text-xs focus:outline-none focus:border-copper-400"
@@ -395,7 +395,7 @@ export const QuotePage: React.FC = () => {
                     <input
                       type="tel"
                       inputMode="tel"
-                      placeholder="e.g. 9876543210"
+                      placeholder="Enter 10-digit phone number"
                       value={customerPhone}
                       onChange={(e) => setCustomerPhone(e.target.value)}
                       className="w-full bg-forest-900 border border-cream-200/20 rounded-xl px-3 py-2 text-cream-100 text-xs focus:outline-none focus:border-copper-400"

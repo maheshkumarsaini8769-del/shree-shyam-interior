@@ -567,7 +567,7 @@ export const ReviewsPage: React.FC = () => {
                     required
                     value={formName}
                     onChange={(e) => setFormName(e.target.value)}
-                    placeholder="e.g. Ramesh Kumar Sharma"
+                    placeholder="Enter your name"
                     className="w-full bg-cream-50 dark:bg-[#1A212C] border border-cream-200 dark:border-cream-200/10 rounded-xl px-3.5 py-2 text-xs text-forest-950 dark:text-cream-50 focus:outline-none focus:border-copper-500"
                   />
                 </div>

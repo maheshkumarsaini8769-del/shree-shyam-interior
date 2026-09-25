@@ -148,7 +148,7 @@ export const SiteVisitPage: React.FC = () => {
                     <input
                       type="text"
                       required
-                      placeholder="e.g. Er. Rajeshwar Sharma"
+                      placeholder="Enter your full name"
                       value={formData.fullName}
                       onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
                       className="w-full bg-cream-50 border border-cream-200 rounded-xl px-4 py-3 text-forest-950 focus:outline-none focus:border-copper-500"
@@ -162,7 +162,7 @@ export const SiteVisitPage: React.FC = () => {
                         type="tel"
                         inputMode="tel"
                         required
-                        placeholder="e.g. 9876543210"
+                        placeholder="Enter 10-digit mobile number"
                         value={formData.phone}
                         onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                         className="w-full bg-cream-50 border border-cream-200 rounded-xl px-4 py-3 text-forest-950 focus:outline-none focus:border-copper-500"

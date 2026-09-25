@@ -275,7 +275,7 @@ export const ContactPage: React.FC = () => {
                     <input
                       type="text"
                       required
-                      placeholder="e.g. Rajesh Sharma"
+                      placeholder="Enter your full name"
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                       className="w-full bg-cream-50 border border-cream-200 rounded-xl px-4 py-3 text-xs sm:text-sm text-forest-950 focus:outline-none focus:border-copper-500 focus:bg-white transition-all"
@@ -290,7 +290,7 @@ export const ContactPage: React.FC = () => {
                       type="tel"
                       required
                       inputMode="tel"
-                      placeholder="e.g. 9829012345"
+                      placeholder="Enter 10-digit mobile number"
                       value={formData.phone}
                       onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                       className="w-full bg-cream-50 border border-cream-200 rounded-xl px-4 py-3 text-xs sm:text-sm text-forest-950 focus:outline-none focus:border-copper-500 focus:bg-white transition-all font-mono"
@@ -305,7 +305,7 @@ export const ContactPage: React.FC = () => {
                     </label>
                     <input
                       type="email"
-                      placeholder="e.g. name@example.com"
+                      placeholder="Enter your email address"
                       value={formData.email}
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                       className="w-full bg-cream-50 border border-cream-200 rounded-xl px-4 py-3 text-xs sm:text-sm text-forest-950 focus:outline-none focus:border-copper-500 focus:bg-white transition-all"
