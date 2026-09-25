@@ -113,25 +113,27 @@ function getClientIp(req) {
 // Authentication & Active Session Management Endpoints
 // -------------------------------------------------------------
 app.post('/api/auth/login', async (req, res) => {
-  const { email, username, password } = req.body;
-  const inputIdentifier = (email || username || '').trim().toLowerCase();
-  const settings = (await readData('settings.json')) || {};
+  try {
+    const { email, username, password } = req.body;
+    const inputIdentifier = (email || username || '').trim().toLowerCase();
+    const settings = (await readData('settings.json')) || {};
 
-  const validEmail = (settings.adminEmail || settings.adminUsername || 'maheshkumarsaini8769@gmail.com').toLowerCase();
-  const inputPassword = (password || '').trim();
-  const isEmailMatch =
-    inputIdentifier === validEmail ||
-    inputIdentifier === 'maheshkumarsaini8769' ||
-    inputIdentifier === 'admin' ||
-    inputIdentifier === 'mahesh';
-  const isPasswordMatch =
-    inputPassword === validPassword ||
-    inputPassword.toLowerCase() === validPassword.toLowerCase() ||
-    inputPassword === 'mahesh99830' ||
-    inputPassword.toLowerCase() === 'mahesh99830' ||
-    inputPassword === 'admin123';
+    const validEmail = (settings.adminEmail || settings.adminUsername || 'maheshkumarsaini8769@gmail.com').toLowerCase();
+    const validPassword = settings.adminPassword || 'mahesh99830';
+    const inputPassword = (password || '').trim();
+    const isEmailMatch =
+      inputIdentifier === validEmail ||
+      inputIdentifier === 'maheshkumarsaini8769' ||
+      inputIdentifier === 'admin' ||
+      inputIdentifier === 'mahesh';
+    const isPasswordMatch =
+      inputPassword === validPassword ||
+      inputPassword.toLowerCase() === validPassword.toLowerCase() ||
+      inputPassword === 'mahesh99830' ||
+      inputPassword.toLowerCase() === 'mahesh99830' ||
+      inputPassword === 'admin123';
 
-  if (isEmailMatch && isPasswordMatch) {
+    if (isEmailMatch && isPasswordMatch) {
     const sessionId = `sess_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
     const token = `ssi_token_${Buffer.from(`${validEmail}:${Date.now()}:${sessionId}`).toString('base64')}`;
 
@@ -168,7 +170,11 @@ app.post('/api/auth/login', async (req, res) => {
     });
   }
 
-  res.status(401).json({ success: false, error: 'Invalid email or password. Access restricted.' });
+    return res.status(401).json({ success: false, error: 'Invalid email or password. Access restricted.' });
+  } catch (err) {
+    console.error('Error during login:', err);
+    res.status(500).json({ success: false, error: 'Authentication service error. Please try again.' });
+  }
 });
 
 app.get('/api/auth/verify', async (req, res) => {
