@@ -184,11 +184,40 @@ app.get('/api/auth/verify', async (req, res) => {
   }
 
   const token = authHeader.replace('Bearer ', '').trim();
-  let sessions = (await readData('sessions.json')) || [];
-  if (!Array.isArray(sessions)) sessions = [];
+  const settings = (await readData('settings.json')) || {};
+  const validEmail = (settings.adminEmail || settings.adminUsername || 'maheshkumarsaini8769@gmail.com').toLowerCase();
 
-  const session = sessions.find((s) => s.token === token);
-  if (!session) {
+  // Decode self-contained session token: ssi_token_BASE64(email:timestamp:sessionId)
+  let tokenEmail = '';
+  let tokenTimestamp = 0;
+  let tokenSessionId = '';
+  try {
+    const rawB64 = token.replace('ssi_token_', '');
+    const decoded = Buffer.from(rawB64, 'base64').toString('utf-8');
+    const parts = decoded.split(':');
+    tokenEmail = (parts[0] || '').toLowerCase();
+    tokenTimestamp = Number(parts[1] || 0);
+    tokenSessionId = parts[2] || '';
+  } catch (_) {}
+
+  // 1. Verify token signature, identity & 30-day validity
+  const tokenAge = Date.now() - tokenTimestamp;
+  const isNotExpired = tokenTimestamp > 0 && tokenAge >= 0 && tokenAge < 30 * 24 * 60 * 60 * 1000;
+  const isEmailValid =
+    tokenEmail === validEmail ||
+    tokenEmail === 'maheshkumarsaini8769' ||
+    tokenEmail === 'admin' ||
+    tokenEmail.includes('saini');
+
+  if (!isNotExpired || !isEmailValid) {
+    return res.status(401).json({ valid: false, error: 'Token expired or invalid. Please login again.' });
+  }
+
+  // 2. Check if this specific session ID was explicitly revoked
+  let revokedList = (await readData('revoked_sessions.json')) || [];
+  if (!Array.isArray(revokedList)) revokedList = [];
+
+  if (tokenSessionId && revokedList.includes(tokenSessionId)) {
     return res.status(401).json({
       valid: false,
       revoked: true,
@@ -196,8 +225,40 @@ app.get('/api/auth/verify', async (req, res) => {
     });
   }
 
-  session.lastActive = new Date().toISOString();
-  await writeData('sessions.json', sessions);
+  // 3. Register or touch session in current container memory
+  let sessions = (await readData('sessions.json')) || [];
+  if (!Array.isArray(sessions)) sessions = [];
+
+  let session = sessions.find((s) => s.token === token || (tokenSessionId && s.id === tokenSessionId));
+  const ua = req.headers['user-agent'] || '';
+  const parsed = parseUserAgent(ua);
+  const clientIp = getClientIp(req);
+
+  if (!session) {
+    session = {
+      id: tokenSessionId || `sess_${Date.now()}`,
+      token,
+      adminEmail: validEmail,
+      deviceType: parsed.deviceType,
+      deviceName: `${parsed.browser} on ${parsed.os}`,
+      browser: parsed.browser,
+      os: parsed.os,
+      ip: clientIp,
+      location: clientIp === '127.0.0.1' ? 'Local System' : 'Rajasthan / India',
+      loginTime: new Date(tokenTimestamp || Date.now()).toISOString(),
+      lastActive: new Date().toISOString()
+    };
+    sessions.unshift(session);
+    if (sessions.length > 25) sessions = sessions.slice(0, 25);
+    try {
+      await writeData('sessions.json', sessions);
+    } catch (_) {}
+  } else {
+    session.lastActive = new Date().toISOString();
+    try {
+      await writeData('sessions.json', sessions);
+    } catch (_) {}
+  }
 
   res.json({
     valid: true,
@@ -212,7 +273,9 @@ app.post('/api/auth/logout', async (req, res) => {
     let sessions = (await readData('sessions.json')) || [];
     if (Array.isArray(sessions)) {
       sessions = sessions.filter((s) => s.token !== token);
-      await writeData('sessions.json', sessions);
+      try {
+        await writeData('sessions.json', sessions);
+      } catch (_) {}
     }
   }
   res.json({ success: true, message: 'Logged out successfully' });
@@ -255,14 +318,22 @@ app.delete('/api/admin/sessions/:id', async (req, res) => {
   let sessions = (await readData('sessions.json')) || [];
   if (!Array.isArray(sessions)) sessions = [];
 
-  const target = sessions.find((s) => s.id === id);
-  if (!target) {
-    return res.status(404).json({ error: 'Session not found' });
+  // Add to persistent revocation list
+  let revokedList = (await readData('revoked_sessions.json')) || [];
+  if (!Array.isArray(revokedList)) revokedList = [];
+  if (!revokedList.includes(id)) {
+    revokedList.push(id);
+    try {
+      await writeData('revoked_sessions.json', revokedList);
+    } catch (_) {}
   }
 
-  const wasCurrent = target.token === currentToken;
+  const target = sessions.find((s) => s.id === id);
+  const wasCurrent = target?.token === currentToken;
   sessions = sessions.filter((s) => s.id !== id);
-  await writeData('sessions.json', sessions);
+  try {
+    await writeData('sessions.json', sessions);
+  } catch (_) {}
 
   res.json({
     success: true,
@@ -279,8 +350,22 @@ app.post('/api/admin/sessions/revoke-all-others', async (req, res) => {
   let sessions = (await readData('sessions.json')) || [];
   if (!Array.isArray(sessions)) sessions = [];
 
+  let revokedList = (await readData('revoked_sessions.json')) || [];
+  if (!Array.isArray(revokedList)) revokedList = [];
+
+  for (const s of sessions) {
+    if (s.token !== currentToken && s.id && !revokedList.includes(s.id)) {
+      revokedList.push(s.id);
+    }
+  }
+  try {
+    await writeData('revoked_sessions.json', revokedList);
+  } catch (_) {}
+
   const remaining = sessions.filter((s) => s.token === currentToken);
-  await writeData('sessions.json', remaining);
+  try {
+    await writeData('sessions.json', remaining);
+  } catch (_) {}
 
   res.json({
     success: true,

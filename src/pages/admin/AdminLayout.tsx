@@ -40,18 +40,22 @@ export const AdminLayout: React.FC = () => {
       return;
     }
 
-    // Verify session validity on route change & periodically every 20 seconds
+    // Verify session validity periodically and on route change
     let isCancelled = false;
     const checkSession = async () => {
-      const res = await apiService.verifyAuth();
-      if (!isCancelled && (!res || !res.valid)) {
-        apiService.logout();
-        navigate('/admin/login?revoked=true');
+      try {
+        const res = await apiService.verifyAuth();
+        if (!isCancelled && res && res.revoked) {
+          apiService.logout();
+          navigate('/admin/login?revoked=true');
+        }
+      } catch (_) {
+        // Keep active session alive on temporary network issues
       }
     };
 
     checkSession();
-    const interval = setInterval(checkSession, 20000);
+    const interval = setInterval(checkSession, 30000);
     return () => {
       isCancelled = true;
       clearInterval(interval);
