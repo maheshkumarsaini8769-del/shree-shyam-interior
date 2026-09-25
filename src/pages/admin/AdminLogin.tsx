@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Lock, Mail, ArrowRight, ShieldAlert } from 'lucide-react';
+import { Lock, Mail, ArrowRight, ShieldAlert, Eye, EyeOff, KeyRound } from 'lucide-react';
 import { apiService } from '../../services/apiService';
 import { useToast } from '../../context/ToastContext';
 
 export const AdminLogin: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const navigate = useNavigate();
@@ -19,8 +20,11 @@ export const AdminLogin: React.FC = () => {
     setLoading(true);
     setError('');
 
+    const cleanEmail = email.trim();
+    const cleanPassword = password.trim();
+
     try {
-      await apiService.login(email, password);
+      await apiService.login(cleanEmail, cleanPassword);
       showToast('Welcome to Shree Shyam Interior Admin Panel', 'success');
       navigate('/admin');
     } catch (err: any) {
@@ -28,6 +32,12 @@ export const AdminLogin: React.FC = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleQuickFill = () => {
+    setEmail('maheshkumarsaini8769@gmail.com');
+    setPassword('mahesh99830');
+    setError('');
   };
 
   return (
@@ -74,42 +84,79 @@ export const AdminLogin: React.FC = () => {
         <form onSubmit={handleLogin} className="space-y-4">
           <div>
             <label className="block text-xs font-semibold text-cream-200/80 mb-1.5 uppercase tracking-wider">
-              Authorized Email
+              Authorized Email / Username
             </label>
             <div className="relative">
               <Mail className="w-4 h-4 text-copper-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
               <input
-                type="email"
+                type="text"
                 required
+                autoCapitalize="none"
+                autoCorrect="off"
+                spellCheck="false"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full bg-[#1A212C] border border-copper-500/20 rounded-xl pl-10 pr-4 py-3 text-sm text-cream-100 placeholder-charcoal-400 focus:outline-none focus:border-copper-400 transition-colors"
-                placeholder="Enter authorized admin email"
+                placeholder="Enter authorized email or username"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-cream-200/80 mb-1.5 uppercase tracking-wider">
-              Password
-            </label>
+            <div className="flex items-center justify-between mb-1.5">
+              <label className="block text-xs font-semibold text-cream-200/80 uppercase tracking-wider">
+                Password
+              </label>
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="text-[11px] text-copper-400 hover:text-copper-300 flex items-center gap-1 font-medium transition-colors"
+              >
+                {showPassword ? (
+                  <>
+                    <EyeOff className="w-3.5 h-3.5" />
+                    <span>Hide</span>
+                  </>
+                ) : (
+                  <>
+                    <Eye className="w-3.5 h-3.5" />
+                    <span>Show</span>
+                  </>
+                )}
+              </button>
+            </div>
             <div className="relative">
               <Lock className="w-4 h-4 text-copper-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
               <input
-                type="password"
+                type={showPassword ? 'text' : 'password'}
                 required
+                autoCapitalize="none"
+                autoCorrect="off"
+                spellCheck="false"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full bg-[#1A212C] border border-copper-500/20 rounded-xl pl-10 pr-4 py-3 text-sm text-cream-100 placeholder-charcoal-400 focus:outline-none focus:border-copper-400 transition-colors"
+                className="w-full bg-[#1A212C] border border-copper-500/20 rounded-xl pl-10 pr-10 py-3 text-sm text-cream-100 placeholder-charcoal-400 focus:outline-none focus:border-copper-400 transition-colors"
                 placeholder="Enter secure password"
               />
             </div>
           </div>
 
+          {/* Quick Fill Helper Button */}
+          <div className="pt-1">
+            <button
+              type="button"
+              onClick={handleQuickFill}
+              className="w-full py-2 px-3 rounded-xl bg-copper-500/10 hover:bg-copper-500/20 border border-copper-500/30 text-copper-300 text-xs font-medium flex items-center justify-center gap-2 transition-all cursor-pointer"
+            >
+              <KeyRound className="w-3.5 h-3.5 text-copper-400" />
+              <span>Fill Admin Credentials (ऑटो भरें)</span>
+            </button>
+          </div>
+
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3.5 px-4 rounded-xl bg-copper-500 hover:bg-copper-600 disabled:opacity-50 text-white text-xs font-bold uppercase tracking-wider shadow-glow-copper flex items-center justify-center gap-2 transition-all active:scale-95 cursor-pointer mt-4"
+            className="w-full py-3.5 px-4 rounded-xl bg-copper-500 hover:bg-copper-600 disabled:opacity-50 text-white text-xs font-bold uppercase tracking-wider shadow-glow-copper flex items-center justify-center gap-2 transition-all active:scale-95 cursor-pointer mt-3"
           >
             <span>{loading ? 'Authenticating...' : 'Sign In to Dashboard'}</span>
             <ArrowRight className="w-4 h-4" />
