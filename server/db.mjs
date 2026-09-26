@@ -131,7 +131,7 @@ async function updateCloudStore(key, data) {
     const rawLeads = key === 'leads' ? data : (cloudCurrent?.leads || memoryStore.get('leads.json') || []);
     const rawQuotes = key === 'quotes' ? data : (cloudCurrent?.quotes || memoryStore.get('quotes.json') || []);
     const rawWa = key === 'whatsappOrders' ? data : (cloudCurrent?.whatsappOrders || memoryStore.get('whatsappOrders.json') || []);
-    const rawSessions = key === 'sessions' ? data : (cloudCurrent?.sessions || memoryStore.get('sessions.json') || []);
+    const rawFestival = key === 'festival' ? data : (cloudCurrent?.festival || memoryStore.get('festival.json') || null);
 
     const leads = (Array.isArray(rawLeads) ? rawLeads : []).map(sanitizeLead).filter(Boolean).slice(0, 50);
     const quotes = (Array.isArray(rawQuotes) ? rawQuotes : []).map(sanitizeQuote).filter(Boolean).slice(0, 50);
@@ -142,6 +142,9 @@ async function updateCloudStore(key, data) {
     memoryStore.set('quotes.json', quotes);
     memoryStore.set('whatsappOrders.json', whatsappOrders);
     memoryStore.set('sessions.json', sessions);
+    if (rawFestival && typeof rawFestival === 'object') {
+      memoryStore.set('festival.json', rawFestival);
+    }
 
     const payload = {
       name: 'shree-shyam-interior-store',
@@ -149,7 +152,8 @@ async function updateCloudStore(key, data) {
         leads,
         quotes,
         whatsappOrders,
-        sessions
+        sessions,
+        festival: rawFestival || memoryStore.get('festival.json') || null
       }
     };
     const res = await fetch(CLOUD_SYNC_URL, {
@@ -207,6 +211,7 @@ export async function initDb() {
       if (Array.isArray(cloudData.quotes)) memoryStore.set('quotes.json', cloudData.quotes);
       if (Array.isArray(cloudData.whatsappOrders)) memoryStore.set('whatsappOrders.json', cloudData.whatsappOrders);
       if (Array.isArray(cloudData.sessions)) memoryStore.set('sessions.json', cloudData.sessions);
+      if (cloudData.festival && typeof cloudData.festival === 'object') memoryStore.set('festival.json', cloudData.festival);
     }
 
     for (const file of files) {
@@ -287,6 +292,14 @@ export async function readData(fileName) {
     }
   }
 
+  if (fileName === 'festival.json') {
+    const cloudData = await fetchCloudStore();
+    if (cloudData && cloudData.festival && typeof cloudData.festival === 'object') {
+      memoryStore.set(fileName, cloudData.festival);
+      return cloudData.festival;
+    }
+  }
+
   // 1. Check in-memory store
   if (memoryStore.has(fileName)) {
     return memoryStore.get(fileName);
@@ -355,6 +368,8 @@ export async function writeData(fileName, data) {
       await updateCloudStore('whatsappOrders', data);
     } else if (fileName === 'sessions.json') {
       await updateCloudStore('sessions', data);
+    } else if (fileName === 'festival.json') {
+      await updateCloudStore('festival', data);
     }
   } catch (err) {
     console.warn(`[WriteData] Non-fatal sync warning for ${fileName}:`, err?.message || err);

@@ -58,16 +58,36 @@ export const AdminFestiveCampaigns: React.FC = () => {
     }
   };
 
-  const handleSelectPreset = (presetKey: FestivalType) => {
+  const handleSelectPreset = async (presetKey: FestivalType, autoActivate = false) => {
     const preset = FESTIVAL_PRESETS[presetKey];
     if (preset) {
-      setConfig({
+      const updatedConfig = {
         ...preset,
         autoSchedule: config.autoSchedule,
         startDate: config.startDate,
         endDate: config.endDate
-      });
-      showToast(`Selected ${preset.festivalName} preset! Click "Save & Activate" to apply live.`, 'info');
+      };
+      setConfig(updatedConfig);
+
+      // If user selected normal mode OR explicitly requested auto-activate, apply live immediately!
+      if (presetKey === 'normal' || autoActivate) {
+        try {
+          setSaving(true);
+          await apiService.updateFestivalCampaign(updatedConfig);
+          showToast(
+            presetKey === 'normal'
+              ? '✅ Website successfully reverted to Normal Standard Mode!'
+              : `🎉 ${preset.festivalName} is now LIVE on customer website!`,
+            'success'
+          );
+        } catch {
+          showToast('Failed to activate mode', 'error');
+        } finally {
+          setSaving(false);
+        }
+      } else {
+        showToast(`Selected ${preset.festivalName} preset! Click "Save & Activate" to apply live.`, 'info');
+      }
     }
   };
 
@@ -77,7 +97,7 @@ export const AdminFestiveCampaigns: React.FC = () => {
       const normalConfig = { ...FESTIVAL_PRESETS.normal, updatedAt: new Date().toISOString() };
       await apiService.updateFestivalCampaign(normalConfig);
       setConfig(normalConfig);
-      showToast('Website successfully reverted to Normal Standard Mode!', 'success');
+      showToast('✅ Website successfully reverted to Normal Standard Mode!', 'success');
     } catch {
       showToast('Failed to revert to normal mode', 'error');
     } finally {
@@ -92,7 +112,7 @@ export const AdminFestiveCampaigns: React.FC = () => {
       await apiService.updateFestivalCampaign(config);
       showToast(
         config.activeFestival === 'normal'
-          ? 'Normal Mode active across website'
+          ? '✅ Normal Mode active across website'
           : `🎉 ${config.festivalName} is now LIVE on customer website!`,
         'success'
       );
@@ -112,7 +132,7 @@ export const AdminFestiveCampaigns: React.FC = () => {
   }> = [
     {
       id: 'normal',
-      title: 'Normal Mode',
+      title: 'Normal Mode (सामान्य)',
       sub: 'Standard luxury wood & forest theme for everyday',
       icon: '🌿',
       accent: 'border-copper-500/40'
@@ -179,23 +199,30 @@ export const AdminFestiveCampaigns: React.FC = () => {
         </div>
 
         {/* Quick Normal Mode Reset Button */}
-        {config.activeFestival !== 'normal' && (
-          <button
-            onClick={handleQuickRevertNormal}
-            disabled={saving}
-            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-forest-900 text-white dark:bg-cream-100 dark:text-forest-950 hover:bg-forest-800 text-xs font-bold uppercase tracking-wider shadow-md transition-all self-start sm:self-auto cursor-pointer"
-          >
-            <RefreshCw className="w-3.5 h-3.5" />
-            <span>Revert to Normal Mode Now</span>
-          </button>
-        )}
+        <div className="flex items-center gap-2">
+          {config.activeFestival !== 'normal' ? (
+            <button
+              onClick={handleQuickRevertNormal}
+              disabled={saving}
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-forest-900 text-white dark:bg-cream-100 dark:text-forest-950 hover:bg-forest-800 text-xs font-bold uppercase tracking-wider shadow-md transition-all self-start sm:self-auto cursor-pointer"
+            >
+              <RefreshCw className={`w-3.5 h-3.5 ${saving ? 'animate-spin' : ''}`} />
+              <span>{saving ? 'Reverting...' : 'Revert to Normal Mode Now'}</span>
+            </button>
+          ) : (
+            <div className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 text-xs font-bold">
+              <CheckCircle2 className="w-4 h-4" />
+              <span>Standard Normal Mode Active</span>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Current Active Status Alert Banner */}
       <div
         className={`p-5 rounded-3xl border text-xs sm:text-sm transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-card ${
           config.activeFestival === 'normal'
-            ? 'bg-cream-100/70 dark:bg-[#121720] border-cream-300 dark:border-cream-200/10 text-charcoal-800 dark:text-cream-100'
+            ? 'bg-cream-100/70 dark:bg-[#121720] border-emerald-500/30 text-charcoal-800 dark:text-cream-100'
             : 'bg-gradient-to-r from-amber-500/15 via-orange-500/10 to-amber-500/15 border-amber-500/40 text-forest-950 dark:text-cream-50'
         }`}
       >
@@ -206,17 +233,28 @@ export const AdminFestiveCampaigns: React.FC = () => {
           <div>
             <div className="font-serif font-bold text-base sm:text-lg flex items-center gap-2">
               <span>Active Mode: {config.festivalName}</span>
-              <span className="inline-block w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping" />
+              <span className={`inline-block w-2.5 h-2.5 rounded-full ${config.activeFestival === 'normal' ? 'bg-emerald-500' : 'bg-amber-500 animate-ping'}`} />
             </div>
             <p className="text-xs text-charcoal-600 dark:text-cream-200/80 mt-0.5">
               {config.activeFestival === 'normal'
-                ? 'Standard luxury wooden catalog and showroom booking banners are currently active.'
+                ? 'Standard luxury wooden catalog and showroom booking banners are currently active on public website.'
                 : `Festive announcement bar, ambient ${config.festivalName} effects, and coupon "${config.couponCode || 'N/A'}" are currently LIVE.`}
             </p>
           </div>
         </div>
 
-        {config.autoSchedule && config.endDate && (
+        {config.activeFestival !== 'normal' && (
+          <button
+            type="button"
+            onClick={handleQuickRevertNormal}
+            disabled={saving}
+            className="shrink-0 px-3.5 py-2 rounded-xl bg-forest-950 dark:bg-white text-white dark:text-forest-950 font-bold text-xs uppercase tracking-wider hover:opacity-90 transition-all cursor-pointer shadow-sm"
+          >
+            Switch to Normal Mode
+          </button>
+        )}
+
+        {config.autoSchedule && config.endDate && config.activeFestival !== 'normal' && (
           <div className="shrink-0 bg-white/80 dark:bg-[#1A212C] px-3.5 py-1.5 rounded-xl border border-cream-200 dark:border-cream-200/10 text-[11px] font-medium">
             <span className="text-charcoal-500 dark:text-cream-200/60 block text-[10px]">Auto-reverts to normal on:</span>
             <span className="font-bold text-copper-600 dark:text-copper-400">{config.endDate}</span>
@@ -234,10 +272,9 @@ export const AdminFestiveCampaigns: React.FC = () => {
           {festivalOptions.map((opt) => {
             const isSelected = config.activeFestival === opt.id;
             return (
-              <button
-                type="button"
+              <div
                 key={opt.id}
-                onClick={() => handleSelectPreset(opt.id)}
+                onClick={() => handleSelectPreset(opt.id, opt.id === 'normal')}
                 className={`p-4 rounded-2xl border text-left transition-all cursor-pointer relative overflow-hidden flex flex-col justify-between ${
                   isSelected
                     ? `${opt.accent} bg-white dark:bg-[#1A212C] shadow-card ring-2 ring-copper-500`
@@ -260,10 +297,18 @@ export const AdminFestiveCampaigns: React.FC = () => {
                 </div>
 
                 <div className="mt-4 pt-2 border-t border-cream-100 dark:border-cream-200/5 text-[10px] font-bold text-copper-600 dark:text-copper-400 uppercase tracking-wider flex items-center justify-between">
-                  <span>{isSelected ? 'Selected' : 'Click to Select'}</span>
+                  <span>
+                    {opt.id === 'normal'
+                      ? isSelected
+                        ? '🌿 Normal Active'
+                        : 'Click to Activate Normal'
+                      : isSelected
+                      ? 'Selected (Active)'
+                      : 'Click to Select'}
+                  </span>
                   <ArrowRight className="w-3 h-3" />
                 </div>
-              </button>
+              </div>
             );
           })}
         </div>
@@ -271,6 +316,33 @@ export const AdminFestiveCampaigns: React.FC = () => {
 
       {/* STEP 2: EDITABLE FESTIVE DETAILS & PREVIEW */}
       <form onSubmit={handleSave} className="bg-white dark:bg-[#121720] rounded-3xl p-6 sm:p-8 border border-cream-200 dark:border-cream-200/10 shadow-soft space-y-6">
+        {/* Top Fast Action Bar so user does NOT need to scroll to bottom */}
+        <div className="p-3.5 rounded-2xl bg-cream-50 dark:bg-[#1A212C] border border-cream-200 dark:border-cream-200/10 flex flex-wrap items-center justify-between gap-3">
+          <div className="text-xs text-charcoal-700 dark:text-cream-200">
+            Selected Theme: <strong className="text-forest-950 dark:text-cream-50">{config.festivalName}</strong>
+          </div>
+          <div className="flex items-center gap-2 ml-auto">
+            {config.activeFestival !== 'normal' && (
+              <button
+                type="button"
+                onClick={handleQuickRevertNormal}
+                disabled={saving}
+                className="px-3.5 py-2 rounded-xl bg-forest-900 hover:bg-forest-800 text-white text-xs font-semibold cursor-pointer transition-colors"
+              >
+                🌿 Switch to Normal
+              </button>
+            )}
+            <button
+              type="submit"
+              disabled={saving}
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-copper-500 hover:bg-copper-600 text-white text-xs font-bold uppercase tracking-wider shadow-glow-copper transition-all active:scale-95 cursor-pointer"
+            >
+              <Save className="w-3.5 h-3.5" />
+              <span>{saving ? 'Activating...' : 'Save & Activate Live'}</span>
+            </button>
+          </div>
+        </div>
+
         <div className="flex items-center justify-between pb-4 border-b border-cream-200 dark:border-cream-200/10">
           <div>
             <h3 className="font-serif text-lg font-bold text-forest-950 dark:text-cream-50">

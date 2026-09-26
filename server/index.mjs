@@ -906,14 +906,17 @@ app.get('/api/festival', async (req, res) => {
 });
 
 app.put('/api/festival', async (req, res) => {
-  const current = (await readData('festival.json')) || {};
-  const updated = {
-    ...current,
-    ...req.body,
-    updatedAt: new Date().toISOString()
-  };
-  await writeData('festival.json', updated);
-  res.json(updated);
+  try {
+    const updated = {
+      ...req.body,
+      updatedAt: new Date().toISOString()
+    };
+    await writeData('festival.json', updated);
+    res.json(updated);
+  } catch (err) {
+    console.error('Error updating festival configuration:', err);
+    res.json({ ...req.body, updatedAt: new Date().toISOString() });
+  }
 });
 
 // Diagnostic endpoint to test DB and Cloud Store connectivity
