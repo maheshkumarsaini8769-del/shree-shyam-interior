@@ -1,14 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Calendar, Clock, MapPin, CheckCircle2, ArrowRight, ShieldCheck, Sparkles, Phone, User, Home } from 'lucide-react';
 import { saveSiteVisit } from '../services/bookingService';
 import { SiteVisitRequest } from '../types/quote';
 import { useToast } from '../context/ToastContext';
 import { Link } from 'react-router-dom';
 import { SEOHead } from '../components/common/SEOHead';
-import { apiService } from '../services/apiService';
+import { apiService, FestivalCampaignConfig } from '../services/apiService';
 
 export const SiteVisitPage: React.FC = () => {
   const { showToast } = useToast();
+  const [suggestedCoupon, setSuggestedCoupon] = useState<string>('WELCOME10');
   const [formData, setFormData] = useState({
     fullName: '',
     phone: '',
@@ -24,6 +25,30 @@ export const SiteVisitPage: React.FC = () => {
   });
 
   const [bookingConfirmed, setBookingConfirmed] = useState<SiteVisitRequest | null>(null);
+
+  // Load active festival coupon dynamically
+  useEffect(() => {
+    apiService.getFestivalCampaign().then((cfg) => {
+      if (cfg && cfg.activeFestival !== 'normal' && cfg.couponCode) {
+        setSuggestedCoupon(cfg.couponCode);
+      } else {
+        setSuggestedCoupon('WELCOME10');
+      }
+    });
+
+    const handleFestivalChange = (e: CustomEvent<FestivalCampaignConfig>) => {
+      if (e.detail && e.detail.activeFestival !== 'normal' && e.detail.couponCode) {
+        setSuggestedCoupon(e.detail.couponCode);
+      } else {
+        setSuggestedCoupon('WELCOME10');
+      }
+    };
+
+    window.addEventListener('ssi_festival_changed' as any, handleFestivalChange);
+    return () => {
+      window.removeEventListener('ssi_festival_changed' as any, handleFestivalChange);
+    };
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -241,15 +266,15 @@ export const SiteVisitPage: React.FC = () => {
                       </label>
                       <button
                         type="button"
-                        onClick={() => setFormData({ ...formData, promoCode: 'DIWALI2026' })}
+                        onClick={() => setFormData({ ...formData, promoCode: suggestedCoupon })}
                         className="text-[11px] font-bold text-copper-600 hover:underline cursor-pointer"
                       >
-                        Apply DIWALI2026
+                        Apply {suggestedCoupon}
                       </button>
                     </div>
                     <input
                       type="text"
-                      placeholder="e.g. DIWALI2026"
+                      placeholder={`e.g. ${suggestedCoupon}`}
                       value={formData.promoCode}
                       onChange={(e) => setFormData({ ...formData, promoCode: e.target.value.toUpperCase() })}
                       className="w-full bg-cream-50 border border-cream-200 rounded-xl px-4 py-3 text-forest-950 font-mono uppercase focus:outline-none focus:border-copper-500 placeholder:normal-case placeholder:font-sans"

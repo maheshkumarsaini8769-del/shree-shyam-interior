@@ -1,7 +1,8 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode, useRef } from 'react';
 import { QuoteItem } from '../types/quote';
 import { Product } from '../types/product';
 import { getStoredQuoteItems, saveQuoteItems, createQuoteItemFromProduct } from '../services/quoteService';
+import { apiService, FestivalCampaignConfig } from '../services/apiService';
 import { useToast } from './ToastContext';
 
 interface QuoteContextType {
@@ -15,6 +16,8 @@ interface QuoteContextType {
   discountPercent: number;
   discountAmount: number;
   appliedCoupon: string | null;
+  activeCouponCode: string;
+  activeCouponDiscount: number;
   applyCoupon: (code: string) => { success: boolean; message: string };
   removeCoupon: () => void;
   gstAmount: number;
@@ -28,22 +31,74 @@ export const QuoteProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   const [items, setItems] = useState<QuoteItem[]>([]);
   const [appliedCoupon, setAppliedCoupon] = useState<string | null>(null);
   const [discountPercent, setDiscountPercent] = useState<number>(0);
+  const [activeFestival, setActiveFestival] = useState<FestivalCampaignConfig | null>(null);
+  const activeFestivalRef = useRef<FestivalCampaignConfig | null>(null);
   const { showToast } = useToast();
 
+  // Keep ref in sync for callbacks
+  useEffect(() => {
+    activeFestivalRef.current = activeFestival;
+  }, [activeFestival]);
+
+  // Sync active festival configuration & listen for real-time changes
   useEffect(() => {
     setItems(getStoredQuoteItems());
-    try {
-      const savedCoupon = localStorage.getItem('ssi_applied_coupon');
-      if (savedCoupon) {
-        const parsed = JSON.parse(savedCoupon);
-        if (parsed.code && parsed.percent) {
+
+    const updateFestivalState = (cfg: FestivalCampaignConfig | null) => {
+      if (!cfg) return;
+      setActiveFestival(cfg);
+
+      try {
+        const savedCoupon = localStorage.getItem('ssi_applied_coupon');
+        if (savedCoupon) {
+          const parsed = JSON.parse(savedCoupon);
+          const currentCode = (parsed.code || '').toUpperCase();
+
+          // If site is in normal mode, remove old festival coupons
+          if (cfg.activeFestival === 'normal') {
+            const festiveOnlyCodes = ['DIWALI2026', 'DIWALI15', 'DEEPAWALI', 'HOLI2026', 'HOLI12', 'SHUBHLABH', 'NEWYEAR26', 'BHARAT79'];
+            if (festiveOnlyCodes.includes(currentCode)) {
+              localStorage.removeItem('ssi_applied_coupon');
+              setAppliedCoupon(null);
+              setDiscountPercent(0);
+              return;
+            }
+          }
+
+          // If festival changed (e.g. from Diwali to Holi), and an old festival coupon is stored,
+          // automatically migrate to the new active festival coupon!
+          if (cfg.activeFestival !== 'normal' && cfg.couponCode) {
+            const activeCode = cfg.couponCode.toUpperCase();
+            const isOldFestivalCode = ['DIWALI2026', 'DIWALI15', 'DEEPAWALI', 'HOLI2026', 'HOLI12', 'SHUBHLABH', 'NEWYEAR26', 'BHARAT79'].includes(currentCode);
+            if (isOldFestivalCode && currentCode !== activeCode) {
+              const newPercent = cfg.discountPercentage || 12;
+              localStorage.setItem('ssi_applied_coupon', JSON.stringify({ code: activeCode, percent: newPercent }));
+              setAppliedCoupon(activeCode);
+              setDiscountPercent(newPercent);
+              return;
+            }
+          }
+
           setAppliedCoupon(parsed.code);
-          setDiscountPercent(parsed.percent);
+          setDiscountPercent(parsed.percent || 0);
         }
+      } catch {
+        // ignore
       }
-    } catch {
-      // ignore
-    }
+    };
+
+    apiService.getFestivalCampaign().then(updateFestivalState);
+
+    const handleFestivalChange = (e: CustomEvent<FestivalCampaignConfig>) => {
+      if (e.detail) {
+        updateFestivalState(e.detail);
+      }
+    };
+
+    window.addEventListener('ssi_festival_changed' as any, handleFestivalChange);
+    return () => {
+      window.removeEventListener('ssi_festival_changed' as any, handleFestivalChange);
+    };
   }, []);
 
   const persist = (updated: QuoteItem[]) => {
@@ -51,37 +106,52 @@ export const QuoteProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     saveQuoteItems(updated);
   };
 
+  const activeCouponCode = (activeFestival && activeFestival.activeFestival !== 'normal') ? (activeFestival.couponCode || '') : '';
+  const activeCouponDiscount = (activeFestival && activeFestival.activeFestival !== 'normal') ? (activeFestival.discountPercentage || 0) : 0;
+
   const applyCoupon = (rawCode: string): { success: boolean; message: string } => {
     const code = rawCode.trim().toUpperCase();
     if (!code) {
       return { success: false, message: 'Please enter a valid coupon code' };
     }
 
-    // Check against standard and festive codes
+    const currentFestival = activeFestivalRef.current;
     let percent = 0;
-    if (code === 'DIWALI2026' || code === 'DIWALI15' || code === 'DEEPAWALI') {
-      percent = 15;
-    } else if (code === 'HOLI2026' || code === 'HOLI12') {
-      percent = 12;
-    } else if (code === 'SHUBHLABH' || code === 'NAVRATRI') {
-      percent = 10;
+
+    // 1. Highest priority: Live Festival Coupon set by Admin
+    if (
+      currentFestival &&
+      currentFestival.activeFestival !== 'normal' &&
+      currentFestival.couponCode &&
+      code === currentFestival.couponCode.toUpperCase()
+    ) {
+      percent = currentFestival.discountPercentage || 10;
+    }
+    // 2. Recognized Festival-specific aliases matching active campaign
+    else if (code === 'HOLI2026' || code === 'HOLI12' || code === 'HOLI15' || code === 'RANGOLI') {
+      percent = (currentFestival?.activeFestival === 'holi' && currentFestival.discountPercentage)
+        ? currentFestival.discountPercentage
+        : 12;
+    } else if (code === 'DIWALI2026' || code === 'DIWALI15' || code === 'DEEPAWALI') {
+      percent = (currentFestival?.activeFestival === 'diwali' && currentFestival.discountPercentage)
+        ? currentFestival.discountPercentage
+        : 15;
+    } else if (code === 'SHUBHLABH' || code === 'NAVRATRI' || code === 'DUSSEHRA') {
+      percent = (currentFestival?.activeFestival === 'navratri' && currentFestival.discountPercentage)
+        ? currentFestival.discountPercentage
+        : 10;
     } else if (code === 'NEWYEAR26' || code === 'NEWYEAR2026') {
+      percent = (currentFestival?.activeFestival === 'newyear' && currentFestival.discountPercentage)
+        ? currentFestival.discountPercentage
+        : 10;
+    } else if (code === 'BHARAT79' || code === 'AZADI') {
+      percent = (currentFestival?.activeFestival === 'patriot' && currentFestival.discountPercentage)
+        ? currentFestival.discountPercentage
+        : 10;
+    }
+    // 3. Evergreen Standard Codes
+    else if (code === 'WELCOME10' || code === 'SHYAM10') {
       percent = 10;
-    } else if (code === 'WELCOME10' || code === 'SHYAM10') {
-      percent = 10;
-    } else {
-      // Check active festival from storage
-      try {
-        const activeCampaign = localStorage.getItem('ssi_festival_campaign_v1');
-        if (activeCampaign) {
-          const parsed = JSON.parse(activeCampaign);
-          if (parsed.couponCode && parsed.couponCode.toUpperCase() === code) {
-            percent = parsed.discountPercentage || 10;
-          }
-        }
-      } catch {
-        // ignore
-      }
     }
 
     if (percent > 0) {
@@ -89,11 +159,12 @@ export const QuoteProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       setDiscountPercent(percent);
       localStorage.setItem('ssi_applied_coupon', JSON.stringify({ code, percent }));
       showToast(`🎉 Festive Coupon "${code}" Applied! Flat ${percent}% OFF`, 'success');
-      return { success: true, message: `Festive coupon ${code} applied successfully!` };
+      return { success: true, message: `Coupon ${code} applied successfully!` };
     }
 
-    showToast(`Invalid coupon code "${code}". Try DIWALI2026`, 'error');
-    return { success: false, message: 'Invalid or expired coupon code' };
+    const suggested = activeCouponCode || 'WELCOME10';
+    showToast(`Invalid coupon code "${code}". Try ${suggested}`, 'error');
+    return { success: false, message: `Invalid or expired coupon code. Try ${suggested}` };
   };
 
   const removeCoupon = () => {
@@ -165,6 +236,8 @@ export const QuoteProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         discountPercent,
         discountAmount,
         appliedCoupon,
+        activeCouponCode,
+        activeCouponDiscount,
         applyCoupon,
         removeCoupon,
         gstAmount,

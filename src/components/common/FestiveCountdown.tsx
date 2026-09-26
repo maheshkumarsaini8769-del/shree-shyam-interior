@@ -14,10 +14,11 @@ export const FestiveCountdown: React.FC<FestiveCountdownProps> = ({ targetDate }
   });
 
   useEffect(() => {
-    // Default fallback to 15 days ahead if none specified
-    const target = targetDate
-      ? new Date(targetDate).getTime()
-      : Date.now() + 15 * 24 * 60 * 60 * 1000;
+    // Fallback to 10 days ahead if none specified or if date is in the past
+    const parsedTime = targetDate ? new Date(targetDate).getTime() : 0;
+    const target = (parsedTime && parsedTime > Date.now())
+      ? parsedTime
+      : Date.now() + 10 * 24 * 60 * 60 * 1000;
 
     const calculate = () => {
       const now = Date.now();

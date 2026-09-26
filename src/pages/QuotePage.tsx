@@ -31,6 +31,8 @@ export const QuotePage: React.FC = () => {
     discountPercent,
     discountAmount,
     appliedCoupon,
+    activeCouponCode,
+    activeCouponDiscount,
     applyCoupon,
     removeCoupon,
     gstAmount,
@@ -345,7 +347,7 @@ export const QuotePage: React.FC = () => {
                       <div className="flex gap-2">
                         <input
                           type="text"
-                          placeholder="e.g. DIWALI2026"
+                          placeholder={activeCouponCode ? `e.g. ${activeCouponCode}` : 'e.g. WELCOME10'}
                           value={inputCoupon}
                           onChange={(e) => setInputCoupon(e.target.value.toUpperCase())}
                           className="flex-1 bg-forest-900 border border-cream-200/20 rounded-xl px-3 py-2 text-cream-100 text-xs font-mono uppercase focus:outline-none focus:border-copper-400 placeholder:text-cream-200/30"
@@ -362,17 +364,31 @@ export const QuotePage: React.FC = () => {
                       </div>
 
                       {/* 1-Click Suggestion Pill */}
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setInputCoupon('DIWALI2026');
-                          applyCoupon('DIWALI2026');
-                        }}
-                        className="text-[10px] text-amber-300 hover:text-amber-200 flex items-center gap-1 cursor-pointer pt-0.5 text-left"
-                      >
-                        <Sparkles className="w-3 h-3 text-amber-400 shrink-0" />
-                        <span>Click to apply: <strong className="underline font-mono">DIWALI2026</strong> (Flat 15% OFF)</span>
-                      </button>
+                      {activeCouponCode ? (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setInputCoupon(activeCouponCode);
+                            applyCoupon(activeCouponCode);
+                          }}
+                          className="text-[10px] text-amber-300 hover:text-amber-200 flex items-center gap-1 cursor-pointer pt-0.5 text-left"
+                        >
+                          <Sparkles className="w-3 h-3 text-amber-400 shrink-0" />
+                          <span>Click to apply: <strong className="underline font-mono">{activeCouponCode}</strong> (Flat {activeCouponDiscount}% OFF)</span>
+                        </button>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setInputCoupon('WELCOME10');
+                            applyCoupon('WELCOME10');
+                          }}
+                          className="text-[10px] text-amber-300 hover:text-amber-200 flex items-center gap-1 cursor-pointer pt-0.5 text-left"
+                        >
+                          <Sparkles className="w-3 h-3 text-amber-400 shrink-0" />
+                          <span>Click to apply: <strong className="underline font-mono">WELCOME10</strong> (Flat 10% OFF Welcome Offer)</span>
+                        </button>
+                      )}
                     </div>
                   )}
                 </div>

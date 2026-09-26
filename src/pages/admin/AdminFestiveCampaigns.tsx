@@ -58,7 +58,7 @@ export const AdminFestiveCampaigns: React.FC = () => {
     }
   };
 
-  const handleSelectPreset = async (presetKey: FestivalType, autoActivate = false) => {
+  const handleSelectPreset = async (presetKey: FestivalType, autoActivate = true) => {
     const preset = FESTIVAL_PRESETS[presetKey];
     if (preset) {
       const updatedConfig = {
@@ -69,15 +69,15 @@ export const AdminFestiveCampaigns: React.FC = () => {
       };
       setConfig(updatedConfig);
 
-      // If user selected normal mode OR explicitly requested auto-activate, apply live immediately!
-      if (presetKey === 'normal' || autoActivate) {
+      // If user selected any preset, save and apply live immediately!
+      if (autoActivate) {
         try {
           setSaving(true);
           await apiService.updateFestivalCampaign(updatedConfig);
           showToast(
             presetKey === 'normal'
               ? '✅ Website successfully reverted to Normal Standard Mode!'
-              : `🎉 ${preset.festivalName} is now LIVE on customer website!`,
+              : `🎉 ${preset.festivalName} is now LIVE on customer website with coupon "${preset.couponCode || 'N/A'}" (${preset.discountPercentage}% OFF)!`,
             'success'
           );
         } catch {
@@ -271,10 +271,11 @@ export const AdminFestiveCampaigns: React.FC = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
           {festivalOptions.map((opt) => {
             const isSelected = config.activeFestival === opt.id;
+            const presetData = FESTIVAL_PRESETS[opt.id];
             return (
               <div
                 key={opt.id}
-                onClick={() => handleSelectPreset(opt.id, opt.id === 'normal')}
+                onClick={() => handleSelectPreset(opt.id, true)}
                 className={`p-4 rounded-2xl border text-left transition-all cursor-pointer relative overflow-hidden flex flex-col justify-between ${
                   isSelected
                     ? `${opt.accent} bg-white dark:bg-[#1A212C] shadow-card ring-2 ring-copper-500`
@@ -282,7 +283,7 @@ export const AdminFestiveCampaigns: React.FC = () => {
                 }`}
               >
                 {isSelected && (
-                  <span className="absolute top-2 right-2 p-1 rounded-full bg-copper-500 text-white">
+                  <span className="absolute top-2 right-2 p-1 rounded-full bg-copper-500 text-white shadow-sm">
                     <Check className="w-3 h-3" />
                   </span>
                 )}
@@ -294,6 +295,14 @@ export const AdminFestiveCampaigns: React.FC = () => {
                   <p className="text-[11px] text-charcoal-500 dark:text-cream-200/70 mt-1 leading-snug">
                     {opt.sub}
                   </p>
+
+                  {presetData?.couponCode && (
+                    <div className="mt-2.5 inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-cream-100 dark:bg-cream-200/10 text-[10px] font-mono font-bold text-copper-600 dark:text-copper-400">
+                      <span>🎟️ {presetData.couponCode}</span>
+                      <span>•</span>
+                      <span>{presetData.discountPercentage}% OFF</span>
+                    </div>
+                  )}
                 </div>
 
                 <div className="mt-4 pt-2 border-t border-cream-100 dark:border-cream-200/5 text-[10px] font-bold text-copper-600 dark:text-copper-400 uppercase tracking-wider flex items-center justify-between">
@@ -303,8 +312,8 @@ export const AdminFestiveCampaigns: React.FC = () => {
                         ? '🌿 Normal Active'
                         : 'Click to Activate Normal'
                       : isSelected
-                      ? 'Selected (Active)'
-                      : 'Click to Select'}
+                      ? '✨ LIVE Active on Website'
+                      : `Click to Activate ${opt.title.split(' ')[0]}`}
                   </span>
                   <ArrowRight className="w-3 h-3" />
                 </div>
@@ -441,7 +450,7 @@ export const AdminFestiveCampaigns: React.FC = () => {
                 type="text"
                 value={config.couponCode}
                 onChange={(e) => setConfig({ ...config, couponCode: e.target.value.toUpperCase() })}
-                placeholder="e.g. DIWALI2026"
+                placeholder="e.g. HOLI2026, DIWALI2026, WELCOME10"
                 className="w-full px-3.5 py-2.5 rounded-xl border border-cream-200 dark:border-cream-200/20 bg-cream-50 dark:bg-[#1A212C] text-xs font-mono font-bold text-copper-600 dark:text-copper-400 uppercase"
               />
               <Gift className="w-4 h-4 text-charcoal-400 absolute right-3 top-3 pointer-events-none" />
