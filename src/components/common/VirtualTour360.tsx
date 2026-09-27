@@ -6,14 +6,12 @@ import {
   Minimize2,
   ZoomIn,
   ZoomOut,
-  Info,
   X,
   Sparkles,
-  ShieldCheck,
   ChevronRight,
   ArrowRight,
-  Eye,
-  CheckCircle2
+  CheckCircle2,
+  Loader2
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
@@ -161,62 +159,98 @@ export const VirtualTour360: React.FC = () => {
   const [isAutoRotate, setIsAutoRotate] = useState(true);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [zoomLevel, setZoomLevel] = useState(1);
-  const [panX, setPanX] = useState(0); // in percent offset
+  const [panOffset, setPanOffset] = useState(0); // 0 to 100% of single panel
+  const [isImageLoaded, setIsImageLoaded] = useState(false);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const isDraggingRef = useRef(false);
   const startXRef = useRef(0);
-  const initialPanXRef = useRef(0);
+  const initialPanOffsetRef = useRef(0);
+  const hasMovedRef = useRef(false);
 
   const currentRoom = ROOM_TOURS[selectedRoomIndex];
 
-  // Auto rotate timer
+  // Reset image loaded on room change
+  useEffect(() => {
+    setIsImageLoaded(false);
+    setActiveHotspot(null);
+    setPanOffset(0);
+  }, [selectedRoomIndex]);
+
+  // Smooth 60FPS Auto-rotate timer with delta-time
   useEffect(() => {
     if (!isAutoRotate) return;
-    const interval = setInterval(() => {
-      setPanX((prev) => (prev + 0.12) % 100);
-    }, 40);
 
-    return () => clearInterval(interval);
+    let animId: number;
+    let lastTime = performance.now();
+
+    const animate = (time: number) => {
+      const dt = (time - lastTime) / 1000;
+      lastTime = time;
+      // 2.2% per second rotation speed
+      setPanOffset((prev) => (prev + dt * 2.2) % 100);
+      animId = requestAnimationFrame(animate);
+    };
+
+    animId = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(animId);
   }, [isAutoRotate]);
 
-  // Handle Drag / Swipe
+  // Handle Drag / Swipe Mouse
   const handleMouseDown = (e: React.MouseEvent) => {
     isDraggingRef.current = true;
+    hasMovedRef.current = false;
     startXRef.current = e.clientX;
-    initialPanXRef.current = panX;
+    initialPanOffsetRef.current = panOffset;
     setIsAutoRotate(false);
   };
 
   const handleMouseMove = (e: React.MouseEvent) => {
-    if (!isDraggingRef.current) return;
-    const diff = (e.clientX - startXRef.current) * 0.15;
-    let newPan = initialPanXRef.current - diff;
-    if (newPan < 0) newPan += 100;
-    setPanX(newPan % 100);
+    if (!isDraggingRef.current || !containerRef.current) return;
+    const deltaPixels = e.clientX - startXRef.current;
+    if (Math.abs(deltaPixels) > 4) {
+      hasMovedRef.current = true;
+    }
+    const containerWidth = containerRef.current.clientWidth || 800;
+    const deltaPercent = (deltaPixels / containerWidth) * 100;
+    const newPan = initialPanOffsetRef.current - deltaPercent;
+    setPanOffset(((newPan % 100) + 100) % 100);
   };
 
   const handleMouseUp = () => {
     isDraggingRef.current = false;
   };
 
+  // Handle Touch
   const handleTouchStart = (e: React.TouchEvent) => {
     isDraggingRef.current = true;
+    hasMovedRef.current = false;
     startXRef.current = e.touches[0].clientX;
-    initialPanXRef.current = panX;
+    initialPanOffsetRef.current = panOffset;
     setIsAutoRotate(false);
   };
 
   const handleTouchMove = (e: React.TouchEvent) => {
-    if (!isDraggingRef.current) return;
-    const diff = (e.touches[0].clientX - startXRef.current) * 0.25;
-    let newPan = initialPanXRef.current - diff;
-    if (newPan < 0) newPan += 100;
-    setPanX(newPan % 100);
+    if (!isDraggingRef.current || !containerRef.current) return;
+    const deltaPixels = e.touches[0].clientX - startXRef.current;
+    if (Math.abs(deltaPixels) > 4) {
+      hasMovedRef.current = true;
+    }
+    const containerWidth = containerRef.current.clientWidth || 800;
+    const deltaPercent = (deltaPixels / containerWidth) * 100;
+    const newPan = initialPanOffsetRef.current - deltaPercent;
+    setPanOffset(((newPan % 100) + 100) % 100);
   };
 
   const handleTouchEnd = () => {
     isDraggingRef.current = false;
+  };
+
+  const resetView = () => {
+    setPanOffset(0);
+    setZoomLevel(1);
+    setIsAutoRotate(true);
+    setActiveHotspot(null);
   };
 
   const toggleFullscreen = () => {
@@ -229,6 +263,14 @@ export const VirtualTour360: React.FC = () => {
       setIsFullscreen(false);
     }
   };
+
+  // 3-panel calculation:
+  // Wrapper is 300% wide (3 panels of 100% viewport width each).
+  // Panel 0: Clone, Panel 1: Center/Default, Panel 2: Clone.
+  // Shifting by -(100 + panOffset) / 3 % keeps viewport strictly between Panel 1 and Panel 2.
+  // There is NEVER any empty space or black void!
+  const normalizedPan = ((panOffset % 100) + 100) % 100;
+  const shiftPercent = (100 + normalizedPan) / 3;
 
   return (
     <div className="w-full bg-forest-950 text-cream-100 rounded-3xl overflow-hidden border border-copper-500/30 shadow-2xl relative">
@@ -259,8 +301,6 @@ export const VirtualTour360: React.FC = () => {
               key={room.id}
               onClick={() => {
                 setSelectedRoomIndex(idx);
-                setActiveHotspot(null);
-                setPanX(0);
               }}
               className={`px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer ${
                 idx === selectedRoomIndex
@@ -283,72 +323,87 @@ export const VirtualTour360: React.FC = () => {
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
-        className="relative w-full h-[360px] sm:h-[480px] lg:h-[540px] overflow-hidden cursor-grab active:cursor-grabbing select-none bg-black"
+        className="relative w-full h-[360px] sm:h-[480px] lg:h-[540px] overflow-hidden cursor-grab active:cursor-grabbing select-none bg-forest-950"
       >
-        {/* Background Image with Infinite Horizontal Seamless Pan */}
+        {/* Loading Spinner Skeleton */}
+        {!isImageLoaded && (
+          <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-forest-950 text-cream-200 gap-3">
+            <Loader2 className="w-8 h-8 text-copper-400 animate-spin" />
+            <span className="text-xs font-semibold uppercase tracking-wider text-copper-300">
+              Loading 360° Walkthrough Scene...
+            </span>
+          </div>
+        )}
+
+        {/* 3-Panel Infinite Seamless Wrapper */}
         <div
-          className="absolute inset-0 w-[200%] h-full flex transition-transform duration-75 ease-out"
+          className="absolute inset-y-0 left-0 flex h-full will-change-transform"
           style={{
-            transform: `translateX(-${panX}%) scale(${zoomLevel})`,
-            transformOrigin: 'center center'
+            width: '300%',
+            transform: `translateX(-${shiftPercent}%) scale(${zoomLevel})`,
+            transformOrigin: 'center center',
+            transition: isDraggingRef.current ? 'none' : 'transform 75ms ease-out'
           }}
         >
-          <img
-            src={currentRoom.imageUrl}
-            alt={currentRoom.name}
-            className="w-1/2 h-full object-cover shrink-0 pointer-events-none"
-            loading="eager"
-          />
-          <img
-            src={currentRoom.imageUrl}
-            alt={currentRoom.name}
-            className="w-1/2 h-full object-cover shrink-0 pointer-events-none"
-            loading="eager"
-          />
+          {[0, 1, 2].map((panelIdx) => (
+            <div
+              key={panelIdx}
+              className="relative w-1/3 h-full shrink-0 select-none overflow-hidden"
+            >
+              <img
+                src={currentRoom.imageUrl}
+                alt={`${currentRoom.name} - Panel ${panelIdx}`}
+                className="w-full h-full object-cover pointer-events-none"
+                draggable={false}
+                loading="eager"
+                onLoad={() => {
+                  if (panelIdx === 1) setIsImageLoaded(true);
+                }}
+              />
+
+              {/* Hotspots locked precisely to this panel */}
+              {currentRoom.hotspots.map((spot) => (
+                <div
+                  key={`${panelIdx}-${spot.id}`}
+                  style={{
+                    left: `${spot.xPercent}%`,
+                    top: `${spot.yPercent}%`
+                  }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (!hasMovedRef.current) {
+                      setActiveHotspot(spot);
+                    }
+                  }}
+                  className="absolute -translate-x-1/2 -translate-y-1/2 z-20 group cursor-pointer"
+                >
+                  {/* Outer Pulse Wave */}
+                  <span className="absolute -inset-2 rounded-full bg-copper-400/40 animate-ping pointer-events-none"></span>
+
+                  {/* Main Hotspot Pin */}
+                  <div className="relative w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-copper-500 text-white flex items-center justify-center shadow-lg border-2 border-white hover:scale-110 transition-transform">
+                    <Sparkles className="w-3.5 h-3.5 text-cream-100" />
+                  </div>
+
+                  {/* Hover Badge */}
+                  <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 hidden group-hover:block bg-forest-950/95 text-cream-50 text-[10px] font-bold px-2.5 py-1 rounded-lg border border-copper-500/40 shadow-xl whitespace-nowrap pointer-events-none">
+                    {spot.title}
+                  </div>
+                </div>
+              ))}
+            </div>
+          ))}
         </div>
 
-        {/* Subtle Vignette & Lighting Gradient Overlay */}
-        <div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-forest-950/80 via-transparent to-forest-950/40" />
-
-        {/* Interactive Clickable Hotspots */}
-        {currentRoom.hotspots.map((spot) => {
-          // Adjust position relative to panX
-          const adjustedX = ((spot.xPercent - (panX % 100) + 100) % 100);
-
-          return (
-            <div
-              key={spot.id}
-              style={{
-                left: `${adjustedX}%`,
-                top: `${spot.yPercent}%`
-              }}
-              onClick={(e) => {
-                e.stopPropagation();
-                setActiveHotspot(spot);
-              }}
-              className="absolute -translate-x-1/2 -translate-y-1/2 z-20 group cursor-pointer"
-            >
-              {/* Outer Pulse Wave */}
-              <span className="absolute -inset-2 rounded-full bg-copper-400/40 animate-ping pointer-events-none"></span>
-
-              {/* Main Hotspot Pin */}
-              <div className="relative w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-copper-500 text-white flex items-center justify-center shadow-lg border-2 border-white hover:scale-110 transition-transform">
-                <Sparkles className="w-3.5 h-3.5 text-cream-100" />
-              </div>
-
-              {/* Hover Badge */}
-              <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 hidden group-hover:block bg-forest-950/95 text-cream-50 text-[10px] font-bold px-2.5 py-1 rounded-lg border border-copper-500/40 shadow-xl whitespace-nowrap pointer-events-none">
-                {spot.title}
-              </div>
-            </div>
-          );
-        })}
+        {/* Subtle Vignette Overlay */}
+        <div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-forest-950/70 via-transparent to-forest-950/30" />
 
         {/* Control Toolbar Overlay */}
-        <div className="absolute top-4 right-4 z-30 flex items-center gap-2 bg-forest-950/85 backdrop-blur-md p-1.5 rounded-2xl border border-cream-200/10 shadow-lg">
+        <div className="absolute top-4 right-4 z-30 flex items-center gap-1.5 sm:gap-2 bg-forest-950/85 backdrop-blur-md p-1.5 rounded-2xl border border-cream-200/10 shadow-lg">
+          {/* Auto-rotate Toggle */}
           <button
             onClick={() => setIsAutoRotate(!isAutoRotate)}
-            className={`p-2 rounded-xl text-xs font-bold transition-all ${
+            className={`p-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
               isAutoRotate ? 'bg-copper-500 text-white' : 'text-cream-200 hover:bg-forest-800'
             }`}
             title={isAutoRotate ? 'Pause 360 Rotation' : 'Start Auto 360 Rotation'}
@@ -356,25 +411,37 @@ export const VirtualTour360: React.FC = () => {
             <RotateCw className={`w-4 h-4 ${isAutoRotate ? 'animate-spin' : ''}`} style={{ animationDuration: '6s' }} />
           </button>
 
+          {/* Reset View */}
+          <button
+            onClick={resetView}
+            className="p-2 rounded-xl text-cream-200 hover:bg-forest-800 transition-colors cursor-pointer"
+            title="Reset 360 View"
+          >
+            <Compass className="w-4 h-4" />
+          </button>
+
+          {/* Zoom In */}
           <button
             onClick={() => setZoomLevel((prev) => Math.min(prev + 0.2, 1.8))}
-            className="p-2 rounded-xl text-cream-200 hover:bg-forest-800 transition-colors"
+            className="p-2 rounded-xl text-cream-200 hover:bg-forest-800 transition-colors cursor-pointer"
             title="Zoom In"
           >
             <ZoomIn className="w-4 h-4" />
           </button>
 
+          {/* Zoom Out */}
           <button
             onClick={() => setZoomLevel((prev) => Math.max(prev - 0.2, 1))}
-            className="p-2 rounded-xl text-cream-200 hover:bg-forest-800 transition-colors"
+            className="p-2 rounded-xl text-cream-200 hover:bg-forest-800 transition-colors cursor-pointer"
             title="Zoom Out"
           >
             <ZoomOut className="w-4 h-4" />
           </button>
 
+          {/* Fullscreen */}
           <button
             onClick={toggleFullscreen}
-            className="p-2 rounded-xl text-cream-200 hover:bg-forest-800 transition-colors"
+            className="p-2 rounded-xl text-cream-200 hover:bg-forest-800 transition-colors cursor-pointer"
             title="Toggle Fullscreen"
           >
             {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
@@ -403,7 +470,7 @@ export const VirtualTour360: React.FC = () => {
               </div>
               <button
                 onClick={() => setActiveHotspot(null)}
-                className="p-1 rounded-lg bg-white/10 hover:bg-white/20 text-cream-200"
+                className="p-1 rounded-lg bg-white/10 hover:bg-white/20 text-cream-200 cursor-pointer"
               >
                 <X className="w-3.5 h-3.5" />
               </button>
@@ -421,7 +488,7 @@ export const VirtualTour360: React.FC = () => {
 
               <Link
                 to="/quote"
-                className="text-copper-400 hover:text-copper-300 font-bold text-[11px] flex items-center gap-0.5"
+                className="text-copper-400 hover:text-copper-300 font-bold text-[11px] flex items-center gap-0.5 cursor-pointer"
               >
                 <span>Calculate Cost</span>
                 <ChevronRight className="w-3 h-3" />
