@@ -18,13 +18,23 @@ import { BeforeAfterSlider } from '../components/common/BeforeAfterSlider';
 import { ImageViewer } from '../components/common/ImageViewer';
 import { onImageErrorWithFallback } from '../utils/imageFallback';
 import { SEOHead } from '../components/common/SEOHead';
+import { apiService } from '../services/apiService';
 
 export const ProjectDetailPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
   const [activeViewerImage, setActiveViewerImage] = useState<number | null>(null);
+  const [allProjects, setAllProjects] = useState<Project[]>(projectsData as unknown as Project[]);
 
-  const project = projectsData.find((p) => p.slug === slug) as Project | undefined;
+  React.useEffect(() => {
+    apiService.getProjects().then((data) => {
+      if (Array.isArray(data) && data.length > 0) {
+        setAllProjects(data as unknown as Project[]);
+      }
+    }).catch(() => {});
+  }, []);
+
+  const project = allProjects.find((p) => p.slug === slug || p.id === slug);
 
   if (!project) {
     return (

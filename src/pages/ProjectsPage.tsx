@@ -14,11 +14,22 @@ export const ProjectsPage: React.FC = () => {
   const [projects, setProjects] = useState<Project[]>(projectsData as unknown as Project[]);
 
   useEffect(() => {
-    apiService.getProjects().then((data) => {
+    const updateProjectsList = (data: any[]) => {
       if (Array.isArray(data) && data.length > 0) {
         setProjects(data as unknown as Project[]);
       }
-    }).catch(() => {});
+    };
+
+    apiService.getProjects().then(updateProjectsList).catch(() => {});
+
+    const handleChange = (e: CustomEvent) => {
+      if (e.detail) updateProjectsList(e.detail);
+    };
+
+    window.addEventListener('ssi_projects_changed' as any, handleChange);
+    return () => {
+      window.removeEventListener('ssi_projects_changed' as any, handleChange);
+    };
   }, []);
 
   const categories = ['All', 'Home', 'Office', 'Commercial', 'Renovation'] as const;

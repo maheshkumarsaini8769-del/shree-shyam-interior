@@ -47,6 +47,17 @@ export const ReviewsPage: React.FC = () => {
     if (searchParams.get('action') === 'write') {
       setIsWriteModalOpen(true);
     }
+
+    const handleReviewsChange = (e: CustomEvent) => {
+      if (Array.isArray(e.detail)) {
+        setTestimonials(e.detail.filter((t: any) => t.status !== 'Hidden'));
+      }
+    };
+
+    window.addEventListener('ssi_testimonials_changed' as any, handleReviewsChange);
+    return () => {
+      window.removeEventListener('ssi_testimonials_changed' as any, handleReviewsChange);
+    };
   }, [searchParams]);
 
   const loadReviews = async () => {

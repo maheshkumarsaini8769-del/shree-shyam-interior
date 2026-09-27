@@ -37,7 +37,7 @@ export const FeaturedProjectsSection: React.FC = () => {
   const [displayProjects, setDisplayProjects] = useState(defaultProjects);
 
   useEffect(() => {
-    apiService.getProjects().then((data) => {
+    const mapProjects = (data: Project[]) => {
       if (Array.isArray(data) && data.length > 0) {
         const mapped = data.map((p) => ({
           title: p.title,
@@ -49,7 +49,18 @@ export const FeaturedProjectsSection: React.FC = () => {
         }));
         setDisplayProjects(mapped);
       }
-    }).catch(() => {});
+    };
+
+    apiService.getProjects().then(mapProjects).catch(() => {});
+
+    const handleChange = (e: CustomEvent) => {
+      if (e.detail) mapProjects(e.detail);
+    };
+
+    window.addEventListener('ssi_projects_changed' as any, handleChange);
+    return () => {
+      window.removeEventListener('ssi_projects_changed' as any, handleChange);
+    };
   }, []);
 
   const filters: ('All' | 'Home' | 'Office' | 'Commercial' | 'Renovation')[] = [

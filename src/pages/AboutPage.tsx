@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Award,
   ShieldCheck,
@@ -18,8 +18,85 @@ import {
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { SEOHead } from '../components/common/SEOHead';
+import { apiService } from '../services/apiService';
 
 export const AboutPage: React.FC = () => {
+  const [showroomInfo, setShowroomInfo] = useState({
+    title: 'Visit Our Flagship Studio on Piprali Road',
+    phone: '+91 98765 43210',
+    timings: 'Mon-Sun: 9:30 AM – 8:30 PM',
+    address: 'Piprali Road, Near Railway Overbridge, Sikar, Rajasthan - 332001'
+  });
+
+  const [dynamicStats, setDynamicStats] = useState([
+    { value: '10+ Years', label: 'Craftsmanship Heritage', sub: 'Established 2014 in Sikar' },
+    { value: '450+', label: 'Homes & Villas Designed', sub: 'Across Sikar & Shekhawati' },
+    { value: '10-Year', label: 'Woodwork Warranty', sub: 'Comprehensive structural cover' },
+    { value: '100%', label: 'Certified Marine Plywood', sub: 'CenturyPly & Greenply BWP' }
+  ]);
+
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        const [settings, content] = await Promise.all([
+          apiService.getSettings().catch(() => null),
+          apiService.getSiteContent().catch(() => null)
+        ]);
+
+        if (content?.showroom) {
+          setShowroomInfo(prev => ({
+            ...prev,
+            title: `Visit Our Flagship Studio on ${content.showroom.address.split(',')[0] || 'Piprali Road'}`,
+            phone: content.showroom.phone || settings?.primaryPhone || prev.phone,
+            timings: content.showroom.timings || prev.timings,
+            address: content.showroom.address || settings?.address || prev.address
+          }));
+        }
+
+        if (Array.isArray(content?.stats) && content.stats.length >= 4) {
+          setDynamicStats(content.stats.map(s => ({
+            value: s.value,
+            label: s.label,
+            sub: s.subtext
+          })));
+        }
+      } catch (_) {}
+    };
+
+    loadData();
+
+    const handleSettingsChange = (e: CustomEvent) => {
+      if (e.detail?.primaryPhone) {
+        setShowroomInfo(prev => ({ ...prev, phone: e.detail.primaryPhone }));
+      }
+    };
+
+    const handleContentChange = (e: CustomEvent) => {
+      if (e.detail?.showroom) {
+        setShowroomInfo(prev => ({
+          ...prev,
+          title: `Visit Our Flagship Studio on ${e.detail.showroom.address.split(',')[0] || 'Piprali Road'}`,
+          phone: e.detail.showroom.phone || prev.phone,
+          timings: e.detail.showroom.timings || prev.timings,
+          address: e.detail.showroom.address || prev.address
+        }));
+      }
+      if (Array.isArray(e.detail?.stats) && e.detail.stats.length >= 4) {
+        setDynamicStats(e.detail.stats.map((s: any) => ({
+          value: s.value,
+          label: s.label,
+          sub: s.subtext
+        })));
+      }
+    };
+
+    window.addEventListener('ssi_settings_changed' as any, handleSettingsChange);
+    window.addEventListener('ssi_content_changed' as any, handleContentChange);
+    return () => {
+      window.removeEventListener('ssi_settings_changed' as any, handleSettingsChange);
+      window.removeEventListener('ssi_content_changed' as any, handleContentChange);
+    };
+  }, []);
   const aboutJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'AboutPage',
@@ -124,12 +201,7 @@ export const AboutPage: React.FC = () => {
       {/* KPI Stats Grid */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8 relative z-20">
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          {[
-            { value: '10+ Years', label: 'Craftsmanship Heritage', sub: 'Established 2014 in Sikar' },
-            { value: '450+', label: 'Homes & Villas Designed', sub: 'Across Sikar & Shekhawati' },
-            { value: '10-Year', label: 'Woodwork Warranty', sub: 'Comprehensive structural cover' },
-            { value: '100%', label: 'Certified Marine Plywood', sub: 'CenturyPly & Greenply BWP' }
-          ].map((stat, i) => (
+          {dynamicStats.map((stat, i) => (
             <div
               key={i}
               className="p-5 sm:p-6 rounded-2xl bg-white border border-cream-200 shadow-soft hover:shadow-card hover:-translate-y-0.5 transition-all text-center"
@@ -285,14 +357,14 @@ export const AboutPage: React.FC = () => {
               Experience Center in Sikar
             </span>
             <h2 className="font-serif text-2xl sm:text-3xl font-bold text-forest-950">
-              Visit Our Flagship Studio on Piprali Road
+              {showroomInfo.title}
             </h2>
             <p className="text-xs sm:text-sm text-charcoal-500 leading-relaxed">
               Touch certified marine plywood samples, explore Häfele soft-close mechanisms in real-time, test designer wardrobe profiles, and meet our senior interior consultants.
             </p>
             <div className="pt-1 flex flex-wrap items-center justify-center lg:justify-start gap-4 text-xs text-charcoal-600 font-medium">
-              <span className="flex items-center gap-1.5"><Clock className="w-4 h-4 text-copper-500" /> Mon-Sun: 9:30 AM – 8:30 PM</span>
-              <span className="flex items-center gap-1.5"><Phone className="w-4 h-4 text-copper-500" /> +91 98765 43210</span>
+              <span className="flex items-center gap-1.5"><Clock className="w-4 h-4 text-copper-500" /> {showroomInfo.timings}</span>
+              <span className="flex items-center gap-1.5"><Phone className="w-4 h-4 text-copper-500" /> {showroomInfo.phone}</span>
             </div>
           </div>
 

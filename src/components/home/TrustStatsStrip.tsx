@@ -12,28 +12,39 @@ const fallbackStats = [
 export const TrustStatsStrip: React.FC = () => {
   const [statsData, setStatsData] = useState(fallbackStats);
   const [hasAnimated, setHasAnimated] = useState(false);
-  const [counts, setCounts] = useState<number[]>([15, 500, 25, 100]);
+  const [counts, setCounts] = useState<string[]>(['15', '500', '25', '100']);
   const sectionRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    apiService.getSiteContent().then((content) => {
-      if (content?.stats && content.stats.length === 4) {
+    const updateStats = (content: any) => {
+      if (content?.stats && Array.isArray(content.stats) && content.stats.length > 0) {
         const icons = [Home, Users, MapPin, ShieldCheck];
-        const mapped = content.stats.map((item, idx) => {
-          const numMatch = item.value.match(/\d+/);
-          const val = numMatch ? parseInt(numMatch[0], 10) : 100;
-          const suffix = item.value.replace(/\d+/g, '') || '+';
+        const mapped = content.stats.map((item: any, idx: number) => {
+          const numMatch = item.value.match(/[\d.]+/);
+          const rawNum = numMatch ? numMatch[0] : item.value;
+          const suffix = item.value.replace(/[\d.]+/g, '') || '';
           return {
-            icon: icons[idx] || ShieldCheck,
-            value: val,
+            icon: icons[idx % icons.length] || ShieldCheck,
+            value: rawNum,
             suffix,
             label: item.label
           };
         });
-        setStatsData(mapped);
-        setCounts(mapped.map((m) => m.value));
+        setStatsData(mapped as any);
+        setCounts(mapped.map((m: any) => m.value));
       }
-    });
+    };
+
+    apiService.getSiteContent().then(updateStats);
+
+    const handleContentChange = (e: CustomEvent<any>) => {
+      if (e.detail?.stats) updateStats(e.detail);
+    };
+
+    window.addEventListener('ssi_content_changed' as any, handleContentChange);
+    return () => {
+      window.removeEventListener('ssi_content_changed' as any, handleContentChange);
+    };
   }, []);
 
   useEffect(() => {
@@ -50,11 +61,11 @@ export const TrustStatsStrip: React.FC = () => {
             currentFrame++;
             const progress = Math.min(currentFrame / totalFrames, 1);
             const eased = 1 - Math.pow(1 - progress, 3);
-            setCounts(statsData.map((s) => Math.round(s.value * eased)));
+            setCounts(statsData.map((s) => String(Math.round((Number(s.value) || 0) * eased))));
 
             if (currentFrame >= totalFrames) {
               clearInterval(timer);
-              setCounts(statsData.map((s) => s.value));
+              setCounts(statsData.map((s) => String(s.value)));
             }
           }, 1000 / frameRate);
         }

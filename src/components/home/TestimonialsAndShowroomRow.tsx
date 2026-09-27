@@ -10,7 +10,18 @@ export const TestimonialsAndShowroomRow: React.FC = () => {
   const [isAutoPlay, setIsAutoPlay] = useState(true);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Load reviews from API
+  const [showroom, setShowroom] = useState({
+    name: "Shree Shyam Interior Experience Center",
+    address: "Piprali Road, Near Railway Overbridge, Sikar, Rajasthan - 332001",
+    phone: "+91 98765 43210",
+    whatsapp: "+91 98765 43210",
+    email: "contact@shreeshyaminterior.com",
+    timings: "Monday - Sunday: 9:30 AM to 8:30 PM",
+    mapCoordinates: "27.6094, 75.1398",
+    image: "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=1200&q=80"
+  });
+
+  // Load reviews from API and listen for updates
   useEffect(() => {
     let isMounted = true;
     apiService.getTestimonials()
@@ -24,8 +35,32 @@ export const TestimonialsAndShowroomRow: React.FC = () => {
       })
       .catch(() => {});
 
+    const updateShowroom = (content: any) => {
+      if (content?.showroom) {
+        setShowroom({
+          name: content.showroom.name || "Shree Shyam Interior Experience Center",
+          address: content.showroom.address || "Piprali Road, Near Railway Overbridge, Sikar, Rajasthan - 332001",
+          phone: content.showroom.phone || "+91 98765 43210",
+          whatsapp: content.showroom.whatsapp || "+91 98765 43210",
+          email: content.showroom.email || "contact@shreeshyaminterior.com",
+          timings: content.showroom.timings || "Monday - Sunday: 9:30 AM to 8:30 PM",
+          mapCoordinates: content.showroom.mapCoordinates || "27.6094, 75.1398",
+          image: content.showroom.image || "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=1200&q=80"
+        });
+      }
+    };
+
+    apiService.getSiteContent().then(updateShowroom);
+
+    const handleContentChange = (e: CustomEvent<any>) => {
+      if (e.detail?.showroom) updateShowroom(e.detail);
+    };
+
+    window.addEventListener('ssi_content_changed' as any, handleContentChange);
+
     return () => {
       isMounted = false;
+      window.removeEventListener('ssi_content_changed' as any, handleContentChange);
     };
   }, []);
 
@@ -197,7 +232,7 @@ export const TestimonialsAndShowroomRow: React.FC = () => {
                     </span>
                   </div>
                   <h3 className="font-serif text-xl sm:text-2xl font-bold text-forest-950 dark:text-cream-50 tracking-tight">
-                    Visit Our <span className="text-copper-500 italic font-normal">Sikar Showroom</span>
+                    {showroom.name}
                   </h3>
                 </div>
               </div>
@@ -205,8 +240,8 @@ export const TestimonialsAndShowroomRow: React.FC = () => {
               {/* Showroom Visual Banner with Live Badges */}
               <div className="relative rounded-xl overflow-hidden h-28 sm:h-32 w-full mb-3 shadow-inner">
                 <img
-                  src="https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=1200&q=80"
-                  alt="Shree Shyam Interior Experience Center Sikar"
+                  src={showroom.image}
+                  alt={showroom.name}
                   className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
                   loading="lazy"
                 />
@@ -215,14 +250,14 @@ export const TestimonialsAndShowroomRow: React.FC = () => {
                 {/* Floating Location Badge */}
                 <div className="absolute top-2 left-2 px-2 py-0.5 rounded-full bg-forest-950/80 backdrop-blur-md border border-copper-500/30 text-copper-300 text-[10px] font-semibold flex items-center gap-1">
                   <MapPin className="w-2.5 h-2.5 text-copper-400" />
-                  <span>Station Road / Piprali Crossing, Sikar</span>
+                  <span>{showroom.address.split(',')[0]}</span>
                 </div>
 
                 {/* Quick Timing Strip */}
                 <div className="absolute bottom-2 left-2 right-2 flex items-center justify-between text-[10px] text-cream-100 bg-forest-950/80 backdrop-blur-md px-2.5 py-1 rounded-lg border border-cream-200/10">
                   <div className="flex items-center gap-1">
                     <Clock className="w-3 h-3 text-copper-400" />
-                    <span>10:00 AM – 8:30 PM (All 7 Days)</span>
+                    <span>{showroom.timings}</span>
                   </div>
                   <span className="text-copper-400 font-semibold hidden sm:inline">Free Parking</span>
                 </div>
@@ -233,7 +268,7 @@ export const TestimonialsAndShowroomRow: React.FC = () => {
                 <div className="flex items-start gap-2 p-2 rounded-lg bg-cream-50 dark:bg-forest-800/60 border border-cream-200 dark:border-cream-200/10">
                   <MapPin className="w-3.5 h-3.5 text-copper-500 shrink-0 mt-0.5" />
                   <div className="text-charcoal-700 dark:text-cream-200 text-[11px] leading-snug">
-                    <strong className="text-forest-950 dark:text-cream-50">Shree Shyam Interior Atelier</strong> — Piprali Road Crossing, Sikar (Raj.)
+                    <strong className="text-forest-950 dark:text-cream-50">{showroom.name}</strong> — {showroom.address}
                   </div>
                 </div>
 
@@ -249,7 +284,7 @@ export const TestimonialsAndShowroomRow: React.FC = () => {
             {/* Showroom Actions Buttons */}
             <div className="mt-3.5 pt-3 border-t border-cream-200 dark:border-cream-200/10 flex flex-wrap items-center gap-2">
               <a
-                href="https://maps.google.com/?q=Shree+Shyam+Interior+Sikar+Rajasthan"
+                href={showroom.mapCoordinates ? `https://maps.google.com/?q=${encodeURIComponent(showroom.name + ' ' + showroom.address)}` : 'https://maps.google.com/?q=Shree+Shyam+Interior+Sikar+Rajasthan'}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-copper-500 hover:bg-copper-600 text-white font-bold text-[11px] uppercase tracking-wider shadow-sm transition-all active:scale-95"
@@ -259,7 +294,7 @@ export const TestimonialsAndShowroomRow: React.FC = () => {
               </a>
 
               <a
-                href="tel:+919876543210"
+                href={`tel:${showroom.phone.replace(/\s+/g, '')}`}
                 className="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-cream-100 hover:bg-cream-200 dark:bg-forest-800 dark:hover:bg-forest-700 text-forest-950 dark:text-cream-100 border border-cream-300 dark:border-cream-200/20 font-bold text-[11px] uppercase tracking-wider transition-all active:scale-95"
               >
                 <Phone className="w-3 h-3 text-copper-500" />
@@ -267,7 +302,7 @@ export const TestimonialsAndShowroomRow: React.FC = () => {
               </a>
 
               <a
-                href="https://wa.me/919876543210?text=Hi%20Shree%20Shyam%20Interior,%20I%20am%20planning%20to%20visit%20your%20Sikar%20showroom."
+                href={`https://wa.me/${showroom.whatsapp.replace(/[^0-9]/g, '')}?text=Hi%20Shree%20Shyam%20Interior,%20I%20am%20planning%20to%20visit%20your%20showroom.`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-[#25D366]/15 hover:bg-[#25D366]/25 text-[#25D366] border border-[#25D366]/30 font-bold text-[11px] uppercase tracking-wider transition-all active:scale-95"
@@ -277,7 +312,6 @@ export const TestimonialsAndShowroomRow: React.FC = () => {
               </a>
             </div>
           </div>
-
         </div>
       </div>
     </section>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Phone,
   Mail,
@@ -36,6 +36,69 @@ export const ContactPage: React.FC = () => {
   const [submitting, setSubmitting] = useState(false);
   const [submittedBookingId, setSubmittedBookingId] = useState<string | null>(null);
 
+  const [contactInfo, setContactInfo] = useState({
+    businessName: 'Shree Shyam Interior',
+    phone: '+91 98765 43210',
+    whatsapp: '+91 98765 43210',
+    email: 'contact@shreeshyaminterior.com',
+    address: 'Piprali Road, Near Railway Overbridge, Sikar, Rajasthan - 332001',
+    timings: 'Monday – Sunday: 9:30 AM to 8:30 PM'
+  });
+
+  useEffect(() => {
+    const loadContactData = async () => {
+      try {
+        const [settings, content] = await Promise.all([
+          apiService.getSettings().catch(() => null),
+          apiService.getSiteContent().catch(() => null)
+        ]);
+        setContactInfo(prev => ({
+          businessName: settings?.businessName || prev.businessName,
+          phone: settings?.primaryPhone || content?.showroom?.phone || prev.phone,
+          whatsapp: settings?.whatsappNumber || content?.showroom?.whatsapp || prev.whatsapp,
+          email: settings?.email || content?.showroom?.email || prev.email,
+          address: content?.showroom?.address || settings?.address || prev.address,
+          timings: content?.showroom?.timings || prev.timings
+        }));
+      } catch (_) {}
+    };
+
+    loadContactData();
+
+    const handleSettingsChange = (e: CustomEvent) => {
+      if (e.detail) {
+        setContactInfo(prev => ({
+          ...prev,
+          businessName: e.detail.businessName || prev.businessName,
+          phone: e.detail.primaryPhone || prev.phone,
+          whatsapp: e.detail.whatsappNumber || prev.whatsapp,
+          email: e.detail.email || prev.email,
+          address: e.detail.address || prev.address
+        }));
+      }
+    };
+
+    const handleContentChange = (e: CustomEvent) => {
+      if (e.detail?.showroom) {
+        setContactInfo(prev => ({
+          ...prev,
+          phone: e.detail.showroom.phone || prev.phone,
+          whatsapp: e.detail.showroom.whatsapp || prev.whatsapp,
+          email: e.detail.showroom.email || prev.email,
+          address: e.detail.showroom.address || prev.address,
+          timings: e.detail.showroom.timings || prev.timings
+        }));
+      }
+    };
+
+    window.addEventListener('ssi_settings_changed' as any, handleSettingsChange);
+    window.addEventListener('ssi_content_changed' as any, handleContentChange);
+    return () => {
+      window.removeEventListener('ssi_settings_changed' as any, handleSettingsChange);
+      window.removeEventListener('ssi_content_changed' as any, handleContentChange);
+    };
+  }, []);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -58,7 +121,6 @@ export const ContactPage: React.FC = () => {
         notes: `Inquiry from Contact Page: ${formData.message}`.trim()
       });
 
-
       // If user selected WhatsApp copy, also log a WhatsApp Order and open chat
       if (formData.sendToWhatsApp) {
         await apiService.submitWhatsAppOrder({
@@ -70,8 +132,8 @@ export const ContactPage: React.FC = () => {
           status: 'New'
         }).catch(() => {});
 
-        const cleanPhone = '919876543210';
-        const text = `*Namaste Shree Shyam Interior!*\nI submitted an inquiry through your website contact page:\n\n*Name:* ${formData.name}\n*Phone:* ${formData.phone}\n*City:* ${formData.city}\n*Service:* ${formData.service}\n*Budget:* ${formData.budget}\n*Note:* ${formData.message || 'Looking for interior consultation'}`;
+        const cleanPhone = contactInfo.whatsapp.replace(/[^0-9]/g, '') || '919876543210';
+        const text = `*Namaste ${contactInfo.businessName}!*\\nI submitted an inquiry through your website contact page:\\n\\n*Name:* ${formData.name}\\n*Phone:* ${formData.phone}\\n*City:* ${formData.city}\\n*Service:* ${formData.service}\\n*Budget:* ${formData.budget}\\n*Note:* ${formData.message || 'Looking for interior consultation'}`;
         window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(text)}`, '_blank');
       }
 
@@ -152,7 +214,7 @@ export const ContactPage: React.FC = () => {
         {/* Quick Contact Metric Badges */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
           <a
-            href="tel:+919876543210"
+            href={`tel:${contactInfo.phone.replace(/[^0-9+]/g, '')}`}
             className="p-5 rounded-2xl bg-white border border-cream-200 shadow-soft hover:shadow-card hover:-translate-y-0.5 transition-all group flex items-start gap-4"
           >
             <div className="w-11 h-11 rounded-xl bg-copper-500/15 text-copper-600 flex items-center justify-center shrink-0 group-hover:bg-copper-500 group-hover:text-white transition-colors">
@@ -160,13 +222,13 @@ export const ContactPage: React.FC = () => {
             </div>
             <div>
               <span className="text-[11px] font-bold uppercase tracking-wider text-charcoal-400 block">Direct Calling</span>
-              <span className="font-mono font-bold text-sm text-forest-950 mt-0.5 block">+91 98765 43210</span>
+              <span className="font-mono font-bold text-sm text-forest-950 mt-0.5 block">{contactInfo.phone}</span>
               <span className="text-[11px] text-copper-600 font-semibold mt-1 inline-block">Speak with Architect →</span>
             </div>
           </a>
 
           <a
-            href="https://wa.me/919876543210?text=Hello%20Shree%20Shyam%20Interior,%20I%20would%20like%20to%20consult%20for%20my%20interior%20project."
+            href={`https://wa.me/${contactInfo.whatsapp.replace(/[^0-9]/g, '') || '919876543210'}?text=${encodeURIComponent(`Hello ${contactInfo.businessName}, I would like to consult for my interior project.`)}`}
             target="_blank"
             rel="noreferrer"
             className="p-5 rounded-2xl bg-white border border-cream-200 shadow-soft hover:shadow-card hover:-translate-y-0.5 transition-all group flex items-start gap-4"
@@ -176,13 +238,13 @@ export const ContactPage: React.FC = () => {
             </div>
             <div>
               <span className="text-[11px] font-bold uppercase tracking-wider text-charcoal-400 block">WhatsApp Support</span>
-              <span className="font-mono font-bold text-sm text-forest-950 mt-0.5 block">+91 98765 43210</span>
+              <span className="font-mono font-bold text-sm text-forest-950 mt-0.5 block">{contactInfo.whatsapp}</span>
               <span className="text-[11px] text-[#25D366] font-semibold mt-1 inline-block">Instant Chat & Estimates →</span>
             </div>
           </a>
 
           <a
-            href="mailto:contact@shreeshyaminterior.com"
+            href={`mailto:${contactInfo.email}`}
             className="p-5 rounded-2xl bg-white border border-cream-200 shadow-soft hover:shadow-card hover:-translate-y-0.5 transition-all group flex items-start gap-4"
           >
             <div className="w-11 h-11 rounded-xl bg-blue-500/15 text-blue-600 flex items-center justify-center shrink-0 group-hover:bg-blue-500 group-hover:text-white transition-colors">
@@ -190,7 +252,7 @@ export const ContactPage: React.FC = () => {
             </div>
             <div>
               <span className="text-[11px] font-bold uppercase tracking-wider text-charcoal-400 block">Official Email</span>
-              <span className="font-bold text-xs text-forest-950 truncate block mt-0.5">contact@shreeshyaminterior.com</span>
+              <span className="font-bold text-xs text-forest-950 truncate block mt-0.5">{contactInfo.email}</span>
               <span className="text-[11px] text-blue-600 font-semibold mt-1 inline-block">Send Floor Plans →</span>
             </div>
           </a>
@@ -201,7 +263,7 @@ export const ContactPage: React.FC = () => {
             </div>
             <div>
               <span className="text-[11px] font-bold uppercase tracking-wider text-charcoal-400 block">Showroom Timings</span>
-              <span className="font-bold text-xs text-forest-950 block mt-0.5">9:30 AM – 8:30 PM</span>
+              <span className="font-bold text-xs text-forest-950 block mt-0.5">{contactInfo.timings}</span>
               <span className="text-[11px] text-amber-600 font-semibold mt-1 block">Open All 7 Days (Mon-Sun)</span>
             </div>
           </div>
@@ -412,7 +474,7 @@ export const ContactPage: React.FC = () => {
                 </div>
                 <div>
                   <span className="text-[10px] font-bold uppercase tracking-widest text-copper-400 block">Flagship Studio</span>
-                  <h3 className="font-serif font-bold text-xl text-cream-50">Shree Shyam Interior</h3>
+                  <h3 className="font-serif font-bold text-xl text-cream-50">{contactInfo.businessName}</h3>
                 </div>
               </div>
 
@@ -421,7 +483,7 @@ export const ContactPage: React.FC = () => {
                   <MapPin className="w-4 h-4 text-copper-400 shrink-0 mt-0.5" />
                   <div>
                     <strong className="text-cream-50 block mb-0.5">Showroom Address:</strong>
-                    <span>Piprali Road, Near Railway Overbridge, Sikar, Rajasthan - 332001</span>
+                    <span>{contactInfo.address}</span>
                   </div>
                 </div>
 
@@ -429,7 +491,7 @@ export const ContactPage: React.FC = () => {
                   <Clock className="w-4 h-4 text-copper-400 shrink-0 mt-0.5" />
                   <div>
                     <strong className="text-cream-50 block mb-0.5">Operational Hours:</strong>
-                    <span>Monday – Sunday: 9:30 AM to 8:30 PM<br /><span className="text-copper-300 font-semibold">Open All 7 Days for Client Walk-ins</span></span>
+                    <span>{contactInfo.timings}<br /><span className="text-copper-300 font-semibold">Open All 7 Days for Client Walk-ins</span></span>
                   </div>
                 </div>
 

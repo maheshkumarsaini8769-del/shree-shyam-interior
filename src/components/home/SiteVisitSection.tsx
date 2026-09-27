@@ -7,6 +7,48 @@ import { apiService } from '../../services/apiService';
 
 export const SiteVisitSection: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [bannerData, setBannerData] = useState({
+    title: 'Book a Free \nSite Visit',
+    description: 'Our experts will visit your site, understand your needs and guide you with the best solutions.',
+    consultantName: 'Er. Rajesh Sharma',
+    consultantTitle: 'Lead Interior Architect',
+    consultantPhoto: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=800&q=80',
+    checkpoints: [
+      'Free Consultation',
+      'Expert Guidance',
+      'No Obligation',
+      'Customised Solutions'
+    ]
+  });
+
+  React.useEffect(() => {
+    const updateBanner = (content: any) => {
+      if (content?.siteVisitBanner) {
+        setBannerData({
+          title: content.siteVisitBanner.title || 'Book a Free \nSite Visit',
+          description: content.siteVisitBanner.description || 'Our experts will visit your site, understand your needs and guide you with the best solutions.',
+          consultantName: content.siteVisitBanner.consultantName || 'Er. Rajesh Sharma',
+          consultantTitle: content.siteVisitBanner.consultantTitle || 'Lead Interior Architect',
+          consultantPhoto: content.siteVisitBanner.consultantPhoto || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=800&q=80',
+          checkpoints: Array.isArray(content.siteVisitBanner.checkpoints) && content.siteVisitBanner.checkpoints.length > 0
+            ? content.siteVisitBanner.checkpoints
+            : ['Free Consultation', 'Expert Guidance', 'No Obligation', 'Customised Solutions']
+        });
+      }
+    };
+
+    apiService.getSiteContent().then(updateBanner);
+
+    const handleContentChange = (e: CustomEvent<any>) => {
+      if (e.detail?.siteVisitBanner) updateBanner(e.detail);
+    };
+
+    window.addEventListener('ssi_content_changed' as any, handleContentChange);
+    return () => {
+      window.removeEventListener('ssi_content_changed' as any, handleContentChange);
+    };
+  }, []);
+
   const [formData, setFormData] = useState({
     fullName: '',
     phone: '',
@@ -62,12 +104,11 @@ export const SiteVisitSection: React.FC = () => {
         <div className="rounded-3xl bg-forest-900 text-cream-100 border border-copper-500/30 overflow-hidden shadow-elevated grid grid-cols-1 lg:grid-cols-12 items-center p-6 sm:p-10 lg:p-12 gap-8 relative">
           {/* Left Column: Heading, Text & Book Now Button */}
           <div className="lg:col-span-4 space-y-4">
-            <h2 className="font-serif text-3xl sm:text-4xl font-bold text-cream-50 leading-tight">
-              Book a Free <br />
-              Site Visit
+            <h2 className="font-serif text-3xl sm:text-4xl font-bold text-cream-50 leading-tight whitespace-pre-line">
+              {bannerData.title}
             </h2>
             <p className="text-xs sm:text-sm text-cream-200/80 font-light leading-relaxed max-w-sm">
-              Our experts will visit your site, understand your needs and guide you with the best solutions.
+              {bannerData.description}
             </p>
 
             <div className="pt-2">
@@ -85,8 +126,8 @@ export const SiteVisitSection: React.FC = () => {
           <div className="lg:col-span-4 flex items-center justify-center relative">
             <div className="relative w-56 sm:w-64 aspect-[3/4] rounded-2xl overflow-hidden shadow-card border border-copper-500/20">
               <img
-                src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=800&q=80"
-                alt="Shree Shyam Interior Lead Consultant"
+                src={bannerData.consultantPhoto}
+                alt={bannerData.consultantName || 'Shree Shyam Interior Lead Consultant'}
                 className="w-full h-full object-cover object-top"
                 loading="lazy"
                 onError={(e) => {
@@ -95,7 +136,7 @@ export const SiteVisitSection: React.FC = () => {
               />
               <div className="absolute inset-0 bg-gradient-to-t from-forest-950/80 via-transparent to-transparent" />
               <div className="absolute bottom-3 left-3 right-3 text-center text-[11px] font-semibold text-copper-300 backdrop-blur-sm bg-forest-950/60 py-1 rounded-lg">
-                Lead Interior Architect
+                {bannerData.consultantTitle}
               </div>
             </div>
           </div>
@@ -103,33 +144,14 @@ export const SiteVisitSection: React.FC = () => {
           {/* Right Column: 4 Golden Checkpoints & Cursive Script (Matching Reference Image) */}
           <div className="lg:col-span-4 space-y-5 flex flex-col justify-between h-full">
             <div className="space-y-3 text-xs sm:text-sm text-cream-100">
-              <div className="flex items-center gap-3">
-                <div className="w-6 h-6 rounded-lg bg-[#C68A43]/20 border border-copper-500/40 flex items-center justify-center text-copper-400 shrink-0">
-                  <CheckSquare className="w-4 h-4 text-[#C68A43]" />
+              {bannerData.checkpoints.map((cp, idx) => (
+                <div key={idx} className="flex items-center gap-3">
+                  <div className="w-6 h-6 rounded-lg bg-[#C68A43]/20 border border-copper-500/40 flex items-center justify-center text-copper-400 shrink-0">
+                    <CheckSquare className="w-4 h-4 text-[#C68A43]" />
+                  </div>
+                  <span className="font-semibold">{cp}</span>
                 </div>
-                <span className="font-semibold">Free Consultation</span>
-              </div>
-
-              <div className="flex items-center gap-3">
-                <div className="w-6 h-6 rounded-lg bg-[#C68A43]/20 border border-copper-500/40 flex items-center justify-center text-copper-400 shrink-0">
-                  <CheckSquare className="w-4 h-4 text-[#C68A43]" />
-                </div>
-                <span className="font-semibold">Expert Guidance</span>
-              </div>
-
-              <div className="flex items-center gap-3">
-                <div className="w-6 h-6 rounded-lg bg-[#C68A43]/20 border border-copper-500/40 flex items-center justify-center text-copper-400 shrink-0">
-                  <CheckSquare className="w-4 h-4 text-[#C68A43]" />
-                </div>
-                <span className="font-semibold">No Obligation</span>
-              </div>
-
-              <div className="flex items-center gap-3">
-                <div className="w-6 h-6 rounded-lg bg-[#C68A43]/20 border border-copper-500/40 flex items-center justify-center text-copper-400 shrink-0">
-                  <CheckSquare className="w-4 h-4 text-[#C68A43]" />
-                </div>
-                <span className="font-semibold">Customised Solutions</span>
-              </div>
+              ))}
             </div>
 
             {/* Handwritten Script (Matching Reference Image) */}

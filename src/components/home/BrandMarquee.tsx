@@ -148,11 +148,22 @@ export const BrandMarquee: React.FC = () => {
   const [brands, setBrands] = useState<Brand[]>(fallbackBrands);
 
   useEffect(() => {
-    apiService.getBrands().then((data) => {
-      if (data && data.length > 0) {
+    const updateBrandsList = (data: Brand[]) => {
+      if (Array.isArray(data) && data.length > 0) {
         setBrands(data.filter((b) => b.status === 'Active'));
       }
-    }).catch(() => {});
+    };
+
+    apiService.getBrands().then(updateBrandsList).catch(() => {});
+
+    const handleChange = (e: CustomEvent) => {
+      if (e.detail) updateBrandsList(e.detail);
+    };
+
+    window.addEventListener('ssi_brands_changed' as any, handleChange);
+    return () => {
+      window.removeEventListener('ssi_brands_changed' as any, handleChange);
+    };
   }, []);
 
   return (

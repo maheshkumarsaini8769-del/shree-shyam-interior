@@ -75,7 +75,7 @@ export const CategoryCarousel: React.FC = () => {
   const [categories, setCategories] = useState<CategoryItem[]>(primaryCategories);
 
   useEffect(() => {
-    apiService.getCategories().then((data) => {
+    const mapCategories = (data: any[]) => {
       if (Array.isArray(data) && data.length > 0) {
         const mapped = data.map((c: any) => ({
           id: c.id || c.slug,
@@ -86,7 +86,18 @@ export const CategoryCarousel: React.FC = () => {
         }));
         setCategories(mapped);
       }
-    }).catch(() => {});
+    };
+
+    apiService.getCategories().then(mapCategories).catch(() => {});
+
+    const handleChange = (e: CustomEvent) => {
+      if (e.detail) mapCategories(e.detail);
+    };
+
+    window.addEventListener('ssi_categories_changed' as any, handleChange);
+    return () => {
+      window.removeEventListener('ssi_categories_changed' as any, handleChange);
+    };
   }, []);
 
   return (

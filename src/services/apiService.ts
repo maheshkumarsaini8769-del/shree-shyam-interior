@@ -1011,7 +1011,9 @@ export const apiService = {
     try {
       const raw = localStorage.getItem('ssi_testimonials');
       const list: Testimonial[] = raw ? JSON.parse(raw) : [];
-      localStorage.setItem('ssi_testimonials', JSON.stringify([newTestimonial, ...list.filter(x => x.id !== newTestimonial.id)]));
+      const updatedList = [newTestimonial, ...list.filter(x => x.id !== newTestimonial.id)];
+      localStorage.setItem('ssi_testimonials', JSON.stringify(updatedList));
+      window.dispatchEvent(new CustomEvent('ssi_testimonials_changed', { detail: updatedList }));
     } catch (_) {}
 
     // Save to backend API
@@ -1037,6 +1039,7 @@ export const apiService = {
           list[idx] = { ...list[idx], ...updates };
           updatedObj = list[idx];
           localStorage.setItem('ssi_testimonials', JSON.stringify(list));
+          window.dispatchEvent(new CustomEvent('ssi_testimonials_changed', { detail: list }));
         }
       }
     } catch (_) {}
@@ -1060,6 +1063,7 @@ export const apiService = {
         const list: Testimonial[] = JSON.parse(raw);
         const filtered = list.filter((t) => t.id !== id);
         localStorage.setItem('ssi_testimonials', JSON.stringify(filtered));
+        window.dispatchEvent(new CustomEvent('ssi_testimonials_changed', { detail: filtered }));
       }
     } catch (_) {}
 

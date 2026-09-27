@@ -25,8 +25,9 @@ export const SiteVisitPage: React.FC = () => {
   });
 
   const [bookingConfirmed, setBookingConfirmed] = useState<SiteVisitRequest | null>(null);
+  const [hotline, setHotline] = useState<string>('+91 98765 43210');
 
-  // Load active festival coupon dynamically
+  // Load active festival coupon and settings dynamically
   useEffect(() => {
     apiService.getFestivalCampaign().then((cfg) => {
       if (cfg && cfg.activeFestival !== 'normal' && cfg.couponCode) {
@@ -36,6 +37,10 @@ export const SiteVisitPage: React.FC = () => {
       }
     });
 
+    apiService.getSettings().then((s) => {
+      if (s?.primaryPhone) setHotline(s.primaryPhone);
+    }).catch(() => {});
+
     const handleFestivalChange = (e: CustomEvent<FestivalCampaignConfig>) => {
       if (e.detail && e.detail.activeFestival !== 'normal' && e.detail.couponCode) {
         setSuggestedCoupon(e.detail.couponCode);
@@ -44,9 +49,17 @@ export const SiteVisitPage: React.FC = () => {
       }
     };
 
+    const handleSettingsChange = (e: CustomEvent) => {
+      if (e.detail?.primaryPhone) {
+        setHotline(e.detail.primaryPhone);
+      }
+    };
+
     window.addEventListener('ssi_festival_changed' as any, handleFestivalChange);
+    window.addEventListener('ssi_settings_changed' as any, handleSettingsChange);
     return () => {
       window.removeEventListener('ssi_festival_changed' as any, handleFestivalChange);
+      window.removeEventListener('ssi_settings_changed' as any, handleSettingsChange);
     };
   }, []);
 
@@ -332,7 +345,7 @@ export const SiteVisitPage: React.FC = () => {
               </div>
 
               <div className="p-4 rounded-2xl bg-forest-900 border border-copper-500/20 text-xs text-copper-300">
-                Showroom Desk Hotline: <a href="tel:+919876543210" className="font-bold underline text-cream-100">+91 98765 43210</a>
+                Showroom Desk Hotline: <a href={`tel:${hotline.replace(/[^0-9+]/g, '')}`} className="font-bold underline text-cream-100">{hotline}</a>
               </div>
             </div>
           </div>

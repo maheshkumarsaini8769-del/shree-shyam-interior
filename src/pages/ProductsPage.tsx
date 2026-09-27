@@ -17,6 +17,7 @@ export const ProductsPage: React.FC = () => {
   const initialSearch = searchParams.get('search') || '';
 
   const [products, setProducts] = useState<Product[]>(productsData as unknown as Product[]);
+  const [categories, setCategories] = useState<any[]>(categoriesData);
   const [selectedCategory, setSelectedCategory] = useState<string>(initialCategory);
   const [searchQuery, setSearchQuery] = useState<string>(initialSearch);
   const [selectedBrand, setSelectedBrand] = useState<string>(initialBrand);
@@ -32,6 +33,28 @@ export const ProductsPage: React.FC = () => {
         setProducts(data);
       }
     });
+
+    apiService.getCategories().then((data) => {
+      if (Array.isArray(data) && data.length > 0) {
+        setCategories(data);
+      }
+    });
+
+    const handleProductsChange = (e: CustomEvent<Product[]>) => {
+      if (Array.isArray(e.detail)) setProducts(e.detail);
+    };
+
+    const handleCategoriesChange = (e: CustomEvent<any[]>) => {
+      if (Array.isArray(e.detail)) setCategories(e.detail);
+    };
+
+    window.addEventListener('ssi_products_changed' as any, handleProductsChange);
+    window.addEventListener('ssi_categories_changed' as any, handleCategoriesChange);
+
+    return () => {
+      window.removeEventListener('ssi_products_changed' as any, handleProductsChange);
+      window.removeEventListener('ssi_categories_changed' as any, handleCategoriesChange);
+    };
   }, []);
 
   const brands = useMemo(() => {
@@ -230,17 +253,17 @@ export const ProductsPage: React.FC = () => {
           >
             All Products ({products.length})
           </button>
-          {categoriesData.map((cat) => {
+          {categories.map((cat) => {
             const count = products.filter(
-              (p) => p.category.toLowerCase() === cat.slug.toLowerCase()
+              (p) => p.category.toLowerCase() === (cat.slug || cat.id).toLowerCase()
             ).length;
 
             return (
               <button
-                key={cat.id}
-                onClick={() => handleCategoryClick(cat.slug)}
+                key={cat.id || cat.slug}
+                onClick={() => handleCategoryClick(cat.slug || cat.id)}
                 className={`px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider whitespace-nowrap transition-all ${
-                  selectedCategory.toLowerCase() === cat.slug.toLowerCase()
+                  selectedCategory.toLowerCase() === (cat.slug || cat.id).toLowerCase()
                     ? 'bg-forest-900 dark:bg-copper-500 text-copper-400 dark:text-white shadow-md border border-copper-400'
                     : 'bg-white dark:bg-forest-900 text-charcoal-600 dark:text-cream-200 border border-cream-200 dark:border-cream-200/10 hover:border-copper-400'
                 }`}
