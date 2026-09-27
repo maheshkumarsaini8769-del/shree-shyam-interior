@@ -195,7 +195,7 @@ const AppContent: React.FC = () => {
       </Suspense>
 
       {/* Global Full-Website Luxury Interior Architecture Background */}
-      <div className="fixed inset-0 -z-10 pointer-events-none overflow-hidden select-none" aria-hidden="true">
+      <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden select-none" aria-hidden="true">
         {/* Light Theme Background */}
         <div
           className="absolute inset-0 bg-cover bg-center bg-no-repeat dark:hidden transition-opacity duration-700"
@@ -207,12 +207,12 @@ const AppContent: React.FC = () => {
           style={{ backgroundImage: `url('/bg-dark.jpg')` }}
         />
         {/* Ambient Warm Luxury Tint */}
-        <div className="absolute inset-0 bg-[#F5F1E8]/82 dark:bg-[#0B0F15]/86 backdrop-blur-[1px] transition-colors duration-500" />
+        <div className="absolute inset-0 bg-[#F5F1E8]/45 dark:bg-[#0B0F15]/55 transition-colors duration-500 backdrop-blur-[0.5px]" />
       </div>
 
       <Header />
 
-      <main className="flex-1">
+      <main className="flex-1 relative z-10">
         <ChunkErrorBoundary>
           <Suspense fallback={<PageSkeleton />}>
             <Routes>

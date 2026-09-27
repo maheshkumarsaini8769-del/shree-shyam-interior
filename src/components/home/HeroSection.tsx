@@ -42,7 +42,7 @@ export const HeroSection: React.FC = () => {
   ];
 
   return (
-    <section className="relative min-h-[90vh] sm:min-h-screen flex items-center overflow-hidden bg-forest-950 text-cream-100 pt-20 sm:pt-24 pb-16">
+    <section className="relative min-h-[90vh] sm:min-h-screen flex items-center overflow-hidden bg-forest-950 text-cream-100 pt-20 sm:pt-24 pb-16 force-opaque">
       {/* Background Luxury Interior Photograph - LCP Optimized */}
       <div className="absolute inset-0 z-0 overflow-hidden">
         <img

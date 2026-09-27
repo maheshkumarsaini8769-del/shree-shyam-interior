@@ -18,7 +18,7 @@
     overflow-x: hidden;
     letter-spacing: -0.012em;
     background-image: 
-      linear-gradient(to bottom, rgba(245, 241, 232, 0.82), rgba(245, 241, 232, 0.88)),
+      linear-gradient(to bottom, rgba(245, 241, 232, 0.48), rgba(245, 241, 232, 0.65)),
       url('/bg-light.jpg');
     background-size: cover;
     background-position: center top;
@@ -30,7 +30,7 @@
     background-color: #0B0F15;
     color: #FAF8F5;
     background-image: 
-      linear-gradient(to bottom, rgba(11, 15, 21, 0.84), rgba(11, 15, 21, 0.90)),
+      linear-gradient(to bottom, rgba(11, 15, 21, 0.52), rgba(11, 15, 21, 0.70)),
       url('/bg-dark.jpg');
     background-size: cover;
     background-position: center top;
@@ -38,9 +38,29 @@
     background-repeat: no-repeat;
   }
 
-  /* Allow luxury full-website architectural wallpaper to shine through page sections gracefully */
-  main > section:not(:first-child) {
+  /* Allow luxury full-website architectural wallpaper to shine through all pages and sections */
+  main [class*="min-h-screen"]:not(.force-opaque),
+  main section:not(.force-opaque) {
     background-color: transparent !important;
+  }
+
+  /* Keep content cards, forms, modals, tables, and dropdowns frosted & readable */
+  main .bg-white {
+    background-color: rgba(255, 255, 255, 0.90) !important;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+
+  .dark main .dark\:bg-forest-900 {
+    background-color: rgba(18, 23, 32, 0.88) !important;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+
+  .dark main .dark\:bg-forest-800 {
+    background-color: rgba(26, 33, 44, 0.85) !important;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
   }
 
   h1, h2, h3, h4, h5, h6, .font-serif {
