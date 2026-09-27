@@ -679,11 +679,6 @@ export const apiService = {
       if (cached) {
         const parsed = JSON.parse(cached);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          apiFetch<Product[]>('/products').then((remote) => {
-            if (Array.isArray(remote) && remote.length > 0) {
-              localStorage.setItem('ssi_products', JSON.stringify(remote));
-            }
-          }).catch(() => {});
           return parsed;
         }
       }
@@ -750,11 +745,6 @@ export const apiService = {
       if (cached) {
         const parsed = JSON.parse(cached);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          apiFetch<ProductCategory[]>('/categories').then((remote) => {
-            if (Array.isArray(remote) && remote.length > 0) {
-              localStorage.setItem('ssi_categories', JSON.stringify(remote));
-            }
-          }).catch(() => {});
           return parsed;
         }
       }
@@ -820,11 +810,6 @@ export const apiService = {
       if (cached) {
         const parsed = JSON.parse(cached);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          apiFetch<Brand[]>('/brands').then((remote) => {
-            if (Array.isArray(remote) && remote.length > 0) {
-              localStorage.setItem('ssi_brands', JSON.stringify(remote));
-            }
-          }).catch(() => {});
           return parsed;
         }
       }
@@ -890,11 +875,6 @@ export const apiService = {
       if (cached) {
         const parsed = JSON.parse(cached);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          apiFetch<Project[]>('/projects').then((remote) => {
-            if (Array.isArray(remote) && remote.length > 0) {
-              localStorage.setItem('ssi_projects', JSON.stringify(remote));
-            }
-          }).catch(() => {});
           return parsed;
         }
       }
@@ -1083,11 +1063,6 @@ export const apiService = {
       if (cached) {
         const parsed = JSON.parse(cached);
         if (parsed && parsed.hero) {
-          apiFetch<SiteContent>('/content').then((remote) => {
-            if (remote && remote.hero) {
-              localStorage.setItem('ssi_site_content', JSON.stringify(remote));
-            }
-          }).catch(() => {});
           return parsed;
         }
       }
@@ -1106,17 +1081,23 @@ export const apiService = {
   },
 
   async updateSiteContent(content: Partial<SiteContent>): Promise<SiteContent> {
+    let merged = initialContent;
     try {
       const current = localStorage.getItem('ssi_site_content');
-      const merged = current ? { ...JSON.parse(current), ...content } : { ...initialContent, ...content };
+      merged = current ? { ...JSON.parse(current), ...content } : { ...initialContent, ...content };
       localStorage.setItem('ssi_site_content', JSON.stringify(merged));
       window.dispatchEvent(new CustomEvent('ssi_content_changed', { detail: merged }));
     } catch (_) {}
 
-    return apiFetch<SiteContent>('/content', {
-      method: 'PUT',
-      body: JSON.stringify(content)
-    });
+    try {
+      const remoteUpdated = await apiFetch<SiteContent>('/content', {
+        method: 'PUT',
+        body: JSON.stringify(content)
+      });
+      return remoteUpdated || merged;
+    } catch (_) {
+      return merged;
+    }
   },
 
   // -------------------------------------------------------------
@@ -1686,11 +1667,6 @@ export const apiService = {
       if (cached) {
         const parsed = JSON.parse(cached);
         if (parsed && parsed.businessName) {
-          apiFetch<BusinessSettings>('/settings').then((remote) => {
-            if (remote && remote.businessName) {
-              localStorage.setItem('ssi_settings', JSON.stringify(remote));
-            }
-          }).catch(() => {});
           return parsed;
         }
       }
@@ -1723,17 +1699,30 @@ export const apiService = {
   },
 
   async updateSettings(settings: Partial<BusinessSettings>): Promise<BusinessSettings> {
+    let merged = {
+      businessName: 'Shree Shyam Interior',
+      gstNumber: '08AAAAA0000A1Z5',
+      primaryPhone: '+91 98765 43210',
+      whatsappNumber: '+91 98765 43210',
+      email: 'contact@shreeshyaminterior.com',
+      address: 'Piprali Road, Sikar, Rajasthan - 332001'
+    };
     try {
       const current = await this.getSettings();
-      const merged = { ...current, ...settings };
+      merged = { ...current, ...settings };
       localStorage.setItem('ssi_settings', JSON.stringify(merged));
       window.dispatchEvent(new CustomEvent('ssi_settings_changed', { detail: merged }));
     } catch (_) {}
 
-    return apiFetch<BusinessSettings>('/settings', {
-      method: 'PUT',
-      body: JSON.stringify(settings)
-    });
+    try {
+      const remoteUpdated = await apiFetch<BusinessSettings>('/settings', {
+        method: 'PUT',
+        body: JSON.stringify(settings)
+      });
+      return remoteUpdated || merged;
+    } catch (_) {
+      return merged;
+    }
   },
 
   // 3D Studio Configurator Finishes & Pricing
@@ -1759,11 +1748,6 @@ export const apiService = {
       if (cached) {
         const parsed = JSON.parse(cached);
         if (parsed && parsed.logo) {
-          apiFetch<BrandingSEOData>('/branding-seo').then((remote) => {
-            if (remote && remote.logo) {
-              localStorage.setItem('ssi_branding_seo', JSON.stringify(remote));
-            }
-          }).catch(() => {});
           return parsed;
         }
       }
@@ -1787,10 +1771,15 @@ export const apiService = {
       window.dispatchEvent(new CustomEvent('ssi_branding_changed', { detail: data }));
     } catch (_) {}
 
-    return apiFetch<BrandingSEOData>('/branding-seo', {
-      method: 'PUT',
-      body: JSON.stringify(data)
-    });
+    try {
+      const remoteUpdated = await apiFetch<BrandingSEOData>('/branding-seo', {
+        method: 'PUT',
+        body: JSON.stringify(data)
+      });
+      return remoteUpdated || data;
+    } catch (_) {
+      return data;
+    }
   },
 
   // 1-Click Festival Theme & Festive Campaigns Engine
@@ -1828,12 +1817,16 @@ export const apiService = {
       }
     }
 
-    // Try API if available in backend
+    // Try API if available in backend only if remote is newer or no local setting exists
     try {
       const remote = await apiFetch<FestivalCampaignConfig>('/festival');
       if (remote && remote.activeFestival) {
-        currentConfig = remote;
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(remote));
+        const localTime = currentConfig.updatedAt ? new Date(currentConfig.updatedAt).getTime() : 0;
+        const remoteTime = remote.updatedAt ? new Date(remote.updatedAt).getTime() : 0;
+        if (remoteTime > localTime || !localStorage.getItem(STORAGE_KEY)) {
+          currentConfig = remote;
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(remote));
+        }
       }
     } catch {
       // Backend not implemented yet, using local persistence
