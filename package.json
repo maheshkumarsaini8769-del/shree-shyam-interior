@@ -4,9 +4,10 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "concurrently -k -n \"API,VITE\" -c \"blue,green\" \"node server/index.mjs\" \"vite\"",
     "server": "node server/index.mjs",
-    "dev:all": "concurrently -n \"API,VITE\" -c \"blue,green\" \"node server/index.mjs\" \"vite\"",
+    "dev:client": "vite",
+    "dev:all": "concurrently -k -n \"API,VITE\" -c \"blue,green\" \"node server/index.mjs\" \"vite\"",
     "build": "tsc && vite build",
     "preview": "vite preview"
   },

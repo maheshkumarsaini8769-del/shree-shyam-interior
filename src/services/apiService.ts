@@ -878,12 +878,13 @@ export const apiService = {
 
   // Categories
   async getCategories(): Promise<ProductCategory[]> {
+    let localList: ProductCategory[] | null = null;
     try {
       const cached = localStorage.getItem('ssi_categories');
       if (cached) {
         const parsed = JSON.parse(cached);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          return parsed;
+          localList = parsed;
         }
       }
     } catch (_) {}
@@ -894,10 +895,9 @@ export const apiService = {
         try { localStorage.setItem('ssi_categories', JSON.stringify(remote)); } catch (_) {}
         return remote;
       }
-      return initialCategories as unknown as ProductCategory[];
-    } catch (e) {
-      return initialCategories as unknown as ProductCategory[];
-    }
+    } catch (_) {}
+
+    return localList || (initialCategories as unknown as ProductCategory[]);
   },
 
   async createCategory(cat: Partial<ProductCategory>): Promise<ProductCategory> {
@@ -912,7 +912,7 @@ export const apiService = {
       ...cat
     };
 
-    const updated = [...current, newCat];
+    const updated = [...current.filter(c => c.id !== newCat.id && c.slug !== newCat.slug), newCat];
     try {
       localStorage.setItem('ssi_categories', JSON.stringify(updated));
       window.dispatchEvent(new CustomEvent('ssi_categories_changed', { detail: updated }));
@@ -922,10 +922,10 @@ export const apiService = {
     } catch (_) {}
 
     try {
-      apiFetch<ProductCategory>('/categories', {
+      await apiFetch<ProductCategory>('/categories', {
         method: 'POST',
         body: JSON.stringify(newCat)
-      }).catch(() => {});
+      });
     } catch (_) {}
 
     return newCat;
@@ -956,10 +956,10 @@ export const apiService = {
     } catch (_) {}
 
     try {
-      apiFetch<ProductCategory>(`/categories/${id}`, {
+      await apiFetch<ProductCategory>(`/categories/${id}`, {
         method: 'PUT',
         body: JSON.stringify(cat)
-      }).catch(() => {});
+      });
     } catch (_) {}
 
     return updatedCat;
@@ -978,9 +978,9 @@ export const apiService = {
     } catch (_) {}
 
     try {
-      apiFetch<{ success: boolean; id: string }>(`/categories/${id}`, {
+      await apiFetch<{ success: boolean; id: string }>(`/categories/${id}`, {
         method: 'DELETE'
-      }).catch(() => {});
+      });
     } catch (_) {}
 
     return { success: true, id };

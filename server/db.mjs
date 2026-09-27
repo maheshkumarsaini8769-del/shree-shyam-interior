@@ -286,12 +286,14 @@ export async function writeData(fileName, data) {
   const writablePath = path.join(WRITABLE_DATA_DIR, fileName);
   await safeWriteFile(writablePath, jsonString);
 
-  // If running locally, also save to server/data
+  // If running locally, also save to server/data and src/data
   if (!IS_VERCEL) {
     const localPath = path.join(BUNDLED_DATA_DIR, fileName);
     if (localPath !== writablePath) {
       await safeWriteFile(localPath, jsonString);
     }
+    const srcPath = path.join(SRC_DATA_DIR, fileName);
+    await safeWriteFile(srcPath, jsonString);
   }
 
   // Sync dynamic leads, quotes, whatsappOrders, and all CMS collections with cloud store safely

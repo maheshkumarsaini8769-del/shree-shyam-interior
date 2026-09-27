@@ -133,13 +133,38 @@ export const ProductsPage: React.FC = () => {
     } else {
       setSearchQuery('');
     }
+
+    if (c && c !== 'all') {
+      setTimeout(() => {
+        const el = document.getElementById('catalog');
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 150);
+    }
   }, [searchParams, brands]);
 
   const filteredProducts = useMemo(() => {
+    const targetCat = categories.find(
+      (c) =>
+        (c.slug && c.slug.toLowerCase() === selectedCategory.toLowerCase()) ||
+        (c.id && c.id.toLowerCase() === selectedCategory.toLowerCase()) ||
+        (c.name && c.name.toLowerCase() === selectedCategory.toLowerCase())
+    );
+
     return products
       .filter((p) => {
+        const pCat = (p.category || '').toLowerCase();
         const matchesCat =
-          selectedCategory === 'all' || p.category.toLowerCase() === selectedCategory.toLowerCase();
+          selectedCategory === 'all' ||
+          pCat === selectedCategory.toLowerCase() ||
+          (targetCat && (
+            pCat === (targetCat.slug || '').toLowerCase() ||
+            pCat === (targetCat.id || '').toLowerCase() ||
+            pCat === (targetCat.name || '').toLowerCase()
+          )) ||
+          (p.subCategory && p.subCategory.toLowerCase() === selectedCategory.toLowerCase());
+
         const matchesBrand =
           selectedBrand === 'all' || p.brand.toLowerCase() === selectedBrand.toLowerCase();
         const matchesQuery =
@@ -156,7 +181,7 @@ export const ProductsPage: React.FC = () => {
         if (sortBy === 'rating') return b.rating - a.rating;
         return (b.reviewCount || 0) - (a.reviewCount || 0); // popular
       });
-  }, [products, selectedCategory, selectedBrand, searchQuery, sortBy]);
+  }, [products, selectedCategory, selectedBrand, searchQuery, sortBy, categories]);
 
   const handleCategoryClick = (slug: string) => {
     setSelectedCategory(slug);
@@ -278,7 +303,7 @@ export const ProductsPage: React.FC = () => {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
+      <div id="catalog" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8 scroll-mt-24">
         {/* Horizontal Category Chips */}
         <div
           className="flex gap-2 overflow-x-auto pb-3 scrollbar-none -mx-4 px-4 sm:mx-0 sm:px-0 mb-6"

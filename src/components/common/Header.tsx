@@ -112,7 +112,7 @@ export const Header: React.FC = () => {
     { label: 'Home', path: '/' },
     { label: 'Services', path: '/services' },
     { label: 'Projects', path: '/projects' },
-    { label: 'Materials', path: '/products' },
+    { label: 'Categories', path: '/products' },
     { label: 'Reviews', path: '/reviews' },
     { label: '3D Studio', path: '/design-ai', badge: 'AI' }
   ];

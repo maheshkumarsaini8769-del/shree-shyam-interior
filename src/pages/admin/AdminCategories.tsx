@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FolderTree, Plus, Edit2, Trash2, X, Upload, Layers } from 'lucide-react';
+import { FolderTree, Plus, Edit2, Trash2, X, Upload, Layers, ArrowUp, ArrowDown } from 'lucide-react';
 import { apiService } from '../../services/apiService';
 import { ProductCategory, Product } from '../../types/product';
 import { useToast } from '../../context/ToastContext';
@@ -91,17 +91,38 @@ export const AdminCategories: React.FC = () => {
 
     try {
       if (editingCat) {
-        const updated = await apiService.updateCategory(editingCat.id, payload);
-        setCategories((prev) => prev.map((c) => (c.id === editingCat.id ? updated : c)));
-        showToast('Category updated', 'success');
+        await apiService.updateCategory(editingCat.id, payload);
+        showToast('Category updated successfully!', 'success');
       } else {
-        const created = await apiService.createCategory(payload);
-        setCategories((prev) => [...prev, created]);
-        showToast('Category created', 'success');
+        await apiService.createCategory(payload);
+        showToast('Category created successfully!', 'success');
       }
       setIsModalOpen(false);
+      await loadData();
     } catch {
       showToast('Failed to save category', 'error');
+    }
+  };
+
+  const handleMoveOrder = async (index: number, direction: 'up' | 'down') => {
+    const targetIndex = direction === 'up' ? index - 1 : index + 1;
+    if (targetIndex < 0 || targetIndex >= categories.length) return;
+
+    const newCategories = [...categories];
+    const temp = newCategories[index];
+    newCategories[index] = newCategories[targetIndex];
+    newCategories[targetIndex] = temp;
+
+    setCategories(newCategories);
+    try {
+      localStorage.setItem('ssi_categories', JSON.stringify(newCategories));
+      window.dispatchEvent(new CustomEvent('ssi_categories_changed', { detail: newCategories }));
+      const channel = new BroadcastChannel('ssi_channel');
+      channel.postMessage({ type: 'categories_updated', data: newCategories });
+      channel.close();
+      showToast('Category position updated!', 'success');
+    } catch {
+      showToast('Failed to change position', 'error');
     }
   };
 
@@ -141,7 +162,7 @@ export const AdminCategories: React.FC = () => {
 
       {/* Categories Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-        {categories.map((cat) => {
+        {categories.map((cat, index) => {
           const liveProductCount = products.filter(
             (p) => p.category.toLowerCase() === cat.slug.toLowerCase()
           ).length;
@@ -161,6 +182,9 @@ export const AdminCategories: React.FC = () => {
                   <div className="absolute top-2.5 right-2.5 px-2.5 py-1 rounded-full bg-forest-950/80 text-copper-300 text-[10px] font-bold backdrop-blur-md">
                     {liveProductCount} items
                   </div>
+                  <div className="absolute top-2.5 left-2.5 px-2 py-0.5 rounded-full bg-black/60 text-white text-[10px] font-mono">
+                    #{index + 1}
+                  </div>
                 </div>
 
                 <div className="p-4">
@@ -179,15 +203,39 @@ export const AdminCategories: React.FC = () => {
               <div className="p-4 pt-0 flex items-center justify-between border-t border-cream-100 dark:border-cream-200/10 mt-3 pt-3">
                 <span className="text-[10px] text-copper-500 font-semibold uppercase">Active Category</span>
                 <div className="flex items-center gap-1">
+                  {/* Position / Location Controls */}
+                  <div className="flex items-center bg-cream-100 dark:bg-[#1A212C] rounded-lg p-0.5 mr-1">
+                    <button
+                      type="button"
+                      disabled={index === 0}
+                      onClick={() => handleMoveOrder(index, 'up')}
+                      title="Move category earlier in location order"
+                      className="p-1 rounded hover:bg-white dark:hover:bg-forest-900 text-charcoal-500 dark:text-cream-200 disabled:opacity-30 transition-colors"
+                    >
+                      <ArrowUp className="w-3.5 h-3.5" />
+                    </button>
+                    <button
+                      type="button"
+                      disabled={index === categories.length - 1}
+                      onClick={() => handleMoveOrder(index, 'down')}
+                      title="Move category later in location order"
+                      className="p-1 rounded hover:bg-white dark:hover:bg-forest-900 text-charcoal-500 dark:text-cream-200 disabled:opacity-30 transition-colors"
+                    >
+                      <ArrowDown className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+
                   <button
                     onClick={() => openEditModal(cat)}
                     className="p-1.5 rounded-lg hover:bg-cream-100 dark:hover:bg-[#1A212C] text-charcoal-600 dark:text-cream-200 hover:text-copper-500 transition-colors"
+                    title="Edit Category Details"
                   >
                     <Edit2 className="w-4 h-4" />
                   </button>
                   <button
                     onClick={() => handleDelete(cat.id, cat.name)}
                     className="p-1.5 rounded-lg hover:bg-red-500/10 text-charcoal-400 hover:text-red-500 transition-colors"
+                    title="Delete Category"
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>
