@@ -127,11 +127,35 @@
       ]
     }
     </script>
+    <!-- Instant Early Theme Application to prevent theme flashing on reload -->
+    <script>
+      (function() {
+        try {
+          var t = localStorage.getItem('ssi_theme');
+          if (t === 'dark') {
+            document.documentElement.classList.add('dark');
+          } else {
+            document.documentElement.classList.remove('dark');
+          }
+        } catch(e) {}
+      })();
+    </script>
   </head>
   <body class="bg-cream-100 text-charcoal-800 dark:bg-forest-950 dark:text-cream-100 font-sans antialiased selection:bg-copper-500 selection:text-white min-h-screen overflow-x-hidden transition-colors duration-300">
     
-    <!-- React Root Mount Target (Contains Semantic Pre-Render for SEO Crawlers, Seobility & Social Bots) -->
+    <!-- React Root Mount Target (Clean seamless loader, replaced instantly on mount) -->
     <div id="root">
+      <div id="app-initial-loader" style="min-height: 100vh; display: flex; align-items: center; justify-content: center; background-color: #F5F1E8;">
+        <div style="width: 32px; height: 32px; border: 3px solid rgba(181, 119, 49, 0.2); border-top-color: #B57731; border-radius: 50%; animation: ssi-spin 0.8s linear infinite;"></div>
+      </div>
+      <style>
+        @keyframes ssi-spin { to { transform: rotate(360deg); } }
+        html.dark #app-initial-loader { background-color: #0B0F15 !important; }
+      </style>
+    </div>
+
+    <!-- Semantic Pre-Render for SEO Crawlers, Non-JS Clients & Bots (Never flashes for real users) -->
+    <noscript>
       <header style="background-color: #14251F; color: #F7F5EE; padding: 16px 24px;">
         <div style="max-width: 1200px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px;">
           <a href="/" style="color: #F7F5EE; text-decoration: none; font-size: 20px; font-weight: bold; text-transform: uppercase;">
@@ -310,7 +334,7 @@
           <a href="/site-visit" style="color: #C68A43; text-decoration: none;">Free Site Visit</a>
         </p>
       </footer>
-    </div>
+    </noscript>
 
     <script type="module" src="/src/main.tsx"></script>
   </body>
