@@ -1,0 +1,11 @@
+[
+  {
+    "id": "admin-super-1",
+    "email": "maheshkumarsaini8769@gmail.com",
+    "name": "Mahesh Kumar Saini",
+    "role": "Super Admin (Owner)",
+    "password": "mahesh99830",
+    "status": "Active",
+    "createdAt": "2026-09-01T00:00:00.000Z"
+  }
+]

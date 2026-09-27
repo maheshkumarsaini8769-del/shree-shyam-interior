@@ -93,10 +93,39 @@ export const CategoryCarousel: React.FC = () => {
     const handleChange = (e: CustomEvent) => {
       if (e.detail) mapCategories(e.detail);
     };
-
     window.addEventListener('ssi_categories_changed' as any, handleChange);
+
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'ssi_categories' && e.newValue) {
+        try {
+          mapCategories(JSON.parse(e.newValue));
+        } catch (_) {}
+      }
+    };
+    window.addEventListener('storage', handleStorageChange);
+
+    let channel: BroadcastChannel | null = null;
+    try {
+      channel = new BroadcastChannel('ssi_channel');
+      channel.onmessage = (msg) => {
+        if (msg.data?.type === 'categories_updated' && msg.data?.data) {
+          mapCategories(msg.data.data);
+        }
+      };
+    } catch (_) {}
+
+    const handleVisibility = () => {
+      if (!document.hidden) {
+        apiService.getCategories().then(mapCategories).catch(() => {});
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibility);
+
     return () => {
       window.removeEventListener('ssi_categories_changed' as any, handleChange);
+      window.removeEventListener('storage', handleStorageChange);
+      document.removeEventListener('visibilitychange', handleVisibility);
+      if (channel) channel.close();
     };
   }, []);
 

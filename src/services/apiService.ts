@@ -275,6 +275,17 @@ export interface AdminSession {
   isCurrent?: boolean;
 }
 
+export interface AdminAuthority {
+  id: string;
+  email: string;
+  name: string;
+  role: 'Super Admin' | 'Manager' | 'Editor';
+  status: 'Active' | 'Suspended';
+  isOwner?: boolean;
+  createdAt: string;
+  lastLogin?: string;
+}
+
 export type FestivalType = 'normal' | 'diwali' | 'holi' | 'navratri' | 'newyear' | 'patriot' | 'custom';
 
 export interface FestivalCampaignConfig {
@@ -664,6 +675,94 @@ export const apiService = {
     });
   },
 
+  // Admin Authority & Team Access Management
+  async getAuthorities(): Promise<AdminAuthority[]> {
+    try {
+      const res = await apiFetch<{ success: boolean; authorities: AdminAuthority[] }>('/admin/authorities');
+      if (res && Array.isArray(res.authorities)) {
+        localStorage.setItem('ssi_authorized_admins', JSON.stringify(res.authorities));
+        return res.authorities;
+      }
+    } catch (_) {}
+
+    // Fallback from localStorage
+    try {
+      const cached = localStorage.getItem('ssi_authorized_admins');
+      if (cached) return JSON.parse(cached);
+    } catch (_) {}
+
+    return [
+      {
+        id: 'admin_owner',
+        email: 'maheshkumarsaini8769@gmail.com',
+        name: 'Mahesh Kumar Saini',
+        role: 'Super Admin',
+        status: 'Active',
+        isOwner: true,
+        createdAt: new Date().toISOString()
+      }
+    ];
+  },
+
+  async addAuthority(data: { email: string; name: string; role: string; password?: string; sendEmail?: boolean }): Promise<{ success: boolean; authority: AdminAuthority; emailSent?: boolean }> {
+    const res = await apiFetch<{ success: boolean; authority: AdminAuthority; emailSent?: boolean }>('/admin/authorities', {
+      method: 'POST',
+      body: JSON.stringify(data)
+    });
+    try {
+      const list = await this.getAuthorities();
+      const updated = [...list.filter(a => a.id !== res.authority.id), res.authority];
+      localStorage.setItem('ssi_authorized_admins', JSON.stringify(updated));
+    } catch (_) {}
+    return res;
+  },
+
+  async updateAuthority(id: string, updates: Partial<AdminAuthority> & { password?: string }): Promise<{ success: boolean; authority: AdminAuthority }> {
+    const res = await apiFetch<{ success: boolean; authority: AdminAuthority }>(`/admin/authorities/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(updates)
+    });
+    try {
+      const list = await this.getAuthorities();
+      const updated = list.map(a => a.id === id ? { ...a, ...res.authority } : a);
+      localStorage.setItem('ssi_authorized_admins', JSON.stringify(updated));
+    } catch (_) {}
+    return res;
+  },
+
+  async deleteAuthority(id: string): Promise<{ success: boolean }> {
+    const res = await apiFetch<{ success: boolean }>(`/admin/authorities/${id}`, {
+      method: 'DELETE'
+    });
+    try {
+      const list = await this.getAuthorities();
+      const updated = list.filter(a => a.id !== id);
+      localStorage.setItem('ssi_authorized_admins', JSON.stringify(updated));
+    } catch (_) {}
+    return res;
+  },
+
+  async resendAuthorityInvite(id: string): Promise<{ success: boolean; message: string }> {
+    return apiFetch<{ success: boolean; message: string }>(`/admin/authorities/${id}/resend`, {
+      method: 'POST'
+    });
+  },
+
+  // Password Recovery via Resend OTP
+  async forgotPassword(email: string): Promise<{ success: boolean; message: string }> {
+    return apiFetch<{ success: boolean; message: string }>('/auth/forgot-password', {
+      method: 'POST',
+      body: JSON.stringify({ email })
+    });
+  },
+
+  async verifyOtpAndResetPassword(email: string, otp: string, newPassword: string): Promise<{ success: boolean; message: string }> {
+    return apiFetch<{ success: boolean; message: string }>('/auth/verify-otp-reset', {
+      method: 'POST',
+      body: JSON.stringify({ email, otp, newPassword })
+    });
+  },
+
   // Active Login Sessions Management (Remote Devices & Security)
   async getSessions(): Promise<AdminSession[]> {
     try {
@@ -802,44 +901,89 @@ export const apiService = {
   },
 
   async createCategory(cat: Partial<ProductCategory>): Promise<ProductCategory> {
-    const created = await apiFetch<ProductCategory>('/categories', {
-      method: 'POST',
-      body: JSON.stringify(cat)
-    });
+    const current = await this.getCategories();
+    const newCat: ProductCategory = {
+      id: cat.slug || `cat-${Date.now()}`,
+      name: cat.name || 'New Category',
+      slug: cat.slug || (cat.name ? cat.name.toLowerCase().replace(/[^a-z0-9]/g, '-') : `cat-${Date.now()}`),
+      tagline: cat.tagline || '',
+      image: cat.image || 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=800&q=80',
+      itemCount: cat.itemCount || 0,
+      ...cat
+    };
+
+    const updated = [...current, newCat];
     try {
-      const current = await this.getCategories();
-      const updated = [...current, created];
       localStorage.setItem('ssi_categories', JSON.stringify(updated));
       window.dispatchEvent(new CustomEvent('ssi_categories_changed', { detail: updated }));
+      const channel = new BroadcastChannel('ssi_channel');
+      channel.postMessage({ type: 'categories_updated', data: updated });
+      channel.close();
     } catch (_) {}
-    return created;
+
+    try {
+      apiFetch<ProductCategory>('/categories', {
+        method: 'POST',
+        body: JSON.stringify(newCat)
+      }).catch(() => {});
+    } catch (_) {}
+
+    return newCat;
   },
 
   async updateCategory(id: string, cat: Partial<ProductCategory>): Promise<ProductCategory> {
-    const updated = await apiFetch<ProductCategory>(`/categories/${id}`, {
-      method: 'PUT',
-      body: JSON.stringify(cat)
+    const current = await this.getCategories();
+    let updatedCat: ProductCategory | null = null;
+    const list = current.map((c) => {
+      if (c.id === id || c.slug === id) {
+        updatedCat = { ...c, ...cat };
+        return updatedCat;
+      }
+      return c;
     });
+
+    if (!updatedCat) {
+      updatedCat = { id, name: cat.name || id, slug: cat.slug || id, ...cat } as ProductCategory;
+      list.push(updatedCat);
+    }
+
     try {
-      const current = await this.getCategories();
-      const list = current.map((c) => (c.id === id || c.slug === id ? { ...c, ...updated } : c));
       localStorage.setItem('ssi_categories', JSON.stringify(list));
       window.dispatchEvent(new CustomEvent('ssi_categories_changed', { detail: list }));
+      const channel = new BroadcastChannel('ssi_channel');
+      channel.postMessage({ type: 'categories_updated', data: list });
+      channel.close();
     } catch (_) {}
-    return updated;
+
+    try {
+      apiFetch<ProductCategory>(`/categories/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify(cat)
+      }).catch(() => {});
+    } catch (_) {}
+
+    return updatedCat;
   },
 
   async deleteCategory(id: string): Promise<{ success: boolean; id: string }> {
-    const res = await apiFetch<{ success: boolean; id: string }>(`/categories/${id}`, {
-      method: 'DELETE'
-    });
+    const current = await this.getCategories();
+    const list = current.filter((c) => c.id !== id && c.slug !== id);
+
     try {
-      const current = await this.getCategories();
-      const list = current.filter((c) => c.id !== id && c.slug !== id);
       localStorage.setItem('ssi_categories', JSON.stringify(list));
       window.dispatchEvent(new CustomEvent('ssi_categories_changed', { detail: list }));
+      const channel = new BroadcastChannel('ssi_channel');
+      channel.postMessage({ type: 'categories_updated', data: list });
+      channel.close();
     } catch (_) {}
-    return res;
+
+    try {
+      apiFetch<{ success: boolean; id: string }>(`/categories/${id}`, {
+        method: 'DELETE'
+      }).catch(() => {});
+    } catch (_) {}
+
+    return { success: true, id };
   },
 
   // Brands

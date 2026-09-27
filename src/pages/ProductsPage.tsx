@@ -51,9 +51,50 @@ export const ProductsPage: React.FC = () => {
     window.addEventListener('ssi_products_changed' as any, handleProductsChange);
     window.addEventListener('ssi_categories_changed' as any, handleCategoriesChange);
 
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'ssi_categories' && e.newValue) {
+        try {
+          const parsed = JSON.parse(e.newValue);
+          if (Array.isArray(parsed)) setCategories(parsed);
+        } catch (_) {}
+      }
+      if (e.key === 'ssi_products' && e.newValue) {
+        try {
+          const parsed = JSON.parse(e.newValue);
+          if (Array.isArray(parsed)) setProducts(parsed);
+        } catch (_) {}
+      }
+    };
+    window.addEventListener('storage', handleStorageChange);
+
+    let channel: BroadcastChannel | null = null;
+    try {
+      channel = new BroadcastChannel('ssi_channel');
+      channel.onmessage = (msg) => {
+        if (msg.data?.type === 'categories_updated' && Array.isArray(msg.data?.data)) {
+          setCategories(msg.data.data);
+        }
+        if (msg.data?.type === 'products_updated' && Array.isArray(msg.data?.data)) {
+          setProducts(msg.data.data);
+        }
+      };
+    } catch (_) {}
+
+    const handleVisibility = () => {
+      if (!document.hidden) {
+        apiService.getCategories().then((data) => {
+          if (Array.isArray(data) && data.length > 0) setCategories(data);
+        });
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibility);
+
     return () => {
       window.removeEventListener('ssi_products_changed' as any, handleProductsChange);
       window.removeEventListener('ssi_categories_changed' as any, handleCategoriesChange);
+      window.removeEventListener('storage', handleStorageChange);
+      document.removeEventListener('visibilitychange', handleVisibility);
+      if (channel) channel.close();
     };
   }, []);
 
