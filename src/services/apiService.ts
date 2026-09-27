@@ -528,7 +528,7 @@ const initialContent: SiteContent = {
     backgroundImage: "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=1920&q=80"
   },
   stats: [
-    { label: "Projects Completed", value: "500+", subtext: "Across Sikar, Jaipur & Shekhawati" },
+    { label: "Projects Completed", value: "1000+", subtext: "Across Sikar, Jaipur & Shekhawati" },
     { label: "Years of Craftsmanship", value: "15+", subtext: "Since 2009 in Rajasthan" },
     { label: "Partner Brands", value: "100%", subtext: "Certified German & Indian Makers" },
     { label: "Client Satisfaction", value: "4.9★", subtext: "From 320+ verified home owners" }

@@ -1,24 +1,24 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { Home, Users, MapPin, ShieldCheck } from 'lucide-react';
+import { Users, Award, ShieldCheck, Star } from 'lucide-react';
 import { apiService } from '../../services/apiService';
 
 const fallbackStats = [
-  { icon: Home, value: 15, suffix: '+', label: 'Years Experience' },
-  { icon: Users, value: 500, suffix: '+', label: 'Projects Completed' },
-  { icon: MapPin, value: 25, suffix: '+', label: 'Cities Served' },
-  { icon: ShieldCheck, value: 100, suffix: '%', label: 'Genuine Products' }
+  { icon: Users, value: '1000', suffix: '+', label: 'Projects Completed', subtext: 'Across Sikar, Jaipur & Shekhawati' },
+  { icon: Award, value: '15', suffix: '+', label: 'Years of Craftsmanship', subtext: 'Since 2009 in Rajasthan' },
+  { icon: ShieldCheck, value: '100', suffix: '%', label: 'Partner Brands', subtext: 'Certified German & Indian Makers' },
+  { icon: Star, value: '4.9', suffix: '★', label: 'Client Satisfaction', subtext: 'From 320+ verified home owners' }
 ];
 
 export const TrustStatsStrip: React.FC = () => {
   const [statsData, setStatsData] = useState(fallbackStats);
   const [hasAnimated, setHasAnimated] = useState(false);
-  const [counts, setCounts] = useState<string[]>(['15', '500', '25', '100']);
+  const [counts, setCounts] = useState<string[]>(['1000', '15', '100', '4.9']);
   const sectionRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const updateStats = (content: any) => {
       if (content?.stats && Array.isArray(content.stats) && content.stats.length > 0) {
-        const icons = [Home, Users, MapPin, ShieldCheck];
+        const icons = [Users, Award, ShieldCheck, Star];
         const mapped = content.stats.map((item: any, idx: number) => {
           const strVal = String(item.value || '').trim();
           const numMatch = strVal.match(/[\d.]+/);
@@ -28,7 +28,8 @@ export const TrustStatsStrip: React.FC = () => {
             icon: icons[idx % icons.length] || ShieldCheck,
             value: rawNum,
             suffix: suffix || (strVal.replace(rawNum, '')),
-            label: item.label || ''
+            label: item.label || '',
+            subtext: item.subtext || ''
           };
         });
         setStatsData(mapped as any);
@@ -66,7 +67,8 @@ export const TrustStatsStrip: React.FC = () => {
               statsData.map((s) => {
                 const num = Number(s.value);
                 if (isNaN(num)) return String(s.value);
-                return String(Math.round(num * eased));
+                const isFloat = String(s.value).includes('.');
+                return isFloat ? (num * eased).toFixed(1) : String(Math.round(num * eased));
               })
             );
 
@@ -101,14 +103,19 @@ export const TrustStatsStrip: React.FC = () => {
                 <div className="w-10 h-10 rounded-xl bg-cream-100 dark:bg-forest-800/80 border border-cream-200 dark:border-copper-500/30 flex items-center justify-center text-[#B57731] dark:text-copper-400 shrink-0 transition-colors">
                   <Icon className="w-5 h-5" />
                 </div>
-                <div>
+                <div className="min-w-0">
                   <div className="font-serif font-bold text-xl sm:text-2xl text-forest-950 dark:text-cream-50 leading-tight">
                     {counts[idx]}
                     <span className="text-[#B57731] dark:text-copper-400 font-sans ml-0.5">{stat.suffix}</span>
                   </div>
-                  <div className="text-[11px] sm:text-xs text-charcoal-500 dark:text-charcoal-300 font-medium whitespace-nowrap">
+                  <div className="text-[11px] sm:text-xs text-charcoal-700 dark:text-cream-200 font-semibold truncate">
                     {stat.label}
                   </div>
+                  {stat.subtext && (
+                    <div className="text-[10px] text-charcoal-400 dark:text-cream-200/50 truncate max-w-[130px] sm:max-w-[190px]" title={stat.subtext}>
+                      {stat.subtext}
+                    </div>
+                  )}
                 </div>
               </div>
             );
