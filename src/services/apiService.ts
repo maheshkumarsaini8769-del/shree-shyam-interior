@@ -675,7 +675,27 @@ export const apiService = {
   // Products
   async getProducts(): Promise<Product[]> {
     try {
-      return await apiFetch<Product[]>('/products');
+      const cached = localStorage.getItem('ssi_products');
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          apiFetch<Product[]>('/products').then((remote) => {
+            if (Array.isArray(remote) && remote.length > 0) {
+              localStorage.setItem('ssi_products', JSON.stringify(remote));
+            }
+          }).catch(() => {});
+          return parsed;
+        }
+      }
+    } catch (_) {}
+
+    try {
+      const remote = await apiFetch<Product[]>('/products');
+      if (Array.isArray(remote) && remote.length > 0) {
+        try { localStorage.setItem('ssi_products', JSON.stringify(remote)); } catch (_) {}
+        return remote;
+      }
+      return initialProducts as unknown as Product[];
     } catch (e) {
       console.warn('API /products failed, falling back to local dataset', e);
       return initialProducts as unknown as Product[];
@@ -683,110 +703,254 @@ export const apiService = {
   },
 
   async createProduct(product: Partial<Product>): Promise<Product> {
-    return apiFetch<Product>('/products', {
+    const created = await apiFetch<Product>('/products', {
       method: 'POST',
       body: JSON.stringify(product)
     });
+    try {
+      const current = await this.getProducts();
+      const updated = [created, ...current.filter((p) => p.id !== created.id)];
+      localStorage.setItem('ssi_products', JSON.stringify(updated));
+      window.dispatchEvent(new CustomEvent('ssi_products_changed', { detail: updated }));
+    } catch (_) {}
+    return created;
   },
 
   async updateProduct(id: string, product: Partial<Product>): Promise<Product> {
-    return apiFetch<Product>(`/products/${id}`, {
+    const updated = await apiFetch<Product>(`/products/${id}`, {
       method: 'PUT',
       body: JSON.stringify(product)
     });
+    try {
+      const current = await this.getProducts();
+      const list = current.map((p) => (p.id === id ? { ...p, ...updated } : p));
+      localStorage.setItem('ssi_products', JSON.stringify(list));
+      window.dispatchEvent(new CustomEvent('ssi_products_changed', { detail: list }));
+    } catch (_) {}
+    return updated;
   },
 
   async deleteProduct(id: string): Promise<{ success: boolean; id: string }> {
-    return apiFetch<{ success: boolean; id: string }>(`/products/${id}`, {
+    const res = await apiFetch<{ success: boolean; id: string }>(`/products/${id}`, {
       method: 'DELETE'
     });
+    try {
+      const current = await this.getProducts();
+      const list = current.filter((p) => p.id !== id);
+      localStorage.setItem('ssi_products', JSON.stringify(list));
+      window.dispatchEvent(new CustomEvent('ssi_products_changed', { detail: list }));
+    } catch (_) {}
+    return res;
   },
 
   // Categories
   async getCategories(): Promise<ProductCategory[]> {
     try {
-      return await apiFetch<ProductCategory[]>('/categories');
+      const cached = localStorage.getItem('ssi_categories');
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          apiFetch<ProductCategory[]>('/categories').then((remote) => {
+            if (Array.isArray(remote) && remote.length > 0) {
+              localStorage.setItem('ssi_categories', JSON.stringify(remote));
+            }
+          }).catch(() => {});
+          return parsed;
+        }
+      }
+    } catch (_) {}
+
+    try {
+      const remote = await apiFetch<ProductCategory[]>('/categories');
+      if (Array.isArray(remote) && remote.length > 0) {
+        try { localStorage.setItem('ssi_categories', JSON.stringify(remote)); } catch (_) {}
+        return remote;
+      }
+      return initialCategories as unknown as ProductCategory[];
     } catch (e) {
       return initialCategories as unknown as ProductCategory[];
     }
   },
 
   async createCategory(cat: Partial<ProductCategory>): Promise<ProductCategory> {
-    return apiFetch<ProductCategory>('/categories', {
+    const created = await apiFetch<ProductCategory>('/categories', {
       method: 'POST',
       body: JSON.stringify(cat)
     });
+    try {
+      const current = await this.getCategories();
+      const updated = [...current, created];
+      localStorage.setItem('ssi_categories', JSON.stringify(updated));
+      window.dispatchEvent(new CustomEvent('ssi_categories_changed', { detail: updated }));
+    } catch (_) {}
+    return created;
   },
 
   async updateCategory(id: string, cat: Partial<ProductCategory>): Promise<ProductCategory> {
-    return apiFetch<ProductCategory>(`/categories/${id}`, {
+    const updated = await apiFetch<ProductCategory>(`/categories/${id}`, {
       method: 'PUT',
       body: JSON.stringify(cat)
     });
+    try {
+      const current = await this.getCategories();
+      const list = current.map((c) => (c.id === id || c.slug === id ? { ...c, ...updated } : c));
+      localStorage.setItem('ssi_categories', JSON.stringify(list));
+      window.dispatchEvent(new CustomEvent('ssi_categories_changed', { detail: list }));
+    } catch (_) {}
+    return updated;
   },
 
   async deleteCategory(id: string): Promise<{ success: boolean; id: string }> {
-    return apiFetch<{ success: boolean; id: string }>(`/categories/${id}`, {
+    const res = await apiFetch<{ success: boolean; id: string }>(`/categories/${id}`, {
       method: 'DELETE'
     });
+    try {
+      const current = await this.getCategories();
+      const list = current.filter((c) => c.id !== id && c.slug !== id);
+      localStorage.setItem('ssi_categories', JSON.stringify(list));
+      window.dispatchEvent(new CustomEvent('ssi_categories_changed', { detail: list }));
+    } catch (_) {}
+    return res;
   },
 
   // Brands
   async getBrands(): Promise<Brand[]> {
     try {
-      return await apiFetch<Brand[]>('/brands');
+      const cached = localStorage.getItem('ssi_brands');
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          apiFetch<Brand[]>('/brands').then((remote) => {
+            if (Array.isArray(remote) && remote.length > 0) {
+              localStorage.setItem('ssi_brands', JSON.stringify(remote));
+            }
+          }).catch(() => {});
+          return parsed;
+        }
+      }
+    } catch (_) {}
+
+    try {
+      const remote = await apiFetch<Brand[]>('/brands');
+      if (Array.isArray(remote) && remote.length > 0) {
+        try { localStorage.setItem('ssi_brands', JSON.stringify(remote)); } catch (_) {}
+        return remote;
+      }
+      return initialBrands;
     } catch (e) {
       return initialBrands;
     }
   },
 
   async createBrand(brand: Partial<Brand>): Promise<Brand> {
-    return apiFetch<Brand>('/brands', {
+    const created = await apiFetch<Brand>('/brands', {
       method: 'POST',
       body: JSON.stringify(brand)
     });
+    try {
+      const current = await this.getBrands();
+      const updated = [...current, created];
+      localStorage.setItem('ssi_brands', JSON.stringify(updated));
+      window.dispatchEvent(new CustomEvent('ssi_brands_changed', { detail: updated }));
+    } catch (_) {}
+    return created;
   },
 
   async updateBrand(id: string, brand: Partial<Brand>): Promise<Brand> {
-    return apiFetch<Brand>(`/brands/${id}`, {
+    const updated = await apiFetch<Brand>(`/brands/${id}`, {
       method: 'PUT',
       body: JSON.stringify(brand)
     });
+    try {
+      const current = await this.getBrands();
+      const list = current.map((b) => (b.id === id ? { ...b, ...updated } : b));
+      localStorage.setItem('ssi_brands', JSON.stringify(list));
+      window.dispatchEvent(new CustomEvent('ssi_brands_changed', { detail: list }));
+    } catch (_) {}
+    return updated;
   },
 
   async deleteBrand(id: string): Promise<{ success: boolean; id: string }> {
-    return apiFetch<{ success: boolean; id: string }>(`/brands/${id}`, {
+    const res = await apiFetch<{ success: boolean; id: string }>(`/brands/${id}`, {
       method: 'DELETE'
     });
+    try {
+      const current = await this.getBrands();
+      const list = current.filter((b) => b.id !== id);
+      localStorage.setItem('ssi_brands', JSON.stringify(list));
+      window.dispatchEvent(new CustomEvent('ssi_brands_changed', { detail: list }));
+    } catch (_) {}
+    return res;
   },
 
   // Projects
   async getProjects(): Promise<Project[]> {
     try {
-      return await apiFetch<Project[]>('/projects');
+      const cached = localStorage.getItem('ssi_projects');
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          apiFetch<Project[]>('/projects').then((remote) => {
+            if (Array.isArray(remote) && remote.length > 0) {
+              localStorage.setItem('ssi_projects', JSON.stringify(remote));
+            }
+          }).catch(() => {});
+          return parsed;
+        }
+      }
+    } catch (_) {}
+
+    try {
+      const remote = await apiFetch<Project[]>('/projects');
+      if (Array.isArray(remote) && remote.length > 0) {
+        try { localStorage.setItem('ssi_projects', JSON.stringify(remote)); } catch (_) {}
+        return remote;
+      }
+      return initialProjects as unknown as Project[];
     } catch (e) {
       return initialProjects as unknown as Project[];
     }
   },
 
   async createProject(project: Partial<Project>): Promise<Project> {
-    return apiFetch<Project>('/projects', {
+    const created = await apiFetch<Project>('/projects', {
       method: 'POST',
       body: JSON.stringify(project)
     });
+    try {
+      const current = await this.getProjects();
+      const updated = [created, ...current.filter((p) => p.id !== created.id)];
+      localStorage.setItem('ssi_projects', JSON.stringify(updated));
+      window.dispatchEvent(new CustomEvent('ssi_projects_changed', { detail: updated }));
+    } catch (_) {}
+    return created;
   },
 
   async updateProject(id: string, project: Partial<Project>): Promise<Project> {
-    return apiFetch<Project>(`/projects/${id}`, {
+    const updated = await apiFetch<Project>(`/projects/${id}`, {
       method: 'PUT',
       body: JSON.stringify(project)
     });
+    try {
+      const current = await this.getProjects();
+      const list = current.map((p) => (p.id === id ? { ...p, ...updated } : p));
+      localStorage.setItem('ssi_projects', JSON.stringify(list));
+      window.dispatchEvent(new CustomEvent('ssi_projects_changed', { detail: list }));
+    } catch (_) {}
+    return updated;
   },
 
   async deleteProject(id: string): Promise<{ success: boolean; id: string }> {
-    return apiFetch<{ success: boolean; id: string }>(`/projects/${id}`, {
+    const res = await apiFetch<{ success: boolean; id: string }>(`/projects/${id}`, {
       method: 'DELETE'
     });
+    try {
+      const current = await this.getProjects();
+      const list = current.filter((p) => p.id !== id);
+      localStorage.setItem('ssi_projects', JSON.stringify(list));
+      window.dispatchEvent(new CustomEvent('ssi_projects_changed', { detail: list }));
+    } catch (_) {}
+    return res;
   },
 
   // Testimonials & Reviews
@@ -911,13 +1075,40 @@ export const apiService = {
   // Site Content CMS
   async getSiteContent(): Promise<SiteContent> {
     try {
-      return await apiFetch<SiteContent>('/content');
+      const cached = localStorage.getItem('ssi_site_content');
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (parsed && parsed.hero) {
+          apiFetch<SiteContent>('/content').then((remote) => {
+            if (remote && remote.hero) {
+              localStorage.setItem('ssi_site_content', JSON.stringify(remote));
+            }
+          }).catch(() => {});
+          return parsed;
+        }
+      }
+    } catch (_) {}
+
+    try {
+      const remote = await apiFetch<SiteContent>('/content');
+      if (remote && remote.hero) {
+        try { localStorage.setItem('ssi_site_content', JSON.stringify(remote)); } catch (_) {}
+        return remote;
+      }
+      return initialContent;
     } catch (e) {
       return initialContent;
     }
   },
 
   async updateSiteContent(content: Partial<SiteContent>): Promise<SiteContent> {
+    try {
+      const current = localStorage.getItem('ssi_site_content');
+      const merged = current ? { ...JSON.parse(current), ...content } : { ...initialContent, ...content };
+      localStorage.setItem('ssi_site_content', JSON.stringify(merged));
+      window.dispatchEvent(new CustomEvent('ssi_content_changed', { detail: merged }));
+    } catch (_) {}
+
     return apiFetch<SiteContent>('/content', {
       method: 'PUT',
       body: JSON.stringify(content)
@@ -1487,7 +1678,34 @@ export const apiService = {
   // Settings
   async getSettings(): Promise<BusinessSettings> {
     try {
-      return await apiFetch<BusinessSettings>('/settings');
+      const cached = localStorage.getItem('ssi_settings');
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (parsed && parsed.businessName) {
+          apiFetch<BusinessSettings>('/settings').then((remote) => {
+            if (remote && remote.businessName) {
+              localStorage.setItem('ssi_settings', JSON.stringify(remote));
+            }
+          }).catch(() => {});
+          return parsed;
+        }
+      }
+    } catch (_) {}
+
+    try {
+      const remote = await apiFetch<BusinessSettings>('/settings');
+      if (remote && remote.businessName) {
+        try { localStorage.setItem('ssi_settings', JSON.stringify(remote)); } catch (_) {}
+        return remote;
+      }
+      return {
+        businessName: 'Shree Shyam Interior',
+        gstNumber: '08AAAAA0000A1Z5',
+        primaryPhone: '+91 98765 43210',
+        whatsappNumber: '+91 98765 43210',
+        email: 'contact@shreeshyaminterior.com',
+        address: 'Piprali Road, Sikar, Rajasthan - 332001'
+      };
     } catch {
       return {
         businessName: 'Shree Shyam Interior',
@@ -1501,6 +1719,13 @@ export const apiService = {
   },
 
   async updateSettings(settings: Partial<BusinessSettings>): Promise<BusinessSettings> {
+    try {
+      const current = await this.getSettings();
+      const merged = { ...current, ...settings };
+      localStorage.setItem('ssi_settings', JSON.stringify(merged));
+      window.dispatchEvent(new CustomEvent('ssi_settings_changed', { detail: merged }));
+    } catch (_) {}
+
     return apiFetch<BusinessSettings>('/settings', {
       method: 'PUT',
       body: JSON.stringify(settings)
@@ -1526,13 +1751,38 @@ export const apiService = {
   // Branding, Logo & SEO
   async getBrandingSEO(): Promise<BrandingSEOData> {
     try {
-      return await apiFetch<BrandingSEOData>('/branding-seo');
+      const cached = localStorage.getItem('ssi_branding_seo');
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (parsed && parsed.logo) {
+          apiFetch<BrandingSEOData>('/branding-seo').then((remote) => {
+            if (remote && remote.logo) {
+              localStorage.setItem('ssi_branding_seo', JSON.stringify(remote));
+            }
+          }).catch(() => {});
+          return parsed;
+        }
+      }
+    } catch (_) {}
+
+    try {
+      const remote = await apiFetch<BrandingSEOData>('/branding-seo');
+      if (remote && remote.logo) {
+        try { localStorage.setItem('ssi_branding_seo', JSON.stringify(remote)); } catch (_) {}
+        return remote;
+      }
+      return fallbackBrandingSEO;
     } catch {
       return fallbackBrandingSEO;
     }
   },
 
   async updateBrandingSEO(data: BrandingSEOData): Promise<BrandingSEOData> {
+    try {
+      localStorage.setItem('ssi_branding_seo', JSON.stringify(data));
+      window.dispatchEvent(new CustomEvent('ssi_branding_changed', { detail: data }));
+    } catch (_) {}
+
     return apiFetch<BrandingSEOData>('/branding-seo', {
       method: 'PUT',
       body: JSON.stringify(data)

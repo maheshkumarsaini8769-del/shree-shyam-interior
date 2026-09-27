@@ -71,9 +71,18 @@ export const Header: React.FC = () => {
       }
     };
 
+    const handleBrandingChange = (e: CustomEvent<BrandingSEOData>) => {
+      if (e.detail) {
+        setBranding(e.detail);
+        if (e.detail.seo?.siteTitle) document.title = e.detail.seo.siteTitle;
+      }
+    };
+
     window.addEventListener('ssi_festival_changed' as any, handleFestivalChange);
+    window.addEventListener('ssi_branding_changed' as any, handleBrandingChange);
     return () => {
       window.removeEventListener('ssi_festival_changed' as any, handleFestivalChange);
+      window.removeEventListener('ssi_branding_changed' as any, handleBrandingChange);
     };
   }, []);
 

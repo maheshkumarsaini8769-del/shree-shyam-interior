@@ -132,6 +132,15 @@ async function updateCloudStore(key, data) {
     const rawQuotes = key === 'quotes' ? data : (cloudCurrent?.quotes || memoryStore.get('quotes.json') || []);
     const rawWa = key === 'whatsappOrders' ? data : (cloudCurrent?.whatsappOrders || memoryStore.get('whatsappOrders.json') || []);
     const rawFestival = key === 'festival' ? data : (cloudCurrent?.festival || memoryStore.get('festival.json') || null);
+    const rawSessions = key === 'sessions' ? data : (cloudCurrent?.sessions || memoryStore.get('sessions.json') || []);
+    const rawSiteContent = key === 'siteContent' ? data : (cloudCurrent?.siteContent || memoryStore.get('siteContent.json') || null);
+    const rawBranding = key === 'brandingSeo' ? data : (cloudCurrent?.brandingSeo || memoryStore.get('brandingSeo.json') || null);
+    const rawSettings = key === 'settings' ? data : (cloudCurrent?.settings || memoryStore.get('settings.json') || null);
+    const rawProducts = key === 'products' ? data : (cloudCurrent?.products || memoryStore.get('products.json') || null);
+    const rawCategories = key === 'categories' ? data : (cloudCurrent?.categories || memoryStore.get('categories.json') || null);
+    const rawBrands = key === 'brands' ? data : (cloudCurrent?.brands || memoryStore.get('brands.json') || null);
+    const rawProjects = key === 'projects' ? data : (cloudCurrent?.projects || memoryStore.get('projects.json') || null);
+    const rawTestimonials = key === 'testimonials' ? data : (cloudCurrent?.testimonials || memoryStore.get('testimonials.json') || null);
 
     const leads = (Array.isArray(rawLeads) ? rawLeads : []).map(sanitizeLead).filter(Boolean).slice(0, 50);
     const quotes = (Array.isArray(rawQuotes) ? rawQuotes : []).map(sanitizeQuote).filter(Boolean).slice(0, 50);
@@ -142,9 +151,15 @@ async function updateCloudStore(key, data) {
     memoryStore.set('quotes.json', quotes);
     memoryStore.set('whatsappOrders.json', whatsappOrders);
     memoryStore.set('sessions.json', sessions);
-    if (rawFestival && typeof rawFestival === 'object') {
-      memoryStore.set('festival.json', rawFestival);
-    }
+    if (rawFestival && typeof rawFestival === 'object') memoryStore.set('festival.json', rawFestival);
+    if (rawSiteContent && typeof rawSiteContent === 'object') memoryStore.set('siteContent.json', rawSiteContent);
+    if (rawBranding && typeof rawBranding === 'object') memoryStore.set('brandingSeo.json', rawBranding);
+    if (rawSettings && typeof rawSettings === 'object') memoryStore.set('settings.json', rawSettings);
+    if (Array.isArray(rawProducts)) memoryStore.set('products.json', rawProducts);
+    if (Array.isArray(rawCategories)) memoryStore.set('categories.json', rawCategories);
+    if (Array.isArray(rawBrands)) memoryStore.set('brands.json', rawBrands);
+    if (Array.isArray(rawProjects)) memoryStore.set('projects.json', rawProjects);
+    if (Array.isArray(rawTestimonials)) memoryStore.set('testimonials.json', rawTestimonials);
 
     const payload = {
       name: 'shree-shyam-interior-store',
@@ -153,7 +168,15 @@ async function updateCloudStore(key, data) {
         quotes,
         whatsappOrders,
         sessions,
-        festival: rawFestival || memoryStore.get('festival.json') || null
+        festival: rawFestival || memoryStore.get('festival.json') || null,
+        siteContent: rawSiteContent || memoryStore.get('siteContent.json') || null,
+        brandingSeo: rawBranding || memoryStore.get('brandingSeo.json') || null,
+        settings: rawSettings || memoryStore.get('settings.json') || null,
+        products: rawProducts || memoryStore.get('products.json') || null,
+        categories: rawCategories || memoryStore.get('categories.json') || null,
+        brands: rawBrands || memoryStore.get('brands.json') || null,
+        projects: rawProjects || memoryStore.get('projects.json') || null,
+        testimonials: rawTestimonials || memoryStore.get('testimonials.json') || null
       }
     };
     const res = await fetch(CLOUD_SYNC_URL, {
@@ -170,8 +193,6 @@ async function updateCloudStore(key, data) {
     console.warn('[CloudStore] Background sync warning (non-fatal):', err?.message || err);
   }
 }
-
-
 
 // Ensure directories and initial data exist
 let initPromise = null;
@@ -212,6 +233,14 @@ export async function initDb() {
       if (Array.isArray(cloudData.whatsappOrders)) memoryStore.set('whatsappOrders.json', cloudData.whatsappOrders);
       if (Array.isArray(cloudData.sessions)) memoryStore.set('sessions.json', cloudData.sessions);
       if (cloudData.festival && typeof cloudData.festival === 'object') memoryStore.set('festival.json', cloudData.festival);
+      if (cloudData.siteContent && typeof cloudData.siteContent === 'object') memoryStore.set('siteContent.json', cloudData.siteContent);
+      if (cloudData.brandingSeo && typeof cloudData.brandingSeo === 'object') memoryStore.set('brandingSeo.json', cloudData.brandingSeo);
+      if (cloudData.settings && typeof cloudData.settings === 'object') memoryStore.set('settings.json', cloudData.settings);
+      if (Array.isArray(cloudData.products)) memoryStore.set('products.json', cloudData.products);
+      if (Array.isArray(cloudData.categories)) memoryStore.set('categories.json', cloudData.categories);
+      if (Array.isArray(cloudData.brands)) memoryStore.set('brands.json', cloudData.brands);
+      if (Array.isArray(cloudData.projects)) memoryStore.set('projects.json', cloudData.projects);
+      if (Array.isArray(cloudData.testimonials)) memoryStore.set('testimonials.json', cloudData.testimonials);
     }
 
     for (const file of files) {
@@ -264,39 +293,43 @@ export async function initDb() {
 initDb().catch(console.error);
 
 export async function readData(fileName) {
-  // For leads, quotes, and whatsappOrders, sync with cloud store for multi-container consistency
-  if (fileName === 'leads.json' || fileName === 'quotes.json' || fileName === 'whatsappOrders.json') {
+  const cloudKeyMap = {
+    'leads.json': 'leads',
+    'quotes.json': 'quotes',
+    'whatsappOrders.json': 'whatsappOrders',
+    'sessions.json': 'sessions',
+    'festival.json': 'festival',
+    'siteContent.json': 'siteContent',
+    'brandingSeo.json': 'brandingSeo',
+    'settings.json': 'settings',
+    'products.json': 'products',
+    'categories.json': 'categories',
+    'brands.json': 'brands',
+    'projects.json': 'projects',
+    'testimonials.json': 'testimonials'
+  };
+
+  const cloudKey = cloudKeyMap[fileName];
+  if (cloudKey) {
     const cloudData = await fetchCloudStore();
-    const cloudKey = fileName === 'leads.json' ? 'leads' : (fileName === 'quotes.json' ? 'quotes' : 'whatsappOrders');
-    if (cloudData && Array.isArray(cloudData[cloudKey])) {
-      const items = cloudData[cloudKey].map((entry) => {
-        if (entry && !Array.isArray(entry.items) && typeof entry.itemsJson === 'string') {
-          try {
-            entry.items = JSON.parse(entry.itemsJson);
-          } catch (_) {
-            entry.items = [];
-          }
+    if (cloudData && cloudData[cloudKey]) {
+      let val = cloudData[cloudKey];
+      if (fileName === 'leads.json' || fileName === 'quotes.json' || fileName === 'whatsappOrders.json') {
+        if (Array.isArray(val)) {
+          val = val.map((entry) => {
+            if (entry && !Array.isArray(entry.items) && typeof entry.itemsJson === 'string') {
+              try {
+                entry.items = JSON.parse(entry.itemsJson);
+              } catch (_) {
+                entry.items = [];
+              }
+            }
+            return entry;
+          });
         }
-        return entry;
-      });
-      memoryStore.set(fileName, items);
-      return items;
-    }
-  }
-
-  if (fileName === 'sessions.json') {
-    const cloudData = await fetchCloudStore();
-    if (cloudData && Array.isArray(cloudData.sessions)) {
-      memoryStore.set(fileName, cloudData.sessions);
-      return cloudData.sessions;
-    }
-  }
-
-  if (fileName === 'festival.json') {
-    const cloudData = await fetchCloudStore();
-    if (cloudData && cloudData.festival && typeof cloudData.festival === 'object') {
-      memoryStore.set(fileName, cloudData.festival);
-      return cloudData.festival;
+      }
+      memoryStore.set(fileName, val);
+      return val;
     }
   }
 
@@ -358,18 +391,25 @@ export async function writeData(fileName, data) {
     }
   }
 
-  // Sync dynamic leads, quotes, whatsappOrders, and sessions with cloud store safely
+  // Sync dynamic leads, quotes, whatsappOrders, and all CMS collections with cloud store safely
   try {
-    if (fileName === 'leads.json') {
-      await updateCloudStore('leads', data);
-    } else if (fileName === 'quotes.json') {
-      await updateCloudStore('quotes', data);
-    } else if (fileName === 'whatsappOrders.json') {
-      await updateCloudStore('whatsappOrders', data);
-    } else if (fileName === 'sessions.json') {
-      await updateCloudStore('sessions', data);
-    } else if (fileName === 'festival.json') {
-      await updateCloudStore('festival', data);
+    const keyMap = {
+      'leads.json': 'leads',
+      'quotes.json': 'quotes',
+      'whatsappOrders.json': 'whatsappOrders',
+      'sessions.json': 'sessions',
+      'festival.json': 'festival',
+      'siteContent.json': 'siteContent',
+      'brandingSeo.json': 'brandingSeo',
+      'settings.json': 'settings',
+      'products.json': 'products',
+      'categories.json': 'categories',
+      'brands.json': 'brands',
+      'projects.json': 'projects',
+      'testimonials.json': 'testimonials'
+    };
+    if (keyMap[fileName]) {
+      await updateCloudStore(keyMap[fileName], data);
     }
   } catch (err) {
     console.warn(`[WriteData] Non-fatal sync warning for ${fileName}:`, err?.message || err);

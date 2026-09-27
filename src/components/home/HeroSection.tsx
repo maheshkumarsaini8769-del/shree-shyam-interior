@@ -18,7 +18,7 @@ export const HeroSection: React.FC = () => {
   });
 
   useEffect(() => {
-    apiService.getSiteContent().then((content) => {
+    const updateHero = (content: any) => {
       if (content?.hero) {
         setHeroData({
           badge: content.hero.badge || "SIKAR'S PREMIER INTERIOR ARCHITECTURE STUDIO",
@@ -32,7 +32,18 @@ export const HeroSection: React.FC = () => {
           backgroundImage: content.hero.backgroundImage || 'https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=1200&q=75'
         });
       }
-    });
+    };
+
+    apiService.getSiteContent().then(updateHero);
+
+    const handleContentChange = (e: CustomEvent<any>) => {
+      if (e.detail) updateHero(e.detail);
+    };
+
+    window.addEventListener('ssi_content_changed' as any, handleContentChange);
+    return () => {
+      window.removeEventListener('ssi_content_changed' as any, handleContentChange);
+    };
   }, []);
 
   const avatars = [

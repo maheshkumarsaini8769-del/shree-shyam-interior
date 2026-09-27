@@ -99,14 +99,20 @@ const ScrollToTop: React.FC = () => {
   return null;
 };
 
-// Luxury Skeleton Shimmer Loader during chunk lazy loading
+// Subtle, non-flashing smooth chunk loader
 const PageSkeleton: React.FC = () => (
-  <div className="min-h-screen bg-cream-100 dark:bg-forest-950 flex flex-col items-center justify-center pt-24 pb-16 px-4">
-    <div className="w-12 h-12 rounded-2xl bg-forest-900 border border-copper-500/40 flex items-center justify-center animate-pulse mb-4">
-      <span className="text-copper-400 font-serif font-bold text-lg">SS</span>
+  <div className="min-h-[40vh] flex items-center justify-center py-24">
+    <div className="w-7 h-7 rounded-full border-2 border-copper-500/20 border-t-copper-500 animate-spin" />
+  </div>
+);
+
+// Admin-specific seamless chunk loader matching admin theme
+const AdminSkeleton: React.FC = () => (
+  <div className="h-screen w-full bg-cream-50 dark:bg-[#0B0F15] flex items-center justify-center">
+    <div className="flex items-center gap-2.5 text-xs font-semibold text-charcoal-500 dark:text-cream-200/60">
+      <div className="w-5 h-5 rounded-full border-2 border-copper-500/20 border-t-copper-500 animate-spin" />
+      <span>Loading Admin...</span>
     </div>
-    <div className="h-4 w-48 bg-copper-500/20 rounded-full animate-pulse mb-2" />
-    <div className="h-3 w-32 bg-forest-900/10 dark:bg-cream-100/10 rounded-full animate-pulse" />
   </div>
 );
 
@@ -159,7 +165,7 @@ const AppContent: React.FC = () => {
   if (isAdminRoute) {
     return (
       <ChunkErrorBoundary>
-        <Suspense fallback={<PageSkeleton />}>
+        <Suspense fallback={<AdminSkeleton />}>
           <Routes>
             <Route path="/admin/login" element={<AdminLogin />} />
             <Route path="/admin" element={<AdminLayout />}>
@@ -187,32 +193,16 @@ const AppContent: React.FC = () => {
   }
 
   return (
-    <div className="flex flex-col min-h-screen relative">
+    <div className="flex flex-col min-h-screen">
       <ScrollToTop />
       <ScrollProgress />
       <Suspense fallback={null}>
         <FestiveEffects />
       </Suspense>
 
-      {/* Global Full-Website Luxury Interior Architecture Background */}
-      <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden select-none" aria-hidden="true">
-        {/* Light Theme Background */}
-        <div
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat dark:hidden transition-opacity duration-700"
-          style={{ backgroundImage: `url('/bg-light.jpg')` }}
-        />
-        {/* Dark Theme Background */}
-        <div
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat hidden dark:block transition-opacity duration-700"
-          style={{ backgroundImage: `url('/bg-dark.jpg')` }}
-        />
-        {/* Ambient Warm Luxury Tint */}
-        <div className="absolute inset-0 bg-[#F5F1E8]/45 dark:bg-[#0B0F15]/55 transition-colors duration-500 backdrop-blur-[0.5px]" />
-      </div>
-
       <Header />
 
-      <main className="flex-1 relative z-10">
+      <main className="flex-1">
         <ChunkErrorBoundary>
           <Suspense fallback={<PageSkeleton />}>
             <Routes>

@@ -10,6 +10,15 @@ export const Footer: React.FC = () => {
     apiService.getBrandingSEO().then((data) => {
       if (data) setBranding(data);
     });
+
+    const handleBrandingChange = (e: CustomEvent<BrandingSEOData>) => {
+      if (e.detail) setBranding(e.detail);
+    };
+
+    window.addEventListener('ssi_branding_changed' as any, handleBrandingChange);
+    return () => {
+      window.removeEventListener('ssi_branding_changed' as any, handleBrandingChange);
+    };
   }, []);
 
   return (
