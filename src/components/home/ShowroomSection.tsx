@@ -13,20 +13,65 @@ export const ShowroomSection: React.FC = () => {
   });
 
   useEffect(() => {
-    Promise.all([
-      apiService.getSiteContent().catch(() => null),
-      apiService.getSettings().catch(() => null)
-    ]).then(([content, settings]) => {
-      setShowroomInfo((prev) => ({
-        ...prev,
-        name: content?.showroom?.name || settings?.businessName || prev.name,
-        address: content?.showroom?.address || settings?.address || prev.address,
-        phone: content?.showroom?.phone || settings?.primaryPhone || prev.phone,
-        whatsapp: content?.showroom?.whatsapp || settings?.whatsappNumber || prev.whatsapp,
-        timings: content?.showroom?.timings || prev.timings,
-        image: content?.showroom?.image || prev.image
-      }));
-    });
+    const loadInfo = () => {
+      Promise.all([
+        apiService.getSiteContent().catch(() => null),
+        apiService.getSettings().catch(() => null)
+      ]).then(([content, settings]) => {
+        setShowroomInfo((prev) => ({
+          ...prev,
+          name: content?.showroom?.name || settings?.businessName || prev.name,
+          address: content?.showroom?.address || settings?.address || prev.address,
+          phone: content?.showroom?.phone || settings?.primaryPhone || prev.phone,
+          whatsapp: content?.showroom?.whatsapp || settings?.whatsappNumber || prev.whatsapp,
+          timings: content?.showroom?.timings || prev.timings,
+          image: content?.showroom?.image || prev.image
+        }));
+      });
+    };
+
+    loadInfo();
+
+    const handleContentChange = (e: CustomEvent<any>) => {
+      if (e.detail?.showroom) {
+        setShowroomInfo((prev) => ({ ...prev, ...e.detail.showroom }));
+      }
+    };
+    window.addEventListener('ssi_content_changed' as any, handleContentChange);
+
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'ssi_site_content' && e.newValue) {
+        try {
+          const parsed = JSON.parse(e.newValue);
+          if (parsed?.showroom) {
+            setShowroomInfo((prev) => ({ ...prev, ...parsed.showroom }));
+          }
+        } catch (_) {}
+      }
+    };
+    window.addEventListener('storage', handleStorageChange);
+
+    let channel: BroadcastChannel | null = null;
+    try {
+      channel = new BroadcastChannel('ssi_channel');
+      channel.onmessage = (msg) => {
+        if (msg.data?.type === 'content_updated' && msg.data?.data?.showroom) {
+          setShowroomInfo((prev) => ({ ...prev, ...msg.data.data.showroom }));
+        }
+      };
+    } catch (_) {}
+
+    const handleVisibility = () => {
+      if (!document.hidden) loadInfo();
+    };
+    document.addEventListener('visibilitychange', handleVisibility);
+
+    return () => {
+      window.removeEventListener('ssi_content_changed' as any, handleContentChange);
+      window.removeEventListener('storage', handleStorageChange);
+      document.removeEventListener('visibilitychange', handleVisibility);
+      if (channel) channel.close();
+    };
   }, []);
 
   const cleanPhone = showroomInfo.phone.replace(/[^0-9+]/g, '');

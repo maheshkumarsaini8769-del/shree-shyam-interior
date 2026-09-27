@@ -1126,12 +1126,19 @@ export const apiService = {
       merged = current ? { ...JSON.parse(current), ...content } : { ...initialContent, ...content };
       localStorage.setItem('ssi_site_content', JSON.stringify(merged));
       window.dispatchEvent(new CustomEvent('ssi_content_changed', { detail: merged }));
+
+      // Broadcast to other tabs/windows in real time
+      try {
+        const channel = new BroadcastChannel('ssi_channel');
+        channel.postMessage({ type: 'content_updated', data: merged });
+        channel.close();
+      } catch (_) {}
     } catch (_) {}
 
     try {
       const remoteUpdated = await apiFetch<SiteContent>('/content', {
         method: 'PUT',
-        body: JSON.stringify(content)
+        body: JSON.stringify(merged)
       });
       return remoteUpdated || merged;
     } catch (_) {

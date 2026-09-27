@@ -34,17 +34,6 @@ async function safeWriteFile(filePath, content) {
 const CLOUD_SYNC_URL = 'https://api.restful-api.dev/objects/ff808181a09d98f701a0c9c936407072';
 
 async function fetchCloudStore() {
-  try {
-    const res = await fetch(CLOUD_SYNC_URL, {
-      signal: AbortSignal.timeout(2500)
-    });
-    if (res.ok) {
-      const json = await res.json();
-      return json?.data || null;
-    }
-  } catch (err) {
-    // Non-blocking fallback to local memory
-  }
   return null;
 }
 
@@ -126,71 +115,25 @@ function sanitizeWaOrder(w) {
 
 
 async function updateCloudStore(key, data) {
-  try {
-    const cloudCurrent = await fetchCloudStore();
-    const rawLeads = key === 'leads' ? data : (cloudCurrent?.leads || memoryStore.get('leads.json') || []);
-    const rawQuotes = key === 'quotes' ? data : (cloudCurrent?.quotes || memoryStore.get('quotes.json') || []);
-    const rawWa = key === 'whatsappOrders' ? data : (cloudCurrent?.whatsappOrders || memoryStore.get('whatsappOrders.json') || []);
-    const rawFestival = key === 'festival' ? data : (cloudCurrent?.festival || memoryStore.get('festival.json') || null);
-    const rawSessions = key === 'sessions' ? data : (cloudCurrent?.sessions || memoryStore.get('sessions.json') || []);
-    const rawSiteContent = key === 'siteContent' ? data : (cloudCurrent?.siteContent || memoryStore.get('siteContent.json') || null);
-    const rawBranding = key === 'brandingSeo' ? data : (cloudCurrent?.brandingSeo || memoryStore.get('brandingSeo.json') || null);
-    const rawSettings = key === 'settings' ? data : (cloudCurrent?.settings || memoryStore.get('settings.json') || null);
-    const rawProducts = key === 'products' ? data : (cloudCurrent?.products || memoryStore.get('products.json') || null);
-    const rawCategories = key === 'categories' ? data : (cloudCurrent?.categories || memoryStore.get('categories.json') || null);
-    const rawBrands = key === 'brands' ? data : (cloudCurrent?.brands || memoryStore.get('brands.json') || null);
-    const rawProjects = key === 'projects' ? data : (cloudCurrent?.projects || memoryStore.get('projects.json') || null);
-    const rawTestimonials = key === 'testimonials' ? data : (cloudCurrent?.testimonials || memoryStore.get('testimonials.json') || null);
-
-    const leads = (Array.isArray(rawLeads) ? rawLeads : []).map(sanitizeLead).filter(Boolean).slice(0, 50);
-    const quotes = (Array.isArray(rawQuotes) ? rawQuotes : []).map(sanitizeQuote).filter(Boolean).slice(0, 50);
-    const whatsappOrders = (Array.isArray(rawWa) ? rawWa : []).map(sanitizeWaOrder).filter(Boolean).slice(0, 50);
-    const sessions = (Array.isArray(rawSessions) ? rawSessions : []).slice(0, 30);
-
-    memoryStore.set('leads.json', leads);
-    memoryStore.set('quotes.json', quotes);
-    memoryStore.set('whatsappOrders.json', whatsappOrders);
-    memoryStore.set('sessions.json', sessions);
-    if (rawFestival && typeof rawFestival === 'object') memoryStore.set('festival.json', rawFestival);
-    if (rawSiteContent && typeof rawSiteContent === 'object') memoryStore.set('siteContent.json', rawSiteContent);
-    if (rawBranding && typeof rawBranding === 'object') memoryStore.set('brandingSeo.json', rawBranding);
-    if (rawSettings && typeof rawSettings === 'object') memoryStore.set('settings.json', rawSettings);
-    if (Array.isArray(rawProducts)) memoryStore.set('products.json', rawProducts);
-    if (Array.isArray(rawCategories)) memoryStore.set('categories.json', rawCategories);
-    if (Array.isArray(rawBrands)) memoryStore.set('brands.json', rawBrands);
-    if (Array.isArray(rawProjects)) memoryStore.set('projects.json', rawProjects);
-    if (Array.isArray(rawTestimonials)) memoryStore.set('testimonials.json', rawTestimonials);
-
-    const payload = {
-      name: 'shree-shyam-interior-store',
-      data: {
-        leads,
-        quotes,
-        whatsappOrders,
-        sessions,
-        festival: rawFestival || memoryStore.get('festival.json') || null,
-        siteContent: rawSiteContent || memoryStore.get('siteContent.json') || null,
-        brandingSeo: rawBranding || memoryStore.get('brandingSeo.json') || null,
-        settings: rawSettings || memoryStore.get('settings.json') || null,
-        products: rawProducts || memoryStore.get('products.json') || null,
-        categories: rawCategories || memoryStore.get('categories.json') || null,
-        brands: rawBrands || memoryStore.get('brands.json') || null,
-        projects: rawProjects || memoryStore.get('projects.json') || null,
-        testimonials: rawTestimonials || memoryStore.get('testimonials.json') || null
-      }
-    };
-    const res = await fetch(CLOUD_SYNC_URL, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-      signal: AbortSignal.timeout(4000)
-    });
-    if (!res.ok) {
-      const text = await res.text().catch(() => '');
-      console.warn(`[CloudStore] HTTP ${res.status} (non-fatal):`, text);
-    }
-  } catch (err) {
-    console.warn('[CloudStore] Background sync warning (non-fatal):', err?.message || err);
+  if (!data) return;
+  const fileMap = {
+    leads: 'leads.json',
+    quotes: 'quotes.json',
+    whatsappOrders: 'whatsappOrders.json',
+    sessions: 'sessions.json',
+    festival: 'festival.json',
+    siteContent: 'siteContent.json',
+    brandingSeo: 'brandingSeo.json',
+    settings: 'settings.json',
+    products: 'products.json',
+    categories: 'categories.json',
+    brands: 'brands.json',
+    projects: 'projects.json',
+    testimonials: 'testimonials.json'
+  };
+  const fileName = fileMap[key];
+  if (fileName) {
+    memoryStore.set(fileName, data);
   }
 }
 
@@ -293,46 +236,6 @@ export async function initDb() {
 initDb().catch(console.error);
 
 export async function readData(fileName) {
-  const cloudKeyMap = {
-    'leads.json': 'leads',
-    'quotes.json': 'quotes',
-    'whatsappOrders.json': 'whatsappOrders',
-    'sessions.json': 'sessions',
-    'festival.json': 'festival',
-    'siteContent.json': 'siteContent',
-    'brandingSeo.json': 'brandingSeo',
-    'settings.json': 'settings',
-    'products.json': 'products',
-    'categories.json': 'categories',
-    'brands.json': 'brands',
-    'projects.json': 'projects',
-    'testimonials.json': 'testimonials'
-  };
-
-  const cloudKey = cloudKeyMap[fileName];
-  if (cloudKey) {
-    const cloudData = await fetchCloudStore();
-    if (cloudData && cloudData[cloudKey]) {
-      let val = cloudData[cloudKey];
-      if (fileName === 'leads.json' || fileName === 'quotes.json' || fileName === 'whatsappOrders.json') {
-        if (Array.isArray(val)) {
-          val = val.map((entry) => {
-            if (entry && !Array.isArray(entry.items) && typeof entry.itemsJson === 'string') {
-              try {
-                entry.items = JSON.parse(entry.itemsJson);
-              } catch (_) {
-                entry.items = [];
-              }
-            }
-            return entry;
-          });
-        }
-      }
-      memoryStore.set(fileName, val);
-      return val;
-    }
-  }
-
   // 1. Check in-memory store
   if (memoryStore.has(fileName)) {
     return memoryStore.get(fileName);

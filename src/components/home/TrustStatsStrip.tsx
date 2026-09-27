@@ -37,15 +37,50 @@ export const TrustStatsStrip: React.FC = () => {
       }
     };
 
+    // 1. Initial load from local cache or API
     apiService.getSiteContent().then(updateStats);
 
+    // 2. Custom event from same tab
     const handleContentChange = (e: CustomEvent<any>) => {
       if (e.detail?.stats) updateStats(e.detail);
     };
-
     window.addEventListener('ssi_content_changed' as any, handleContentChange);
+
+    // 3. Storage event from other tabs/windows
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'ssi_site_content' && e.newValue) {
+        try {
+          const parsed = JSON.parse(e.newValue);
+          if (parsed?.stats) updateStats(parsed);
+        } catch (_) {}
+      }
+    };
+    window.addEventListener('storage', handleStorageChange);
+
+    // 4. BroadcastChannel across all browser tabs
+    let channel: BroadcastChannel | null = null;
+    try {
+      channel = new BroadcastChannel('ssi_channel');
+      channel.onmessage = (msg) => {
+        if (msg.data?.type === 'content_updated' && msg.data?.data?.stats) {
+          updateStats(msg.data.data);
+        }
+      };
+    } catch (_) {}
+
+    // 5. Auto-sync whenever user focuses or switches back to tab
+    const handleVisibility = () => {
+      if (!document.hidden) {
+        apiService.getSiteContent().then(updateStats);
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibility);
+
     return () => {
       window.removeEventListener('ssi_content_changed' as any, handleContentChange);
+      window.removeEventListener('storage', handleStorageChange);
+      document.removeEventListener('visibilitychange', handleVisibility);
+      if (channel) channel.close();
     };
   }, []);
 
