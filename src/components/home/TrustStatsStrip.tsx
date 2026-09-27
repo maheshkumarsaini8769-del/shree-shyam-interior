@@ -20,18 +20,19 @@ export const TrustStatsStrip: React.FC = () => {
       if (content?.stats && Array.isArray(content.stats) && content.stats.length > 0) {
         const icons = [Home, Users, MapPin, ShieldCheck];
         const mapped = content.stats.map((item: any, idx: number) => {
-          const numMatch = item.value.match(/[\d.]+/);
-          const rawNum = numMatch ? numMatch[0] : item.value;
-          const suffix = item.value.replace(/[\d.]+/g, '') || '';
+          const strVal = String(item.value || '').trim();
+          const numMatch = strVal.match(/[\d.]+/);
+          const rawNum = numMatch ? numMatch[0] : strVal;
+          const suffix = numMatch ? strVal.slice(strVal.indexOf(rawNum) + rawNum.length) : '';
           return {
             icon: icons[idx % icons.length] || ShieldCheck,
             value: rawNum,
-            suffix,
-            label: item.label
+            suffix: suffix || (strVal.replace(rawNum, '')),
+            label: item.label || ''
           };
         });
         setStatsData(mapped as any);
-        setCounts(mapped.map((m: any) => m.value));
+        setCounts(mapped.map((m: any) => String(m.value)));
       }
     };
 
@@ -61,7 +62,13 @@ export const TrustStatsStrip: React.FC = () => {
             currentFrame++;
             const progress = Math.min(currentFrame / totalFrames, 1);
             const eased = 1 - Math.pow(1 - progress, 3);
-            setCounts(statsData.map((s) => String(Math.round((Number(s.value) || 0) * eased))));
+            setCounts(
+              statsData.map((s) => {
+                const num = Number(s.value);
+                if (isNaN(num)) return String(s.value);
+                return String(Math.round(num * eased));
+              })
+            );
 
             if (currentFrame >= totalFrames) {
               clearInterval(timer);

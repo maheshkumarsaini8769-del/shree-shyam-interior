@@ -59,8 +59,34 @@ export const AdminContentCMS: React.FC = () => {
     }
   };
 
-  const handleSaveAll = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleStatChange = (idx: number, field: 'value' | 'label' | 'subtext', val: string) => {
+    if (!content) return;
+    const currentStats = content.stats ? [...content.stats] : [];
+    currentStats[idx] = {
+      ...currentStats[idx],
+      [field]: val
+    };
+    setContent({
+      ...content,
+      stats: currentStats
+    });
+  };
+
+  const handleCheckpointChange = (idx: number, val: string) => {
+    if (!content) return;
+    const next = [...(content.siteVisitBanner?.checkpoints || [])];
+    next[idx] = val;
+    setContent({
+      ...content,
+      siteVisitBanner: {
+        ...content.siteVisitBanner,
+        checkpoints: next
+      }
+    });
+  };
+
+  const handleSaveAll = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
     if (!content) return;
 
     try {
@@ -299,39 +325,72 @@ export const AdminContentCMS: React.FC = () => {
                 </div>
               </div>
             </div>
+
+            <div className="pt-4 border-t border-cream-200 dark:border-cream-200/10 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <p className="text-[11px] text-charcoal-400 dark:text-cream-200/60">
+                Saves Hero title, badges, CTA buttons and background image to public website.
+              </p>
+              <button
+                type="button"
+                onClick={handleSaveAll}
+                disabled={saving}
+                className="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl bg-copper-500 hover:bg-copper-600 disabled:opacity-50 text-white text-xs font-bold uppercase tracking-wider shadow-glow-copper transition-all cursor-pointer"
+              >
+                <Save className="w-4 h-4" />
+                <span>{saving ? 'Publishing...' : 'Save & Publish Live'}</span>
+              </button>
+            </div>
           </div>
         )}
 
         {/* TAB 2: STATS */}
         {activeTab === 'stats' && (
           <div className="bg-white dark:bg-[#121720] rounded-3xl p-6 sm:p-8 border border-cream-200 dark:border-cream-200/10 shadow-soft space-y-6">
-            <h3 className="font-serif text-lg font-bold text-forest-950 dark:text-cream-50 pb-2 border-b border-cream-100 dark:border-cream-200/10">
-              Trust Statistics Floating Bar (4 Counters)
-            </h3>
+            <div className="pb-3 border-b border-cream-100 dark:border-cream-200/10 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div>
+                <h3 className="font-serif text-lg font-bold text-forest-950 dark:text-cream-50">
+                  Trust Statistics Floating Bar (4 Counters)
+                </h3>
+                <p className="text-xs text-charcoal-500 dark:text-cream-200/70 mt-0.5">
+                  Counters appear directly under the hero banner. Values support numbers and suffixes (e.g. 500+, 15+, 100%, 25+).
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={handleSaveAll}
+                disabled={saving}
+                className="inline-flex items-center gap-2 px-5 py-2 rounded-xl bg-copper-500 hover:bg-copper-600 disabled:opacity-50 text-white text-xs font-bold uppercase tracking-wider shadow-glow-copper transition-all cursor-pointer self-start sm:self-auto"
+              >
+                <Save className="w-4 h-4" />
+                <span>{saving ? 'Publishing...' : 'Save & Publish'}</span>
+              </button>
+            </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {(content.stats || []).map((stat, idx) => (
                 <div
                   key={idx}
-                  className="p-4 rounded-2xl bg-cream-50 dark:bg-[#1A212C] border border-cream-200 dark:border-cream-200/10 space-y-2.5"
+                  className="p-4 rounded-2xl bg-cream-50 dark:bg-[#1A212C] border border-cream-200 dark:border-cream-200/10 space-y-2.5 transition-all"
                 >
-                  <span className="text-xs font-bold text-copper-500 uppercase">
-                    Metric #{idx + 1}
-                  </span>
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold text-copper-500 uppercase tracking-wide">
+                      Metric Counter #{idx + 1}
+                    </span>
+                    <span className="text-[11px] font-bold text-forest-950 dark:text-cream-100 bg-cream-200/50 dark:bg-[#121720] px-2 py-0.5 rounded-lg border border-cream-300 dark:border-cream-200/10">
+                      Preview: {stat.value}
+                    </span>
+                  </div>
 
                   <div>
                     <label className="block text-[11px] font-semibold text-charcoal-500 dark:text-cream-200/70 mb-1">
-                      Counter Value (e.g. 500+, 15+, 100%)
+                      Counter Value (e.g. 500+, 15+, 100%, 25+)
                     </label>
                     <input
                       type="text"
                       value={stat.value}
-                      onChange={(e) => {
-                        const next = [...content.stats];
-                        next[idx].value = e.target.value;
-                        setContent({ ...content, stats: next });
-                      }}
-                      className="w-full bg-white dark:bg-[#121720] border border-cream-200 dark:border-cream-200/10 rounded-xl px-3 py-1.5 text-sm font-serif font-bold text-forest-950 dark:text-cream-50"
+                      onChange={(e) => handleStatChange(idx, 'value', e.target.value)}
+                      placeholder="e.g. 15+"
+                      className="w-full bg-white dark:bg-[#121720] border border-cream-200 dark:border-cream-200/10 rounded-xl px-3 py-1.5 text-sm font-serif font-bold text-forest-950 dark:text-cream-50 focus:outline-none focus:border-copper-400"
                     />
                   </div>
 
@@ -342,12 +401,9 @@ export const AdminContentCMS: React.FC = () => {
                     <input
                       type="text"
                       value={stat.label}
-                      onChange={(e) => {
-                        const next = [...content.stats];
-                        next[idx].label = e.target.value;
-                        setContent({ ...content, stats: next });
-                      }}
-                      className="w-full bg-white dark:bg-[#121720] border border-cream-200 dark:border-cream-200/10 rounded-xl px-3 py-1.5 text-xs text-forest-950 dark:text-cream-50"
+                      onChange={(e) => handleStatChange(idx, 'label', e.target.value)}
+                      placeholder="e.g. Years Experience"
+                      className="w-full bg-white dark:bg-[#121720] border border-cream-200 dark:border-cream-200/10 rounded-xl px-3 py-1.5 text-xs text-forest-950 dark:text-cream-50 focus:outline-none focus:border-copper-400"
                     />
                   </div>
 
@@ -358,16 +414,28 @@ export const AdminContentCMS: React.FC = () => {
                     <input
                       type="text"
                       value={stat.subtext}
-                      onChange={(e) => {
-                        const next = [...content.stats];
-                        next[idx].subtext = e.target.value;
-                        setContent({ ...content, stats: next });
-                      }}
-                      className="w-full bg-white dark:bg-[#121720] border border-cream-200 dark:border-cream-200/10 rounded-xl px-3 py-1.5 text-xs text-forest-950 dark:text-cream-50"
+                      onChange={(e) => handleStatChange(idx, 'subtext', e.target.value)}
+                      placeholder="e.g. In Rajasthan & Delhi NCR"
+                      className="w-full bg-white dark:bg-[#121720] border border-cream-200 dark:border-cream-200/10 rounded-xl px-3 py-1.5 text-xs text-forest-950 dark:text-cream-50 focus:outline-none focus:border-copper-400"
                     />
                   </div>
                 </div>
               ))}
+            </div>
+
+            <div className="pt-4 border-t border-cream-200 dark:border-cream-200/10 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <p className="text-[11px] text-charcoal-400 dark:text-cream-200/60">
+                Clicking Save publishes all 4 counters immediately to the website home screen.
+              </p>
+              <button
+                type="button"
+                onClick={handleSaveAll}
+                disabled={saving}
+                className="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl bg-copper-500 hover:bg-copper-600 disabled:opacity-50 text-white text-xs font-bold uppercase tracking-wider shadow-glow-copper transition-all cursor-pointer"
+              >
+                <Save className="w-4 h-4" />
+                <span>{saving ? 'Publishing...' : 'Save & Publish Live'}</span>
+              </button>
             </div>
           </div>
         )}
@@ -375,9 +443,25 @@ export const AdminContentCMS: React.FC = () => {
         {/* TAB 3: SITE VISIT BANNER */}
         {activeTab === 'siteVisit' && (
           <div className="bg-white dark:bg-[#121720] rounded-3xl p-6 sm:p-8 border border-cream-200 dark:border-cream-200/10 shadow-soft space-y-5">
-            <h3 className="font-serif text-lg font-bold text-forest-950 dark:text-cream-50 pb-2 border-b border-cream-100 dark:border-cream-200/10">
-              Site Visit Banner & Lead Consultant
-            </h3>
+            <div className="pb-3 border-b border-cream-100 dark:border-cream-200/10 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div>
+                <h3 className="font-serif text-lg font-bold text-forest-950 dark:text-cream-50">
+                  Site Visit Banner & Lead Consultant
+                </h3>
+                <p className="text-xs text-charcoal-500 dark:text-cream-200/70 mt-0.5">
+                  Configure free consultation banner, consultant details, and 4 audit inspection checkpoints.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={handleSaveAll}
+                disabled={saving}
+                className="inline-flex items-center gap-2 px-5 py-2 rounded-xl bg-copper-500 hover:bg-copper-600 disabled:opacity-50 text-white text-xs font-bold uppercase tracking-wider shadow-glow-copper transition-all cursor-pointer self-start sm:self-auto"
+              >
+                <Save className="w-4 h-4" />
+                <span>{saving ? 'Publishing...' : 'Save & Publish'}</span>
+              </button>
+            </div>
 
             <div>
               <label className="block text-xs font-bold uppercase text-charcoal-600 dark:text-cream-200/80 mb-1">
@@ -471,12 +555,13 @@ export const AdminContentCMS: React.FC = () => {
                   }
                   className="flex-1 bg-cream-50 dark:bg-[#1A212C] border border-cream-200 dark:border-cream-200/10 rounded-xl px-3 py-2 text-xs text-forest-950 dark:text-cream-50"
                 />
-                <label className="px-3.5 py-2 rounded-xl bg-copper-500/15 text-copper-600 dark:text-copper-400 text-xs font-bold flex items-center gap-1.5 cursor-pointer">
+                <label className={`px-3.5 py-2 rounded-xl bg-copper-500/15 text-copper-600 dark:text-copper-400 text-xs font-bold flex items-center gap-1.5 cursor-pointer hover:bg-copper-500/25 transition-all ${uploading ? 'opacity-60 pointer-events-none' : ''}`}>
                   <Upload className="w-3.5 h-3.5" />
-                  <span>Upload</span>
+                  <span>{uploading ? 'Uploading...' : 'Upload'}</span>
                   <input
                     type="file"
                     accept="image/*"
+                    disabled={uploading}
                     className="hidden"
                     onChange={(e) => handleImageUpload(e, 'siteVisit')}
                   />
@@ -489,23 +574,31 @@ export const AdminContentCMS: React.FC = () => {
                 4 Inspection Checkpoints
               </label>
               <div className="space-y-2">
-                {content.siteVisitBanner.checkpoints.map((cp, idx) => (
+                {(content.siteVisitBanner?.checkpoints || []).map((cp, idx) => (
                   <input
                     key={idx}
                     type="text"
                     value={cp}
-                    onChange={(e) => {
-                      const next = [...content.siteVisitBanner.checkpoints];
-                      next[idx] = e.target.value;
-                      setContent({
-                        ...content,
-                        siteVisitBanner: { ...content.siteVisitBanner, checkpoints: next }
-                      });
-                    }}
+                    onChange={(e) => handleCheckpointChange(idx, e.target.value)}
                     className="w-full bg-cream-50 dark:bg-[#1A212C] border border-cream-200 dark:border-cream-200/10 rounded-xl px-3 py-1.5 text-xs text-forest-950 dark:text-cream-50"
                   />
                 ))}
               </div>
+            </div>
+
+            <div className="pt-4 border-t border-cream-200 dark:border-cream-200/10 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <p className="text-[11px] text-charcoal-400 dark:text-cream-200/60">
+                Saves Site Visit consultant credentials and inspection checkpoints across the website.
+              </p>
+              <button
+                type="button"
+                onClick={handleSaveAll}
+                disabled={saving}
+                className="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl bg-copper-500 hover:bg-copper-600 disabled:opacity-50 text-white text-xs font-bold uppercase tracking-wider shadow-glow-copper transition-all cursor-pointer"
+              >
+                <Save className="w-4 h-4" />
+                <span>{saving ? 'Publishing...' : 'Save & Publish Live'}</span>
+              </button>
             </div>
           </div>
         )}
@@ -513,9 +606,25 @@ export const AdminContentCMS: React.FC = () => {
         {/* TAB 4: SHOWROOM */}
         {activeTab === 'showroom' && (
           <div className="bg-white dark:bg-[#121720] rounded-3xl p-6 sm:p-8 border border-cream-200 dark:border-cream-200/10 shadow-soft space-y-5">
-            <h3 className="font-serif text-lg font-bold text-forest-950 dark:text-cream-50 pb-2 border-b border-cream-100 dark:border-cream-200/10">
-              Sikar Experience Center & Showroom Details
-            </h3>
+            <div className="pb-3 border-b border-cream-100 dark:border-cream-200/10 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div>
+                <h3 className="font-serif text-lg font-bold text-forest-950 dark:text-cream-50">
+                  Sikar Experience Center & Showroom Details
+                </h3>
+                <p className="text-xs text-charcoal-500 dark:text-cream-200/70 mt-0.5">
+                  Update flagship studio address, contact numbers, hours, and experience center photo.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={handleSaveAll}
+                disabled={saving}
+                className="inline-flex items-center gap-2 px-5 py-2 rounded-xl bg-copper-500 hover:bg-copper-600 disabled:opacity-50 text-white text-xs font-bold uppercase tracking-wider shadow-glow-copper transition-all cursor-pointer self-start sm:self-auto"
+              >
+                <Save className="w-4 h-4" />
+                <span>{saving ? 'Publishing...' : 'Save & Publish'}</span>
+              </button>
+            </div>
 
             <div>
               <label className="block text-xs font-bold uppercase text-charcoal-600 dark:text-cream-200/80 mb-1">
@@ -620,12 +729,13 @@ export const AdminContentCMS: React.FC = () => {
                   }
                   className="flex-1 bg-cream-50 dark:bg-[#1A212C] border border-cream-200 dark:border-cream-200/10 rounded-xl px-3 py-2 text-xs text-forest-950 dark:text-cream-50"
                 />
-                <label className="px-3.5 py-2 rounded-xl bg-copper-500/15 text-copper-600 dark:text-copper-400 text-xs font-bold flex items-center gap-1.5 cursor-pointer">
+                <label className={`px-3.5 py-2 rounded-xl bg-copper-500/15 text-copper-600 dark:text-copper-400 text-xs font-bold flex items-center gap-1.5 cursor-pointer hover:bg-copper-500/25 transition-all ${uploading ? 'opacity-60 pointer-events-none' : ''}`}>
                   <Upload className="w-3.5 h-3.5" />
-                  <span>Upload</span>
+                  <span>{uploading ? 'Uploading...' : 'Upload'}</span>
                   <input
                     type="file"
                     accept="image/*"
+                    disabled={uploading}
                     className="hidden"
                     onChange={(e) => handleImageUpload(e, 'showroom')}
                   />
@@ -641,6 +751,21 @@ export const AdminContentCMS: React.FC = () => {
                   />
                 </div>
               )}
+            </div>
+
+            <div className="pt-4 border-t border-cream-200 dark:border-cream-200/10 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <p className="text-[11px] text-charcoal-400 dark:text-cream-200/60">
+                Saves Showroom contact, address, timings and photo to the contact/footer areas.
+              </p>
+              <button
+                type="button"
+                onClick={handleSaveAll}
+                disabled={saving}
+                className="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl bg-copper-500 hover:bg-copper-600 disabled:opacity-50 text-white text-xs font-bold uppercase tracking-wider shadow-glow-copper transition-all cursor-pointer"
+              >
+                <Save className="w-4 h-4" />
+                <span>{saving ? 'Publishing...' : 'Save & Publish Live'}</span>
+              </button>
             </div>
           </div>
         )}
