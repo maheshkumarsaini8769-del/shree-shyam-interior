@@ -568,7 +568,7 @@ export const FestiveEffects: React.FC = () => {
               type="button"
               onClick={handleDismissModal}
               className="absolute top-3 right-3 sm:top-4 sm:right-4 z-30 flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-cream-200 dark:bg-[#252E3E] text-charcoal-800 dark:text-cream-50 hover:bg-cream-300 dark:hover:bg-[#354359] shadow-md border border-cream-300 dark:border-white/10 transition-transform active:scale-90 cursor-pointer touch-manipulation"
-              title="Close Greeting (बंद करें)"
+              title="Close Greeting"
               aria-label="Close Greeting"
             >
               <X className="w-5 h-5 text-charcoal-900 dark:text-cream-50" />
@@ -662,7 +662,7 @@ export const FestiveEffects: React.FC = () => {
                 onClick={handleDismissModal}
                 className="text-xs text-charcoal-500 dark:text-cream-300/70 hover:text-charcoal-800 dark:hover:text-cream-50 underline decoration-dotted transition-colors cursor-pointer py-1 px-3"
               >
-                ✕ Skip & Explore Website (वेबसाइट देखें)
+                ✕ Skip & Explore Website
               </button>
             </div>
           </div>

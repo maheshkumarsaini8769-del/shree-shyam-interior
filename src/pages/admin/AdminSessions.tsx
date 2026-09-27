@@ -70,7 +70,7 @@ export const AdminSessions: React.FC = () => {
       setActionLoading('all-others');
       const res = await apiService.revokeAllOtherSessions();
       if (res.success) {
-        showToast('All other devices have been logged out successfully! (बाकी सभी डिवाइस लॉगआउट हो गए)', 'success');
+        showToast('All other devices have been logged out successfully!', 'success');
         setSessions((prev) => prev.filter((s) => s.isCurrent));
       }
     } catch {
@@ -127,7 +127,7 @@ export const AdminSessions: React.FC = () => {
             <span>Admin Device Security & Session Manager</span>
           </div>
           <h1 className="font-serif text-2xl sm:text-3xl font-bold text-forest-950 dark:text-cream-50">
-            Active Login Devices (लॉगिन डिवाइसेस)
+            Active Login Devices
           </h1>
           <p className="text-xs sm:text-sm text-charcoal-500 dark:text-cream-200/70 mt-1">
             Check where your Admin Panel is currently logged in. Terminate unauthorized or old sessions with 1-click.
@@ -206,7 +206,7 @@ export const AdminSessions: React.FC = () => {
       {/* 1. CURRENT ACTIVE DEVICE */}
       <div className="space-y-3">
         <h2 className="text-xs font-bold uppercase tracking-wider text-charcoal-600 dark:text-cream-200/80 flex items-center gap-2">
-          <span>This Device (वर्तमान उपयोग में डिवाइस)</span>
+          <span>This Device (Currently in Use)</span>
           <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-[10px] font-bold border border-emerald-500/20">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
             Active Session
@@ -312,7 +312,7 @@ export const AdminSessions: React.FC = () => {
                     className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-red-50 dark:bg-red-950/30 hover:bg-red-100 dark:hover:bg-red-900/50 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-900/40 text-xs font-bold transition-all active:scale-95 cursor-pointer disabled:opacity-50"
                   >
                     <LogOut className="w-3.5 h-3.5" />
-                    <span>{actionLoading === session.id ? 'Revoking...' : 'Remove / Logout (हटाएं)'}</span>
+                    <span>{actionLoading === session.id ? 'Revoking...' : 'Remove / Logout'}</span>
                   </button>
                 </div>
               </div>
@@ -324,7 +324,7 @@ export const AdminSessions: React.FC = () => {
               <CheckCircle2 className="w-6 h-6" />
             </div>
             <h3 className="font-serif text-base font-bold text-forest-950 dark:text-cream-50">
-              No Other Devices Connected (सुरक्षित)
+              No Other Devices Connected (Secured)
             </h3>
             <p className="text-xs text-charcoal-500 dark:text-cream-200/70 max-w-md mx-auto leading-relaxed">
               Your admin panel is not logged in anywhere else. If someone attempts to log in from another laptop or phone, it will instantly show up here.

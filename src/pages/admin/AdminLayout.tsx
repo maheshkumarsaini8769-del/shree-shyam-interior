@@ -93,7 +93,7 @@ export const AdminLayout: React.FC = () => {
     { label: 'Material Quotes', path: '/admin/quotes', icon: FileText },
     { label: 'WhatsApp Orders', path: '/admin/whatsapp-orders', icon: MessageSquare },
     { label: '3D Studio Finishes', path: '/admin/3d-studio', icon: Box },
-    { label: 'Festival Themes (त्यौहार)', path: '/admin/festive', icon: PartyPopper },
+    { label: 'Festival Themes & Offers', path: '/admin/festive', icon: PartyPopper },
     { label: 'Active Devices & Security', path: '/admin/sessions', icon: ShieldCheck },
     { label: 'Social Media Links', path: '/admin/social-links', icon: Share2 },
     { label: 'Logo, SEO & Banners', path: '/admin/seo-branding', icon: Sparkles },

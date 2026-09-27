@@ -332,7 +332,7 @@ export const FESTIVAL_PRESETS: Record<FestivalType, FestivalCampaignConfig> = {
   },
   diwali: {
     activeFestival: 'diwali',
-    festivalName: 'Diwali (दीपावली महोत्सव)',
+    festivalName: 'Diwali Celebration',
     badgeText: '🪔 SHUBH DEEPAWALI OFFER',
     bannerText: 'Shubh Deepawali Special: Flat 15% OFF on Turnkey Interiors + Free 3D VR Walkthrough! Use code DIWALI2026',
     greetingTitle: '🪔 Shubh Deepawali from Shree Shyam Interior!',
@@ -351,7 +351,7 @@ export const FESTIVAL_PRESETS: Record<FestivalType, FestivalCampaignConfig> = {
   },
   holi: {
     activeFestival: 'holi',
-    festivalName: 'Holi (रंगों का त्यौहार)',
+    festivalName: 'Holi Celebration',
     badgeText: '🎨 HOLI DHAMAKA',
     bannerText: 'Rangon Ka Tyohar Special: Complimentary German Soft-Close Hardware Upgrade on Kitchens! Use code HOLI2026',
     greetingTitle: '🎨 Happy & Colorful Holi!',
@@ -370,7 +370,7 @@ export const FESTIVAL_PRESETS: Record<FestivalType, FestivalCampaignConfig> = {
   },
   navratri: {
     activeFestival: 'navratri',
-    festivalName: 'Navratri & Dussehra (शुभ नवरात्रि)',
+    festivalName: 'Navratri & Dussehra Festival',
     badgeText: '✨ NAVRATRI UTSAV',
     bannerText: 'Auspicious Griha Pravesh Offers: Flat 10% OFF on Living & Puja Room Teakwood Paneling! Use code SHUBHLABH',
     greetingTitle: '✨ Shubh Navratri & Dussehra!',
@@ -388,7 +388,7 @@ export const FESTIVAL_PRESETS: Record<FestivalType, FestivalCampaignConfig> = {
   },
   newyear: {
     activeFestival: 'newyear',
-    festivalName: 'New Year (नया साल)',
+    festivalName: 'New Year Celebration',
     badgeText: '🎉 NEW YEAR 2026',
     bannerText: 'Transform Your Home for 2026: Book a Full Villa Package & Receive ₹25,000 Material Gift Voucher! Code: NEWYEAR26',
     greetingTitle: '🎉 Happy New Year 2026!',
@@ -407,7 +407,7 @@ export const FESTIVAL_PRESETS: Record<FestivalType, FestivalCampaignConfig> = {
   },
   patriot: {
     activeFestival: 'patriot',
-    festivalName: 'Independence & Republic Day (राष्ट्रीय पर्व)',
+    festivalName: 'Independence & Republic National Days',
     badgeText: '🇮🇳 DESH KA INTERIOR',
     bannerText: '100% Genuine Made in India Century Marine Ply & Teakwood Interiors at Factory Direct Rates. Code: BHARAT79',
     greetingTitle: '🇮🇳 Proudly Handcrafted in Rajasthan',

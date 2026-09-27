@@ -132,21 +132,21 @@ export const AdminFestiveCampaigns: React.FC = () => {
   }> = [
     {
       id: 'normal',
-      title: 'Normal Mode (सामान्य)',
+      title: 'Normal Mode (Default)',
       sub: 'Standard luxury wood & forest theme for everyday',
       icon: '🌿',
       accent: 'border-copper-500/40'
     },
     {
       id: 'diwali',
-      title: 'Diwali (दीपावली)',
+      title: 'Diwali Celebration',
       sub: 'Warm golden diyas, amber glow & Deepawali offers',
       icon: '🪔',
       accent: 'border-amber-500'
     },
     {
       id: 'holi',
-      title: 'Holi (होली उत्सव)',
+      title: 'Holi Celebration',
       sub: 'Festive gulal splashes & hardware upgrade offers',
       icon: '🎨',
       accent: 'border-pink-500'
@@ -160,7 +160,7 @@ export const AdminFestiveCampaigns: React.FC = () => {
     },
     {
       id: 'newyear',
-      title: 'New Year (नया साल)',
+      title: 'New Year Celebration',
       sub: 'Festive confetti, starlight & transformation vouchers',
       icon: '🎉',
       accent: 'border-sky-500'
@@ -191,7 +191,7 @@ export const AdminFestiveCampaigns: React.FC = () => {
             <span>Festival Themes & Seasonal Engine</span>
           </div>
           <h2 className="font-serif text-2xl sm:text-3xl font-bold text-forest-950 dark:text-cream-50">
-            1-Click Festival Switcher (त्यौहार मोड)
+            1-Click Festival Theme Switcher
           </h2>
           <p className="text-xs sm:text-sm text-charcoal-500 dark:text-cream-200/70 mt-1">
             Change your entire website theme into Diwali, Holi, or New Year with a single click, and easily revert to Normal mode.
@@ -497,7 +497,7 @@ export const AdminFestiveCampaigns: React.FC = () => {
 
           <div className="sm:col-span-2">
             <label className="block text-xs font-bold uppercase text-charcoal-600 dark:text-cream-200/80 mb-1.5 flex items-center justify-between">
-              <span>Theme Highlight Accent Color (थीम का मुख्य रंग)</span>
+              <span>Theme Highlight Accent Color</span>
               <span className="font-mono text-[11px] font-bold" style={{ color: config.highlightColor || '#F59E0B' }}>
                 {config.highlightColor || '#F59E0B'}
               </span>
@@ -583,7 +583,7 @@ export const AdminFestiveCampaigns: React.FC = () => {
             <div>
               <span className="text-xs font-bold text-forest-950 dark:text-cream-50 block flex items-center gap-1.5">
                 <Sparkles className="w-3.5 h-3.5 text-amber-500" />
-                Interactive Phooljhadi / Sparkler Trail (फुलझड़ी कर्सर)
+                Interactive Sparkler Cursor Trail
               </span>
               <span className="text-[11px] text-charcoal-500 dark:text-cream-200/60">
                 Smooth 60fps golden / festive sparkle particles following user's mouse pointer and mobile finger touches.
@@ -606,7 +606,7 @@ export const AdminFestiveCampaigns: React.FC = () => {
               <div>
                 <span className="text-xs font-bold text-forest-950 dark:text-cream-50 block flex items-center gap-1.5">
                   <Clock className="w-3.5 h-3.5 text-copper-500" />
-                  Live Festive Urgency Countdown Timer (काउंटडाउन टाइमर)
+                  Live Festive Countdown Timer
                 </span>
                 <span className="text-[11px] text-charcoal-500 dark:text-cream-200/60">
                   Displays an active digital countdown badge (Days : Hours : Mins : Secs) in the top announcement bar.
@@ -644,7 +644,7 @@ export const AdminFestiveCampaigns: React.FC = () => {
               <div>
                 <span className="text-xs font-bold text-forest-950 dark:text-cream-50 block flex items-center gap-1.5">
                   <Gift className="w-3.5 h-3.5 text-copper-500" />
-                  Floating Secret Festive Diya / Surprise Gift Box (सरप्राइज गिफ्ट बॉक्स)
+                  Floating Festive Diya / Surprise Gift Box
                 </span>
                 <span className="text-[11px] text-charcoal-500 dark:text-cream-200/60">
                   Visitors can tap the glowing floating Diya on the bottom corner to uncover a special surprise gift.
@@ -664,7 +664,7 @@ export const AdminFestiveCampaigns: React.FC = () => {
             {config.showSurpriseGiftBox && (
               <div className="pt-2">
                 <label className="block text-[11px] font-bold uppercase text-charcoal-600 dark:text-cream-200/80 mb-1">
-                  Surprise Bonus Gift Text (गिफ्ट ऑफर)
+                  Surprise Bonus Gift Offer Text
                 </label>
                 <input
                   type="text"
@@ -753,7 +753,7 @@ export const AdminFestiveCampaigns: React.FC = () => {
       </form>
 
       {/* ========================================================================= */}
-      {/* STEP 3: LIVE CUSTOMER EXPERIENCE SIMULATOR (लाइव प्रीव्यू व सिमुलेटर)     */}
+      {/* STEP 3: LIVE CUSTOMER EXPERIENCE SIMULATOR                                */}
       {/* ========================================================================= */}
       <div className="bg-white dark:bg-[#121720] rounded-3xl p-6 sm:p-8 border border-cream-200 dark:border-cream-200/10 shadow-soft space-y-5">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-cream-100 dark:border-cream-200/10">
@@ -763,7 +763,7 @@ export const AdminFestiveCampaigns: React.FC = () => {
               <span>Real-Time Visual Simulator</span>
             </div>
             <h3 className="font-serif text-lg font-bold text-forest-950 dark:text-cream-50">
-              Live Customer Website Preview (ग्राहकों को कैसा दिखेगा)
+              Live Customer Website Preview
             </h3>
             <p className="text-xs text-charcoal-500 dark:text-cream-200/60">
               Instant live preview of how visitors see your festive banner, countdown, and greeting popups.

@@ -297,7 +297,7 @@ export const Header: React.FC = () => {
                 )}
               </div>
               <span className="text-[10px] font-sans text-charcoal-500 dark:text-cream-300/80 font-medium tracking-normal mt-0.5">
-                घर सजाते हैं, दिल से !
+                Crafting Homes With Heart
               </span>
             </div>
           </Link>

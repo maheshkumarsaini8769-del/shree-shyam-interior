@@ -189,7 +189,7 @@ export const AboutPage: React.FC = () => {
           </h1>
 
           <p className="font-serif italic text-lg sm:text-xl text-copper-300 mt-3">
-            “घर सजाते हैं, दिल से !”
+            “Crafting Homes With Heart & Soul”
           </p>
 
           <p className="text-sm sm:text-base text-cream-200/80 mt-4 max-w-3xl font-light leading-relaxed">

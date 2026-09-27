@@ -318,7 +318,7 @@ export const AdminSettings: React.FC = () => {
           <div>
             <h3 className="font-serif text-lg font-bold text-forest-950 dark:text-cream-50 flex items-center gap-2">
               <ShieldCheck className="w-5 h-5 text-emerald-500" />
-              <span>Active Login Devices & Security (लॉगिन डिवाइसेस)</span>
+              <span>Active Login Devices & Security</span>
             </h3>
             <p className="text-xs text-charcoal-500 dark:text-cream-200/60 mt-1">
               Check all computers, laptops, and mobile phones currently logged into your admin panel and terminate sessions remotely.
@@ -339,7 +339,7 @@ export const AdminSettings: React.FC = () => {
           <div>
             <h3 className="font-serif text-lg font-bold text-forest-950 dark:text-cream-50 flex items-center gap-2">
               <Users className="w-5 h-5 text-copper-500" />
-              <span>Admin Authority & Team Access (एडमिन अथॉरिटी एवं टीम एक्सेस)</span>
+              <span>Admin Authority & Team Access Management</span>
             </h3>
             <p className="text-xs text-charcoal-500 dark:text-cream-200/60 mt-1">
               Grant admin privileges to verified email addresses. Only authorized emails can access the portal or receive OTP password reset codes via Resend.
