@@ -3,12 +3,8 @@ import { motion } from 'framer-motion';
 import { ArrowRight, ChevronDown } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { apiService } from '../../services/apiService';
-import { useTheme } from '../../context/ThemeContext';
 
 export const HeroSection: React.FC = () => {
-  const { theme } = useTheme();
-  const isDark = theme === 'dark';
-
   const [heroData, setHeroData] = useState({
     badge: "SIKAR'S PREMIER INTERIOR ARCHITECTURE STUDIO",
     titlePrefix: 'Premium Interior Design',
@@ -18,7 +14,7 @@ export const HeroSection: React.FC = () => {
     primaryCtaLink: '/site-visit',
     secondaryCtaText: 'Explore 3D Studio',
     secondaryCtaLink: '/design-ai',
-    backgroundImage: ''
+    backgroundImage: 'https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=1200&q=75'
   });
 
   useEffect(() => {
@@ -33,7 +29,7 @@ export const HeroSection: React.FC = () => {
           primaryCtaLink: content.hero.primaryCtaLink || '/site-visit',
           secondaryCtaText: content.hero.secondaryCtaText || 'Explore 3D Studio',
           secondaryCtaLink: content.hero.secondaryCtaLink || '/design-ai',
-          backgroundImage: content.hero.backgroundImage || ''
+          backgroundImage: content.hero.backgroundImage || 'https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=1200&q=75'
         });
       }
     });
@@ -45,70 +41,26 @@ export const HeroSection: React.FC = () => {
     'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=120&q=80'
   ];
 
-  // If a custom image was uploaded/configured in CMS and is not the old fallback unsplash URL, use it
-  const isCustomImage = heroData.backgroundImage &&
-    !heroData.backgroundImage.includes('unsplash.com/photo-1600210492486');
-
   return (
-    <section
-      className={`relative min-h-[90vh] sm:min-h-screen flex items-center overflow-hidden pt-20 sm:pt-24 pb-16 transition-colors duration-500 ${
-        isDark ? 'bg-forest-950 text-cream-100' : 'bg-[#FAF7F2] text-forest-950'
-      }`}
-    >
+    <section className="relative min-h-[90vh] sm:min-h-screen flex items-center overflow-hidden bg-forest-950 text-cream-100 pt-20 sm:pt-24 pb-16">
       {/* Background Luxury Interior Photograph - LCP Optimized */}
-      <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none select-none">
-        {isCustomImage ? (
-          <img
-            src={heroData.backgroundImage}
-            alt="Shree Shyam Interior Architecture"
-            className="w-full h-full object-cover object-center filter brightness-95"
-            loading="eager"
-            decoding="sync"
-            fetchPriority="high"
-          />
-        ) : (
-          <>
-            {/* Bright / Light Theme Background (task.md prompt 2) */}
-            <img
-              src="/hero-light.jpg"
-              alt="Shree Shyam Interior Bright Luxury Architecture"
-              className={`absolute inset-0 w-full h-full object-cover object-center transition-opacity duration-700 ease-in-out ${
-                !isDark ? 'opacity-100' : 'opacity-0'
-              }`}
-              loading="eager"
-              decoding="sync"
-              fetchPriority="high"
-            />
-
-            {/* Dark Theme Background (task.md prompt 1) */}
-            <img
-              src="/hero-dark.jpg"
-              alt="Shree Shyam Interior Dark Luxury Architecture"
-              className={`absolute inset-0 w-full h-full object-cover object-center transition-opacity duration-700 ease-in-out ${
-                isDark ? 'opacity-100' : 'opacity-0'
-              }`}
-              loading="eager"
-              decoding="sync"
-              fetchPriority="high"
-            />
-          </>
-        )}
-
-        {/* Dynamic Architectural Overlays: Keep Center 45% readable for hero text */}
-        <div
-          className={`absolute inset-0 transition-opacity duration-700 pointer-events-none ${
-            isDark
-              ? 'bg-gradient-to-r from-forest-950/90 via-forest-950/60 to-transparent'
-              : 'bg-gradient-to-r from-[#FAF7F2]/90 via-[#FAF7F2]/60 to-transparent'
-          }`}
+      <div className="absolute inset-0 z-0 overflow-hidden">
+        <img
+          src={heroData.backgroundImage}
+          srcSet="https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=640&q=75 640w, https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=1080&q=75 1080w, https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=1600&q=80 1600w"
+          sizes="100vw"
+          alt="Shree Shyam Interior Modern Luxury Living Architecture"
+          className="w-full h-full object-cover object-center pointer-events-none filter brightness-90"
+          loading="eager"
+          decoding="sync"
+          fetchPriority="high"
+          onError={(e) => {
+            e.currentTarget.src = "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=75";
+          }}
         />
-        <div
-          className={`absolute inset-0 transition-opacity duration-700 pointer-events-none ${
-            isDark
-              ? 'bg-gradient-to-t from-forest-950 via-transparent to-forest-950/40'
-              : 'bg-gradient-to-t from-[#FAF7F2]/80 via-transparent to-[#FAF7F2]/30'
-          }`}
-        />
+        {/* Subtle Dark Gradient Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-r from-forest-950/90 via-forest-950/65 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-forest-950 via-transparent to-forest-950/40" />
       </div>
 
       {/* Main Content Area */}
@@ -119,11 +71,7 @@ export const HeroSection: React.FC = () => {
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.15 }}
-            className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border text-[11px] font-semibold tracking-[0.18em] uppercase backdrop-blur-md mb-5 transition-colors ${
-              isDark
-                ? 'bg-forest-900/80 border-copper-500/30 text-copper-300'
-                : 'bg-white/85 border-copper-500/40 text-copper-700 shadow-sm'
-            }`}
+            className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-forest-900/80 border border-copper-500/30 text-copper-300 text-[11px] font-semibold tracking-[0.18em] uppercase backdrop-blur-md mb-5"
           >
             <span className="w-1.5 h-1.5 rounded-full bg-copper-400 animate-pulse" />
             <span>{heroData.badge}</span>
@@ -134,14 +82,10 @@ export const HeroSection: React.FC = () => {
             initial={{ opacity: 0, y: 25 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.25 }}
-            className={`font-serif text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight leading-[1.12] transition-colors ${
-              isDark ? 'text-cream-50' : 'text-forest-950'
-            }`}
+            className="font-serif text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight leading-[1.12] text-cream-50"
           >
             {heroData.titlePrefix} <br />
-            <span className={`italic font-normal ${isDark ? 'text-copper-400' : 'text-copper-600'}`}>
-              {heroData.titleHighlight}
-            </span>
+            <span className="text-copper-400 italic font-normal">{heroData.titleHighlight}</span>
           </motion.h1>
 
           {/* Subtitle Description */}
@@ -149,9 +93,7 @@ export const HeroSection: React.FC = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.4 }}
-            className={`mt-4 sm:mt-5 text-sm sm:text-base font-normal leading-relaxed max-w-lg transition-colors ${
-              isDark ? 'text-cream-200/90' : 'text-charcoal-700'
-            }`}
+            className="mt-4 sm:mt-5 text-sm sm:text-base text-cream-200/90 font-light leading-relaxed max-w-lg"
           >
             {heroData.subtitle}
           </motion.p>
@@ -165,7 +107,7 @@ export const HeroSection: React.FC = () => {
           >
             <Link
               to={heroData.primaryCtaLink}
-              className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full bg-gradient-to-r from-copper-500 to-copper-600 hover:from-copper-600 hover:to-copper-700 text-white font-semibold text-xs tracking-wider uppercase shadow-glow-copper transition-all hover:scale-[1.02] active:scale-95 group cursor-pointer"
+              className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full bg-gradient-to-r from-copper-500 to-copper-600 hover:from-copper-600 hover:to-copper-700 text-white font-semibold text-xs tracking-wider uppercase shadow-glow-copper transition-all hover:scale-[1.02] active:scale-95 group"
             >
               <span>{heroData.primaryCtaText}</span>
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -174,11 +116,7 @@ export const HeroSection: React.FC = () => {
             {heroData.secondaryCtaText && (
               <Link
                 to={heroData.secondaryCtaLink}
-                className={`inline-flex items-center gap-2 px-6 py-3.5 rounded-full border font-semibold text-xs tracking-wider uppercase backdrop-blur-md transition-all hover:scale-[1.02] active:scale-95 cursor-pointer ${
-                  isDark
-                    ? 'bg-cream-100/10 hover:bg-cream-100/15 border-cream-100/20 text-cream-100'
-                    : 'bg-forest-950/5 hover:bg-forest-950/10 border-forest-950/15 text-forest-950'
-                }`}
+                className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full bg-cream-100/10 hover:bg-cream-100/15 border border-cream-100/20 text-cream-100 font-semibold text-xs tracking-wider uppercase backdrop-blur-md transition-all hover:scale-[1.02] active:scale-95"
               >
                 <span>{heroData.secondaryCtaText}</span>
               </Link>
@@ -198,19 +136,15 @@ export const HeroSection: React.FC = () => {
                   key={idx}
                   src={img}
                   alt={`Happy homeowner ${idx + 1}`}
-                  className={`w-9 h-9 rounded-full border-2 object-cover ${
-                    isDark ? 'border-forest-950' : 'border-white'
-                  }`}
+                  className="w-9 h-9 rounded-full border-2 border-forest-950 object-cover"
                   loading="lazy"
                   decoding="async"
                 />
               ))}
             </div>
-            <div className={`text-xs font-medium ${isDark ? 'text-cream-100' : 'text-forest-950'}`}>
+            <div className="text-xs text-cream-100 font-medium">
               <span className="font-bold block">500+ Happy Clients</span>
-              <span className={`text-[11px] font-semibold ${isDark ? 'text-copper-300' : 'text-copper-600'}`}>
-                in Rajasthan
-              </span>
+              <span className="text-copper-300 text-[11px]">in Rajasthan</span>
             </div>
           </motion.div>
         </div>
@@ -221,9 +155,7 @@ export const HeroSection: React.FC = () => {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 1.2, duration: 0.6 }}
-        className={`absolute bottom-6 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-1 pointer-events-none transition-colors ${
-          isDark ? 'text-cream-200/60' : 'text-charcoal-500'
-        }`}
+        className="absolute bottom-6 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-1 text-cream-200/60 pointer-events-none"
       >
         <span className="text-[10px] tracking-widest uppercase font-semibold">Scroll</span>
         <motion.div

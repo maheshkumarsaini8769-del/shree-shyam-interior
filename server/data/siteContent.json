@@ -8,7 +8,7 @@
     "primaryCtaLink": "/site-visit",
     "secondaryCtaText": "Explore 3D Studio",
     "secondaryCtaLink": "/design-ai",
-    "backgroundImage": "/hero-dark.jpg"
+    "backgroundImage": "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=1920&q=80"
   },
   "stats": [
     {

@@ -193,6 +193,23 @@ const AppContent: React.FC = () => {
       <Suspense fallback={null}>
         <FestiveEffects />
       </Suspense>
+
+      {/* Global Full-Website Luxury Interior Architecture Background */}
+      <div className="fixed inset-0 -z-10 pointer-events-none overflow-hidden select-none" aria-hidden="true">
+        {/* Light Theme Background */}
+        <div
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat dark:hidden transition-opacity duration-700"
+          style={{ backgroundImage: `url('/bg-light.jpg')` }}
+        />
+        {/* Dark Theme Background */}
+        <div
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat hidden dark:block transition-opacity duration-700"
+          style={{ backgroundImage: `url('/bg-dark.jpg')` }}
+        />
+        {/* Ambient Warm Luxury Tint */}
+        <div className="absolute inset-0 bg-[#F5F1E8]/82 dark:bg-[#0B0F15]/86 backdrop-blur-[1px] transition-colors duration-500" />
+      </div>
+
       <Header />
 
       <main className="flex-1">
