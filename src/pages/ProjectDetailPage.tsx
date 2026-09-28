@@ -102,7 +102,7 @@ export const ProjectDetailPage: React.FC = () => {
   ];
 
   return (
-    <div className="pt-20 pb-28 min-h-screen bg-cream-50 text-charcoal-800">
+    <div className="pt-20 pb-28 min-h-screen bg-transparent text-charcoal-800 dark:text-cream-100">
       <SEOHead
         title={`${project.title} - ${project.location}`}
         description={`${project.overview.slice(0, 150)}... Turnkey interior case study in ${project.location} by Shree Shyam Interior.`}

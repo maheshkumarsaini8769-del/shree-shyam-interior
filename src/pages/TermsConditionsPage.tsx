@@ -60,7 +60,7 @@ export const TermsConditionsPage: React.FC = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-[#FDFBF7] text-[#14251F] pt-24 pb-20 selection:bg-[#C68A43]/20">
+    <div className="min-h-screen bg-transparent text-[#14251F] dark:text-cream-100 pt-24 pb-20 selection:bg-[#C68A43]/20">
       <SEOHead
         title="Terms and Conditions | Shree Shyam Interior Sikar"
         description="Review the terms and conditions of service for Shree Shyam Interior. Covers design consultation, payment milestones, manufacturing, installation, and 10-year warranty guidelines in Sikar, Rajasthan."

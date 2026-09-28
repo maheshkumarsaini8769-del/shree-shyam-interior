@@ -259,7 +259,7 @@ export const DesignAIPage: React.FC = () => {
   };
 
   return (
-    <div className="pt-24 pb-28 min-h-screen bg-cream-50 dark:bg-forest-950 text-charcoal-800 dark:text-cream-100 relative transition-colors duration-300">
+    <div className="pt-24 pb-28 min-h-screen bg-transparent text-charcoal-800 dark:text-cream-100 relative transition-colors duration-300">
       <SEOHead
         title="Interactive 3D Room Studio & Visualizer | Sikar"
         description="Experience realistic 3D room styling, custom furniture configurations, and photorealistic finishes for your living room, kitchen, or bedroom in Sikar."

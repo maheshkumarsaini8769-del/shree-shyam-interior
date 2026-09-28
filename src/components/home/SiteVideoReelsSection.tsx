@@ -83,7 +83,7 @@ export const SiteVideoReelsSection: React.FC = () => {
   const [isMuted, setIsMuted] = useState(true);
 
   return (
-    <section className="py-12 sm:py-16 bg-cream-100 dark:bg-forest-950 text-forest-950 dark:text-cream-100 transition-colors">
+    <section className="py-12 sm:py-16 bg-transparent text-forest-950 dark:text-cream-100 transition-colors">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Section Header */}

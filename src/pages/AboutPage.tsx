@@ -166,7 +166,7 @@ export const AboutPage: React.FC = () => {
   ];
 
   return (
-    <div className="pt-24 pb-28 min-h-screen bg-cream-50 text-charcoal-900 selection:bg-copper-500/20">
+    <div className="pt-24 pb-28 min-h-screen bg-transparent text-charcoal-900 dark:text-cream-100 selection:bg-copper-500/20">
       <SEOHead
         title="About Us | Best Interior Designer in Sikar"
         description="Discover the story of Shree Shyam Interior, Sikar’s trusted turnkey interior architecture and modular kitchen studio. 10+ years of excellence, 450+ completed homes, and genuine marine plywood."

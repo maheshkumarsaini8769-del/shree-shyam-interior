@@ -85,7 +85,7 @@ export const HomePage: React.FC = () => {
       <AIVisualizerAndEstimatorRow />
 
       {/* 4.5. Interactive 360° Virtual Panoramic Walkthrough */}
-      <section className="py-12 bg-cream-50 dark:bg-forest-900 transition-colors">
+      <section className="py-12 bg-transparent transition-colors">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <VirtualTour360 />
         </div>

@@ -62,7 +62,7 @@ export const PrivacyPolicyPage: React.FC = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-[#FDFBF7] text-[#14251F] pt-24 pb-20 selection:bg-[#C68A43]/20">
+    <div className="min-h-screen bg-transparent text-[#14251F] dark:text-cream-100 pt-24 pb-20 selection:bg-[#C68A43]/20">
       <SEOHead
         title="Privacy Policy | Shree Shyam Interior Sikar"
         description="Read the official Privacy Policy of Shree Shyam Interior. Learn how we collect, handle, safeguard, and process client information, floor plans, and project inquiries in Sikar, Rajasthan."

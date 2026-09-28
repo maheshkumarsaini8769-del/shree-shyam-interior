@@ -123,7 +123,7 @@ export const AISearchKnowledgeSection: React.FC = () => {
   ];
 
   return (
-    <section id="faq-guide" className="py-20 bg-cream-100 dark:bg-forest-950 border-t border-cream-200/80 dark:border-copper-500/15 transition-colors">
+    <section id="faq-guide" className="py-20 bg-transparent border-t border-cream-200/80 dark:border-copper-500/15 transition-colors">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Section Header */}

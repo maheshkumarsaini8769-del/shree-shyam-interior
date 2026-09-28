@@ -245,7 +245,7 @@ export const ProductsPage: React.FC = () => {
     selectedCategory !== 'all' || selectedBrand !== 'all' || searchQuery.trim().length > 0;
 
   return (
-    <div className="pt-24 pb-28 min-h-screen bg-cream-50 dark:bg-forest-950 text-charcoal-800 dark:text-cream-100 transition-colors duration-300">
+    <div className="pt-24 pb-28 min-h-screen bg-transparent text-charcoal-800 dark:text-cream-100 transition-colors duration-300">
       <SEOHead
         title="Interior Architectural Materials Catalog | Sikar, Rajasthan"
         description="Shop 100% genuine Century Marine Plywood, Greenlam Laminates, Häfele & Hettich Hardware, Philips Track Lighting, Charcoal Louvers, and Asian Paints in Sikar."

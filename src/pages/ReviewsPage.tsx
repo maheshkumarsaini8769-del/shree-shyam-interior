@@ -174,7 +174,7 @@ export const ReviewsPage: React.FC = () => {
   };
 
   return (
-    <div className="pt-24 pb-28 min-h-screen bg-cream-50 dark:bg-forest-950 text-charcoal-800 dark:text-cream-100 transition-colors duration-300">
+    <div className="pt-24 pb-28 min-h-screen bg-transparent text-charcoal-800 dark:text-cream-100 transition-colors duration-300">
       <SEOHead
         title="Client Reviews & Ratings | Shree Shyam Interior Sikar"
         description="Read genuine verified reviews and testimonials from 250+ clients in Sikar, Jaipur & Rajasthan for Shree Shyam Interior turnkey homes, modular kitchens & woodwork."

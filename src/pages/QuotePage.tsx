@@ -121,7 +121,7 @@ export const QuotePage: React.FC = () => {
 
 
   return (
-    <div className="pt-24 pb-28 min-h-screen bg-cream-50 text-charcoal-800">
+    <div className="pt-24 pb-28 min-h-screen bg-transparent text-charcoal-800 dark:text-cream-100">
       <SEOHead
         title="Instant Turnkey Cost Estimator & Quote Sheet | Sikar"
         description="Calculate estimated costs for home interior design, modular kitchens, wardrobes, and materials in Sikar, Rajasthan. Instant BOQ with GST breakdown."

@@ -33,6 +33,7 @@
       calc(var(--hex-w) / 2) calc(var(--hex-h) / 2),
       0 0,
       calc(var(--hex-w) / 2) calc(var(--hex-h) / 2);
+    background-attachment: fixed;
     color: #1B2026;
     font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     overflow-x: hidden;
@@ -44,6 +45,7 @@
     --hex-color: rgba(212, 175, 55, 0.12);
     --hex-bg: #0A0B0E;
     background-color: var(--hex-bg);
+    background-attachment: fixed;
     color: #FAF8F5;
   }
 
@@ -230,6 +232,7 @@ html[data-festival-theme="newyear"] .bg-copper-500 {
     calc(var(--hex-w) / 2) calc(var(--hex-h) / 2),
     0 0,
     calc(var(--hex-w) / 2) calc(var(--hex-h) / 2);
+  background-attachment: fixed;
   transition: background-color 0.25s ease;
 }
 
@@ -238,6 +241,7 @@ html[data-festival-theme="newyear"] .bg-copper-500 {
 .dark.honeycomb-grid {
   --hex-color: rgba(212, 175, 55, 0.10);
   --hex-bg: #0A0B0E;
+  background-attachment: fixed;
 }
 
 /* Transparent Overlay Variant (for layering on existing containers) */
@@ -268,5 +272,17 @@ html[data-festival-theme="newyear"] .bg-copper-500 {
 .dark.honeycomb-overlay {
   --hex-color: rgba(212, 175, 55, 0.07);
 }
+
+/* ==========================================================================
+   Full-Website Honeycomb Grid Transparency
+   - Lets the underlying honeycomb grid shine through all website sections
+   - Leaves floating cards (white / forest-900 / #121720) solid & readable
+   ========================================================================== */
+main.honeycomb-grid > div > section:not(.force-opaque),
+main.honeycomb-grid section:not(.force-opaque),
+main.honeycomb-grid > * > div.min-h-screen {
+  background-color: transparent !important;
+}
+
 
 

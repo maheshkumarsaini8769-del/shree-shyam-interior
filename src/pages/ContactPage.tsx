@@ -184,7 +184,7 @@ export const ContactPage: React.FC = () => {
   };
 
   return (
-    <div className="pt-24 pb-28 min-h-screen bg-cream-50 text-charcoal-900 selection:bg-copper-500/20">
+    <div className="pt-24 pb-28 min-h-screen bg-transparent text-charcoal-900 dark:text-cream-100 selection:bg-copper-500/20">
       <SEOHead
         title="Contact Us | Best Interior Designer in Sikar"
         description="Contact Shree Shyam Interior on Piprali Road, Sikar, Rajasthan. Call +91 98765 43210 or visit our showroom for turnkey interior design, modular kitchens, and free site visits."
