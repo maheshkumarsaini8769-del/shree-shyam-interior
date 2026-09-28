@@ -17,6 +17,32 @@ interface CategoryItem {
 
 const defaultFallbackImg = 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=600&q=80';
 
+const mapCategories = (data: any[]): CategoryItem[] => {
+  if (!Array.isArray(data) || data.length === 0) return [];
+  const seen = new Set<string>();
+  const res: CategoryItem[] = [];
+
+  for (const c of data) {
+    if (!c) continue;
+    const id = c.id || c.slug;
+    const slug = c.slug || c.id;
+    const key = (id || slug || '').toLowerCase().trim();
+    if (!key || seen.has(key)) continue;
+    seen.add(key);
+
+    res.push({
+      id,
+      name: c.name || 'Category',
+      slug,
+      image: c.image || defaultFallbackImg,
+      fallback: defaultFallbackImg,
+      tagline: c.tagline || '',
+      itemCount: c.itemCount || 0
+    });
+  }
+  return res;
+};
+
 export const CategoryCarousel: React.FC = () => {
   const [categories, setCategories] = useState<CategoryItem[]>(() => {
     try {
@@ -24,57 +50,32 @@ export const CategoryCarousel: React.FC = () => {
       if (cached) {
         const parsed = JSON.parse(cached);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          return parsed.map((c: any) => ({
-            id: c.id || c.slug,
-            name: c.name,
-            slug: c.slug || c.id,
-            image: c.image || defaultFallbackImg,
-            fallback: defaultFallbackImg,
-            tagline: c.tagline || '',
-            itemCount: c.itemCount || 0
-          }));
+          return mapCategories(parsed);
         }
       }
     } catch (_) {}
 
-    return (initialCategories as any[]).map((c: any) => ({
-      id: c.id || c.slug,
-      name: c.name,
-      slug: c.slug || c.id,
-      image: c.image || defaultFallbackImg,
-      fallback: defaultFallbackImg,
-      tagline: c.tagline || '',
-      itemCount: c.itemCount || 0
-    }));
+    return mapCategories(initialCategories as any[]);
   });
 
   useEffect(() => {
-    const mapCategories = (data: any[]) => {
+    const handleUpdate = (data: any[]) => {
       if (Array.isArray(data) && data.length > 0) {
-        const mapped = data.map((c: any) => ({
-          id: c.id || c.slug,
-          name: c.name,
-          slug: c.slug || c.id,
-          image: c.image || defaultFallbackImg,
-          fallback: defaultFallbackImg,
-          tagline: c.tagline || '',
-          itemCount: c.itemCount || 0
-        }));
-        setCategories(mapped);
+        setCategories(mapCategories(data));
       }
     };
 
-    apiService.getCategories().then(mapCategories).catch(() => {});
+    apiService.getCategories().then(handleUpdate).catch(() => {});
 
     const handleChange = (e: CustomEvent) => {
-      if (e.detail) mapCategories(e.detail);
+      if (e.detail) handleUpdate(e.detail);
     };
     window.addEventListener('ssi_categories_changed' as any, handleChange);
 
     const handleStorageChange = (e: StorageEvent) => {
       if (e.key === 'ssi_categories' && e.newValue) {
         try {
-          mapCategories(JSON.parse(e.newValue));
+          handleUpdate(JSON.parse(e.newValue));
         } catch (_) {}
       }
     };
@@ -85,14 +86,14 @@ export const CategoryCarousel: React.FC = () => {
       channel = new BroadcastChannel('ssi_channel');
       channel.onmessage = (msg) => {
         if (msg.data?.type === 'categories_updated' && msg.data?.data) {
-          mapCategories(msg.data.data);
+          handleUpdate(msg.data.data);
         }
       };
     } catch (_) {}
 
     const handleVisibility = () => {
       if (!document.hidden) {
-        apiService.getCategories().then(mapCategories).catch(() => {});
+        apiService.getCategories().then(handleUpdate).catch(() => {});
       }
     };
     document.addEventListener('visibilitychange', handleVisibility);

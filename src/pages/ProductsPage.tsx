@@ -16,8 +16,26 @@ export const ProductsPage: React.FC = () => {
   const initialBrand = searchParams.get('brand') || 'all';
   const initialSearch = searchParams.get('search') || '';
 
-  const [products, setProducts] = useState<Product[]>(productsData as unknown as Product[]);
-  const [categories, setCategories] = useState<any[]>(categoriesData);
+  const [products, setProducts] = useState<Product[]>(() => {
+    try {
+      const cached = localStorage.getItem('ssi_products');
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch (_) {}
+    return productsData as unknown as Product[];
+  });
+  const [categories, setCategories] = useState<any[]>(() => {
+    try {
+      const cached = localStorage.getItem('ssi_categories');
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (Array.isArray(parsed) && parsed.length > 0) return apiService.deduplicateCategories(parsed);
+      }
+    } catch (_) {}
+    return apiService.deduplicateCategories(categoriesData);
+  });
   const [selectedCategory, setSelectedCategory] = useState<string>(initialCategory);
   const [searchQuery, setSearchQuery] = useState<string>(initialSearch);
   const [selectedBrand, setSelectedBrand] = useState<string>(initialBrand);
@@ -36,7 +54,7 @@ export const ProductsPage: React.FC = () => {
 
     apiService.getCategories().then((data) => {
       if (Array.isArray(data) && data.length > 0) {
-        setCategories(data);
+        setCategories(apiService.deduplicateCategories(data));
       }
     });
 
@@ -45,7 +63,7 @@ export const ProductsPage: React.FC = () => {
     };
 
     const handleCategoriesChange = (e: CustomEvent<any[]>) => {
-      if (Array.isArray(e.detail)) setCategories(e.detail);
+      if (Array.isArray(e.detail)) setCategories(apiService.deduplicateCategories(e.detail));
     };
 
     window.addEventListener('ssi_products_changed' as any, handleProductsChange);
@@ -55,7 +73,7 @@ export const ProductsPage: React.FC = () => {
       if (e.key === 'ssi_categories' && e.newValue) {
         try {
           const parsed = JSON.parse(e.newValue);
-          if (Array.isArray(parsed)) setCategories(parsed);
+          if (Array.isArray(parsed)) setCategories(apiService.deduplicateCategories(parsed));
         } catch (_) {}
       }
       if (e.key === 'ssi_products' && e.newValue) {
@@ -72,7 +90,7 @@ export const ProductsPage: React.FC = () => {
       channel = new BroadcastChannel('ssi_channel');
       channel.onmessage = (msg) => {
         if (msg.data?.type === 'categories_updated' && Array.isArray(msg.data?.data)) {
-          setCategories(msg.data.data);
+          setCategories(apiService.deduplicateCategories(msg.data.data));
         }
         if (msg.data?.type === 'products_updated' && Array.isArray(msg.data?.data)) {
           setProducts(msg.data.data);
@@ -83,7 +101,7 @@ export const ProductsPage: React.FC = () => {
     const handleVisibility = () => {
       if (!document.hidden) {
         apiService.getCategories().then((data) => {
-          if (Array.isArray(data) && data.length > 0) setCategories(data);
+          if (Array.isArray(data) && data.length > 0) setCategories(apiService.deduplicateCategories(data));
         });
       }
     };

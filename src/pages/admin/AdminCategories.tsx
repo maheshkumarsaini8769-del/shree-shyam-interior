@@ -5,9 +5,20 @@ import { ProductCategory, Product } from '../../types/product';
 import { useToast } from '../../context/ToastContext';
 
 export const AdminCategories: React.FC = () => {
-  const [categories, setCategories] = useState<ProductCategory[]>([]);
+  const [categories, setCategories] = useState<ProductCategory[]>(() => {
+    try {
+      const cached = localStorage.getItem('ssi_categories');
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          return apiService.deduplicateCategories(parsed);
+        }
+      }
+    } catch (_) {}
+    return [];
+  });
   const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingCat, setEditingCat] = useState<ProductCategory | null>(null);
   const [uploading, setUploading] = useState(false);
@@ -24,21 +35,53 @@ export const AdminCategories: React.FC = () => {
 
   useEffect(() => {
     loadData();
+
+    const handleCategoriesChange = (e: CustomEvent<ProductCategory[]>) => {
+      if (Array.isArray(e.detail)) {
+        setCategories(apiService.deduplicateCategories(e.detail));
+      }
+    };
+    window.addEventListener('ssi_categories_changed' as any, handleCategoriesChange);
+
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'ssi_categories' && e.newValue) {
+        try {
+          const parsed = JSON.parse(e.newValue);
+          if (Array.isArray(parsed)) {
+            setCategories(apiService.deduplicateCategories(parsed));
+          }
+        } catch (_) {}
+      }
+    };
+    window.addEventListener('storage', handleStorageChange);
+
+    let channel: BroadcastChannel | null = null;
+    try {
+      channel = new BroadcastChannel('ssi_channel');
+      channel.onmessage = (msg) => {
+        if (msg.data?.type === 'categories_updated' && Array.isArray(msg.data?.data)) {
+          setCategories(apiService.deduplicateCategories(msg.data.data));
+        }
+      };
+    } catch (_) {}
+
+    return () => {
+      window.removeEventListener('ssi_categories_changed' as any, handleCategoriesChange);
+      window.removeEventListener('storage', handleStorageChange);
+      if (channel) channel.close();
+    };
   }, []);
 
   const loadData = async () => {
     try {
-      setLoading(true);
       const [cats, prods] = await Promise.all([
         apiService.getCategories(),
         apiService.getProducts()
       ]);
-      setCategories(cats);
+      setCategories(apiService.deduplicateCategories(cats));
       setProducts(prods);
     } catch {
       showToast('Failed to load categories', 'error');
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -84,14 +127,17 @@ export const AdminCategories: React.FC = () => {
       formData.slug?.trim() ||
       formData.name.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-');
 
+    const targetId = editingCat ? (editingCat.id || slug) : (slug || `cat-${Date.now()}`);
+
     const payload = {
       ...formData,
+      id: targetId,
       slug
     };
 
     try {
       if (editingCat) {
-        await apiService.updateCategory(editingCat.id, payload);
+        await apiService.updateCategory(targetId, payload);
         showToast('Category updated successfully!', 'success');
       } else {
         await apiService.createCategory(payload);
@@ -113,12 +159,13 @@ export const AdminCategories: React.FC = () => {
     newCategories[index] = newCategories[targetIndex];
     newCategories[targetIndex] = temp;
 
-    setCategories(newCategories);
+    const deduped = apiService.deduplicateCategories(newCategories);
+    setCategories(deduped);
     try {
-      localStorage.setItem('ssi_categories', JSON.stringify(newCategories));
-      window.dispatchEvent(new CustomEvent('ssi_categories_changed', { detail: newCategories }));
+      localStorage.setItem('ssi_categories', JSON.stringify(deduped));
+      window.dispatchEvent(new CustomEvent('ssi_categories_changed', { detail: deduped }));
       const channel = new BroadcastChannel('ssi_channel');
-      channel.postMessage({ type: 'categories_updated', data: newCategories });
+      channel.postMessage({ type: 'categories_updated', data: deduped });
       channel.close();
       showToast('Category position updated!', 'success');
     } catch {
@@ -131,7 +178,7 @@ export const AdminCategories: React.FC = () => {
 
     try {
       await apiService.deleteCategory(id);
-      setCategories((prev) => prev.filter((c) => c.id !== id && c.slug !== id));
+      setCategories((prev) => apiService.deduplicateCategories(prev.filter((c) => c.id !== id && c.slug !== id)));
       showToast('Category deleted', 'success');
     } catch {
       showToast('Failed to delete category', 'error');

@@ -906,38 +906,127 @@ app.delete('/api/products/:id', async (req, res) => {
 // -------------------------------------------------------------
 // Categories CRUD
 // -------------------------------------------------------------
+function deduplicateCategoriesServer(cats) {
+  if (!Array.isArray(cats)) return [];
+  const seenIds = new Set();
+  const seenSlugs = new Set();
+  const result = [];
+
+  for (const c of cats) {
+    if (!c || typeof c !== 'object') continue;
+    const normId = (c.id || '').trim().toLowerCase();
+    const normSlug = (c.slug || '').trim().toLowerCase();
+
+    if (normId && seenIds.has(normId)) continue;
+    if (normSlug && seenSlugs.has(normSlug)) continue;
+
+    if (normId) seenIds.add(normId);
+    if (normSlug) seenSlugs.add(normSlug);
+
+    result.push({
+      ...c,
+      id: c.id || c.slug || `cat-${Date.now()}`,
+      slug: c.slug || (c.name ? c.name.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-') : `cat-${Date.now()}`)
+    });
+  }
+  return result;
+}
+
 app.get('/api/categories', async (req, res) => {
-  const categories = (await readData('categories.json')) || [];
+  const rawCategories = (await readData('categories.json')) || [];
+  const categories = deduplicateCategoriesServer(rawCategories);
   res.json(categories);
 });
 
 app.post('/api/categories', async (req, res) => {
   const categories = (await readData('categories.json')) || [];
+  const reqSlug = (req.body.slug || (req.body.name ? req.body.name.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-') : '')).trim();
+  const reqId = (req.body.id || reqSlug || `cat-${Date.now()}`).trim();
+
   const newCat = {
-    id: req.body.slug || `cat-${Date.now()}`,
-    ...req.body
+    ...req.body,
+    id: reqId,
+    slug: reqSlug || reqId
   };
-  categories.push(newCat);
-  await writeData('categories.json', categories);
+
+  const normId = newCat.id.toLowerCase();
+  const normSlug = newCat.slug.toLowerCase();
+  const normName = (newCat.name || '').trim().toLowerCase();
+
+  const existingIdx = categories.findIndex(
+    (c) =>
+      (c.id && c.id.toLowerCase() === normId) ||
+      (c.slug && c.slug.toLowerCase() === normSlug) ||
+      (normName && c.name && c.name.toLowerCase() === normName)
+  );
+
+  if (existingIdx !== -1) {
+    categories[existingIdx] = { ...categories[existingIdx], ...newCat };
+  } else {
+    categories.push(newCat);
+  }
+
+  const deduped = deduplicateCategoriesServer(categories);
+  await writeData('categories.json', deduped);
   res.status(201).json(newCat);
 });
 
 app.put('/api/categories/:id', async (req, res) => {
   const { id } = req.params;
+  const decodedId = decodeURIComponent(id || '').trim().toLowerCase();
   const categories = (await readData('categories.json')) || [];
-  const idx = categories.findIndex((c) => c.id === id || c.slug === id);
-  if (idx === -1) return res.status(404).json({ error: 'Category not found' });
 
-  categories[idx] = { ...categories[idx], ...req.body };
-  await writeData('categories.json', categories);
+  const bodySlug = (req.body.slug || '').trim().toLowerCase();
+  const bodyId = (req.body.id || '').trim().toLowerCase();
+  const bodyName = (req.body.name || '').trim().toLowerCase();
+
+  let idx = categories.findIndex((c) => {
+    const cId = (c.id || '').toLowerCase();
+    const cSlug = (c.slug || '').toLowerCase();
+    const cName = (c.name || '').toLowerCase();
+
+    return (
+      (decodedId && (cId === decodedId || cSlug === decodedId)) ||
+      (bodyId && cId === bodyId) ||
+      (bodySlug && cSlug === bodySlug) ||
+      (bodyName && cName === bodyName)
+    );
+  });
+
+  if (idx === -1) {
+    const newCat = {
+      id: req.body.id || id || `cat-${Date.now()}`,
+      slug: req.body.slug || id,
+      ...req.body
+    };
+    categories.push(newCat);
+    idx = categories.length - 1;
+  } else {
+    categories[idx] = {
+      ...categories[idx],
+      ...req.body,
+      id: categories[idx].id || req.body.id || id
+    };
+  }
+
+  const deduped = deduplicateCategoriesServer(categories);
+  await writeData('categories.json', deduped);
   res.json(categories[idx]);
 });
 
 app.delete('/api/categories/:id', async (req, res) => {
   const { id } = req.params;
+  const decodedId = decodeURIComponent(id || '').trim().toLowerCase();
   let categories = (await readData('categories.json')) || [];
-  categories = categories.filter((c) => c.id !== id && c.slug !== id);
-  await writeData('categories.json', categories);
+
+  categories = categories.filter((c) => {
+    const cId = (c.id || '').toLowerCase();
+    const cSlug = (c.slug || '').toLowerCase();
+    return cId !== decodedId && cSlug !== decodedId;
+  });
+
+  const deduped = deduplicateCategoriesServer(categories);
+  await writeData('categories.json', deduped);
   res.json({ success: true, id });
 });
 

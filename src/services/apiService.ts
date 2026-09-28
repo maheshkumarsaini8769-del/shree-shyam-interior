@@ -877,6 +877,36 @@ export const apiService = {
   },
 
   // Categories
+  deduplicateCategories(cats: ProductCategory[]): ProductCategory[] {
+    if (!Array.isArray(cats)) return [];
+    const seenIds = new Set<string>();
+    const seenSlugs = new Set<string>();
+    const seenNames = new Set<string>();
+    const result: ProductCategory[] = [];
+
+    for (const c of cats) {
+      if (!c || typeof c !== 'object') continue;
+      const normId = (c.id || '').trim().toLowerCase();
+      const normSlug = (c.slug || '').trim().toLowerCase();
+      const normName = (c.name || '').trim().toLowerCase();
+
+      if (normId && seenIds.has(normId)) continue;
+      if (normSlug && seenSlugs.has(normSlug)) continue;
+      if (normName && seenNames.has(normName)) continue;
+
+      if (normId) seenIds.add(normId);
+      if (normSlug) seenSlugs.add(normSlug);
+      if (normName) seenNames.add(normName);
+
+      result.push({
+        ...c,
+        id: c.id || c.slug || `cat-${Date.now()}`,
+        slug: c.slug || (c.name ? c.name.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-') : `cat-${Date.now()}`)
+      });
+    }
+    return result;
+  },
+
   async getCategories(): Promise<ProductCategory[]> {
     let localList: ProductCategory[] | null = null;
     try {
@@ -884,7 +914,7 @@ export const apiService = {
       if (cached) {
         const parsed = JSON.parse(cached);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          localList = parsed;
+          localList = this.deduplicateCategories(parsed);
         }
       }
     } catch (_) {}
@@ -892,27 +922,50 @@ export const apiService = {
     try {
       const remote = await apiFetch<ProductCategory[]>('/categories');
       if (Array.isArray(remote) && remote.length > 0) {
-        try { localStorage.setItem('ssi_categories', JSON.stringify(remote)); } catch (_) {}
-        return remote;
+        const dedupedRemote = this.deduplicateCategories(remote);
+        try { localStorage.setItem('ssi_categories', JSON.stringify(dedupedRemote)); } catch (_) {}
+        return dedupedRemote;
       }
     } catch (_) {}
 
-    return localList || (initialCategories as unknown as ProductCategory[]);
+    const fallback = localList && localList.length > 0 ? localList : this.deduplicateCategories(initialCategories as unknown as ProductCategory[]);
+    return fallback;
   },
 
   async createCategory(cat: Partial<ProductCategory>): Promise<ProductCategory> {
     const current = await this.getCategories();
+    const slug = cat.slug || (cat.name ? cat.name.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-') : `cat-${Date.now()}`);
     const newCat: ProductCategory = {
-      id: cat.slug || `cat-${Date.now()}`,
+      id: cat.id || slug,
       name: cat.name || 'New Category',
-      slug: cat.slug || (cat.name ? cat.name.toLowerCase().replace(/[^a-z0-9]/g, '-') : `cat-${Date.now()}`),
+      slug,
       tagline: cat.tagline || '',
       image: cat.image || 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=800&q=80',
       itemCount: cat.itemCount || 0,
       ...cat
     };
 
-    const updated = [...current.filter(c => c.id !== newCat.id && c.slug !== newCat.slug), newCat];
+    const normId = (newCat.id || '').toLowerCase();
+    const normSlug = (newCat.slug || '').toLowerCase();
+    const normName = (newCat.name || '').toLowerCase();
+
+    const existingIdx = current.findIndex(
+      (c) =>
+        (c.id && c.id.toLowerCase() === normId) ||
+        (c.slug && c.slug.toLowerCase() === normSlug) ||
+        (normName && c.name && c.name.toLowerCase() === normName)
+    );
+
+    let updated: ProductCategory[];
+    if (existingIdx !== -1) {
+      updated = [...current];
+      updated[existingIdx] = { ...updated[existingIdx], ...newCat };
+    } else {
+      updated = [...current, newCat];
+    }
+
+    updated = this.deduplicateCategories(updated);
+
     try {
       localStorage.setItem('ssi_categories', JSON.stringify(updated));
       window.dispatchEvent(new CustomEvent('ssi_categories_changed', { detail: updated }));
@@ -933,32 +986,63 @@ export const apiService = {
 
   async updateCategory(id: string, cat: Partial<ProductCategory>): Promise<ProductCategory> {
     const current = await this.getCategories();
+    const normId = (id || '').trim().toLowerCase();
+    const normSlug = (cat.slug || '').trim().toLowerCase();
+    const normName = (cat.name || '').trim().toLowerCase();
+
+    let matched = false;
     let updatedCat: ProductCategory | null = null;
+
     const list = current.map((c) => {
-      if (c.id === id || c.slug === id) {
-        updatedCat = { ...c, ...cat };
+      const cId = (c.id || '').toLowerCase();
+      const cSlug = (c.slug || '').toLowerCase();
+      const cName = (c.name || '').toLowerCase();
+
+      const isMatch =
+        (normId && (cId === normId || cSlug === normId)) ||
+        (normSlug && cSlug === normSlug) ||
+        (normName && cName === normName);
+
+      if (isMatch && !matched) {
+        matched = true;
+        updatedCat = {
+          ...c,
+          ...cat,
+          id: c.id || cat.id || normId || normSlug,
+          slug: cat.slug || c.slug
+        };
         return updatedCat;
       }
       return c;
     });
 
     if (!updatedCat) {
-      updatedCat = { id, name: cat.name || id, slug: cat.slug || id, ...cat } as ProductCategory;
+      updatedCat = {
+        id: cat.id || id || normSlug || `cat-${Date.now()}`,
+        name: cat.name || id,
+        slug: cat.slug || id,
+        tagline: cat.tagline || '',
+        image: cat.image || 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=800&q=80',
+        itemCount: cat.itemCount || 0,
+        ...cat
+      } as ProductCategory;
       list.push(updatedCat);
     }
 
+    const dedupedList = this.deduplicateCategories(list);
+
     try {
-      localStorage.setItem('ssi_categories', JSON.stringify(list));
-      window.dispatchEvent(new CustomEvent('ssi_categories_changed', { detail: list }));
+      localStorage.setItem('ssi_categories', JSON.stringify(dedupedList));
+      window.dispatchEvent(new CustomEvent('ssi_categories_changed', { detail: dedupedList }));
       const channel = new BroadcastChannel('ssi_channel');
-      channel.postMessage({ type: 'categories_updated', data: list });
+      channel.postMessage({ type: 'categories_updated', data: dedupedList });
       channel.close();
     } catch (_) {}
 
     try {
-      await apiFetch<ProductCategory>(`/categories/${id}`, {
+      await apiFetch<ProductCategory>(`/categories/${encodeURIComponent(id)}`, {
         method: 'PUT',
-        body: JSON.stringify(cat)
+        body: JSON.stringify(updatedCat)
       });
     } catch (_) {}
 
@@ -967,18 +1051,26 @@ export const apiService = {
 
   async deleteCategory(id: string): Promise<{ success: boolean; id: string }> {
     const current = await this.getCategories();
-    const list = current.filter((c) => c.id !== id && c.slug !== id);
+    const normId = (id || '').trim().toLowerCase();
+
+    const list = current.filter((c) => {
+      const cId = (c.id || '').toLowerCase();
+      const cSlug = (c.slug || '').toLowerCase();
+      return cId !== normId && cSlug !== normId;
+    });
+
+    const dedupedList = this.deduplicateCategories(list);
 
     try {
-      localStorage.setItem('ssi_categories', JSON.stringify(list));
-      window.dispatchEvent(new CustomEvent('ssi_categories_changed', { detail: list }));
+      localStorage.setItem('ssi_categories', JSON.stringify(dedupedList));
+      window.dispatchEvent(new CustomEvent('ssi_categories_changed', { detail: dedupedList }));
       const channel = new BroadcastChannel('ssi_channel');
-      channel.postMessage({ type: 'categories_updated', data: list });
+      channel.postMessage({ type: 'categories_updated', data: dedupedList });
       channel.close();
     } catch (_) {}
 
     try {
-      await apiFetch<{ success: boolean; id: string }>(`/categories/${id}`, {
+      await apiFetch<{ success: boolean; id: string }>(`/categories/${encodeURIComponent(id)}`, {
         method: 'DELETE'
       });
     } catch (_) {}
