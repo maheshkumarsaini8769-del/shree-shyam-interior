@@ -90,7 +90,7 @@ export const TestimonialsAndShowroomRow: React.FC = () => {
   const currentReview = testimonials[currentIndex] || testimonials[0];
 
   return (
-    <section className="py-8 sm:py-12 bg-transparent text-forest-950 dark:text-cream-100 relative overflow-hidden transition-colors duration-300">
+    <section className="py-8 sm:py-12 bg-cream-100 dark:bg-forest-950 text-forest-950 dark:text-cream-100 relative overflow-hidden transition-colors duration-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-6 items-stretch">
 

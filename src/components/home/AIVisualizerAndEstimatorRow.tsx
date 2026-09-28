@@ -24,7 +24,7 @@ export const AIVisualizerAndEstimatorRow: React.FC = () => {
   });
 
   return (
-    <section className="py-12 sm:py-16 bg-transparent transition-colors duration-300">
+    <section className="py-12 sm:py-16 bg-cream-100 dark:bg-forest-950 transition-colors duration-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 items-stretch">
           {/* Card 1: Visualize Your Dream Space (Left Card) */}

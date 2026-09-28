@@ -330,7 +330,7 @@ export const AdminLayout: React.FC = () => {
         {/* Dynamic Page Body - Independent Smooth Scroll Container */}
         <main
           ref={mainScrollRef}
-          className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden overscroll-contain p-4 sm:p-6 lg:p-8 admin-scrollbar honeycomb-grid"
+          className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden overscroll-contain p-4 sm:p-6 lg:p-8 admin-scrollbar"
           style={{ WebkitOverflowScrolling: 'touch', touchAction: 'pan-y' }}
           data-lenis-prevent
         >

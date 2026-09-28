@@ -37,7 +37,7 @@ export const ProfilePage: React.FC = () => {
   ];
 
   return (
-    <div className="pt-24 pb-28 min-h-screen bg-transparent text-charcoal-800 dark:text-cream-100">
+    <div className="pt-24 pb-28 min-h-screen bg-cream-50 text-charcoal-800">
       {/* Top Banner */}
       <div className="bg-forest-950 text-cream-100 py-10 sm:py-14 border-b border-cream-200/10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row sm:items-center justify-between gap-6">

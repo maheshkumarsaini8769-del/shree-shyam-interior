@@ -92,7 +92,7 @@ export const SiteVisitPage: React.FC = () => {
   };
 
   return (
-    <div className="pt-24 pb-28 min-h-screen bg-transparent text-charcoal-800 dark:text-cream-100">
+    <div className="pt-24 pb-28 min-h-screen bg-cream-50 text-charcoal-800">
       <SEOHead
         title="Book Free Site Visit & Consultation in Sikar | Shree Shyam Interior"
         description="Book a 100% free site consultation in Sikar & Rajasthan. Our interior architect visits your property with laser measurement tools, physical material swatches, and 3D estimates."

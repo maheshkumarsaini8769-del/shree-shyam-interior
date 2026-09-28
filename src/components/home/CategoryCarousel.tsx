@@ -107,7 +107,7 @@ export const CategoryCarousel: React.FC = () => {
   }, []);
 
   return (
-    <section id="categories" className="py-12 sm:py-16 bg-transparent transition-colors scroll-mt-20">
+    <section id="categories" className="py-12 sm:py-16 bg-cream-100 dark:bg-forest-950 transition-colors scroll-mt-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6 sm:mb-8">

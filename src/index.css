@@ -12,40 +12,15 @@
   }
 
   body {
-    --hex-w: 56px;
-    --hex-h: 97px; /* 56 * sqrt(3) ~ 96.99px */
-    --hex-color: rgba(0, 0, 0, 0.13);
-    --hex-bg: #F4F5F7;
-
-    background-color: var(--hex-bg);
-    background-image:
-      linear-gradient(30deg, var(--hex-color) 12%, transparent 12.5%, transparent 87%, var(--hex-color) 87.5%, var(--hex-color)),
-      linear-gradient(150deg, var(--hex-color) 12%, transparent 12.5%, transparent 87%, var(--hex-color) 87.5%, var(--hex-color)),
-      linear-gradient(30deg, var(--hex-color) 12%, transparent 12.5%, transparent 87%, var(--hex-color) 87.5%, var(--hex-color)),
-      linear-gradient(150deg, var(--hex-color) 12%, transparent 12.5%, transparent 87%, var(--hex-color) 87.5%, var(--hex-color)),
-      linear-gradient(60deg, var(--hex-color) 25%, transparent 25.5%, transparent 75%, var(--hex-color) 75%, var(--hex-color)),
-      linear-gradient(60deg, var(--hex-color) 25%, transparent 25.5%, transparent 75%, var(--hex-color) 75%, var(--hex-color));
-    background-size: var(--hex-w) var(--hex-h);
-    background-position:
-      0 0,
-      0 0,
-      calc(var(--hex-w) / 2) calc(var(--hex-h) / 2),
-      calc(var(--hex-w) / 2) calc(var(--hex-h) / 2),
-      0 0,
-      calc(var(--hex-w) / 2) calc(var(--hex-h) / 2);
-    background-attachment: fixed;
+    background-color: #F5F1E8;
     color: #1B2026;
     font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     overflow-x: hidden;
     letter-spacing: -0.012em;
-    transition: background-color 0.25s ease;
   }
 
   .dark body {
-    --hex-color: rgba(212, 175, 55, 0.12);
-    --hex-bg: #0A0B0E;
-    background-color: var(--hex-bg);
-    background-attachment: fixed;
+    background-color: #0B0F15;
     color: #FAF8F5;
   }
 
@@ -203,86 +178,4 @@ html[data-festival-theme="newyear"] .text-copper-600 {
 html[data-festival-theme="newyear"] .bg-copper-500 {
   background-color: #0284C7 !important;
 }
-
-/* ==========================================================================
-   Geometric Honeycomb / Hexagonal Background Grid (Pure CSS Gradients)
-   - Seamless interlocking hexagons with thin, crisp stroke lines
-   - Light Mode: Clean platinum (#F4F5F7) + Graphite borders (rgba(0, 0, 0, 0.12))
-   - Dark Mode: Space-Cadet Black (#0A0B0E) + Subtle Cyan/Gold borders (rgba(212, 175, 55, 0.10))
-   ========================================================================== */
-.honeycomb-grid {
-  --hex-w: 56px;
-  --hex-h: 97px; /* Exact sqrt(3) ratio ~ 96.99px */
-  --hex-color: rgba(0, 0, 0, 0.12);
-  --hex-bg: #F4F5F7;
-
-  background-color: var(--hex-bg);
-  background-image:
-    linear-gradient(30deg, var(--hex-color) 12%, transparent 12.5%, transparent 87%, var(--hex-color) 87.5%, var(--hex-color)),
-    linear-gradient(150deg, var(--hex-color) 12%, transparent 12.5%, transparent 87%, var(--hex-color) 87.5%, var(--hex-color)),
-    linear-gradient(30deg, var(--hex-color) 12%, transparent 12.5%, transparent 87%, var(--hex-color) 87.5%, var(--hex-color)),
-    linear-gradient(150deg, var(--hex-color) 12%, transparent 12.5%, transparent 87%, var(--hex-color) 87.5%, var(--hex-color)),
-    linear-gradient(60deg, var(--hex-color) 25%, transparent 25.5%, transparent 75%, var(--hex-color) 75%, var(--hex-color)),
-    linear-gradient(60deg, var(--hex-color) 25%, transparent 25.5%, transparent 75%, var(--hex-color) 75%, var(--hex-color));
-  background-size: var(--hex-w) var(--hex-h);
-  background-position:
-    0 0,
-    0 0,
-    calc(var(--hex-w) / 2) calc(var(--hex-h) / 2),
-    calc(var(--hex-w) / 2) calc(var(--hex-h) / 2),
-    0 0,
-    calc(var(--hex-w) / 2) calc(var(--hex-h) / 2);
-  background-attachment: fixed;
-  transition: background-color 0.25s ease;
-}
-
-.dark .honeycomb-grid,
-[data-theme='dark'] .honeycomb-grid,
-.dark.honeycomb-grid {
-  --hex-color: rgba(212, 175, 55, 0.10);
-  --hex-bg: #0A0B0E;
-  background-attachment: fixed;
-}
-
-/* Transparent Overlay Variant (for layering on existing containers) */
-.honeycomb-overlay {
-  --hex-w: 56px;
-  --hex-h: 97px;
-  --hex-color: rgba(0, 0, 0, 0.07);
-
-  background-image:
-    linear-gradient(30deg, var(--hex-color) 12%, transparent 12.5%, transparent 87%, var(--hex-color) 87.5%, var(--hex-color)),
-    linear-gradient(150deg, var(--hex-color) 12%, transparent 12.5%, transparent 87%, var(--hex-color) 87.5%, var(--hex-color)),
-    linear-gradient(30deg, var(--hex-color) 12%, transparent 12.5%, transparent 87%, var(--hex-color) 87.5%, var(--hex-color)),
-    linear-gradient(150deg, var(--hex-color) 12%, transparent 12.5%, transparent 87%, var(--hex-color) 87.5%, var(--hex-color)),
-    linear-gradient(60deg, var(--hex-color) 25%, transparent 25.5%, transparent 75%, var(--hex-color) 75%, var(--hex-color)),
-    linear-gradient(60deg, var(--hex-color) 25%, transparent 25.5%, transparent 75%, var(--hex-color) 75%, var(--hex-color));
-  background-size: var(--hex-w) var(--hex-h);
-  background-position:
-    0 0,
-    0 0,
-    calc(var(--hex-w) / 2) calc(var(--hex-h) / 2),
-    calc(var(--hex-w) / 2) calc(var(--hex-h) / 2),
-    0 0,
-    calc(var(--hex-w) / 2) calc(var(--hex-h) / 2);
-}
-
-.dark .honeycomb-overlay,
-[data-theme='dark'] .honeycomb-overlay,
-.dark.honeycomb-overlay {
-  --hex-color: rgba(212, 175, 55, 0.07);
-}
-
-/* ==========================================================================
-   Full-Website Honeycomb Grid Transparency
-   - Lets the underlying honeycomb grid shine through all website sections
-   - Leaves floating cards (white / forest-900 / #121720) solid & readable
-   ========================================================================== */
-main.honeycomb-grid > div > section:not(.force-opaque),
-main.honeycomb-grid section:not(.force-opaque),
-main.honeycomb-grid > * > div.min-h-screen {
-  background-color: transparent !important;
-}
-
-
 

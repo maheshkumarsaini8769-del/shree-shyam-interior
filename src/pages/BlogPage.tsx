@@ -91,7 +91,7 @@ export const BlogPage: React.FC = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-transparent text-[#14251F] dark:text-cream-100 pt-24 pb-20 selection:bg-[#C68A43]/20">
+    <div className="min-h-screen bg-[#FDFBF7] text-[#14251F] pt-24 pb-20 selection:bg-[#C68A43]/20">
       <SEOHead
         title="Interior Design Ideas, Modular Kitchen & Home Decor Blog | Shree Shyam Interior Sikar"
         description="Explore expert interior design guides, modular kitchen trends, bedroom styling, false ceiling tips, and budgeting advice tailored for homes in Sikar, Rajasthan."

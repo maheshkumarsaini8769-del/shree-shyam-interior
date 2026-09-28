@@ -127,7 +127,7 @@ export const SiteVisitSection: React.FC = () => {
   };
 
   return (
-    <section className="py-12 sm:py-16 bg-transparent transition-colors">
+    <section className="py-12 sm:py-16 bg-cream-100 dark:bg-forest-950 transition-colors">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Banner Container (Matching Reference Image) */}
         <div className="rounded-3xl bg-forest-900 text-cream-100 border border-copper-500/30 overflow-hidden shadow-elevated grid grid-cols-1 lg:grid-cols-12 items-center p-6 sm:p-10 lg:p-12 gap-8 relative">

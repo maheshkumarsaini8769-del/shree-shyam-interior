@@ -120,7 +120,7 @@ export const ServiceDetailPage: React.FC = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-transparent text-charcoal-800 dark:text-cream-100 pt-20 transition-colors">
+    <div className="min-h-screen bg-cream-50 text-charcoal-800 dark:bg-forest-950 dark:text-cream-100 pt-20 transition-colors">
       <SEOHead
         title={service.metaTitle}
         description={service.metaDescription}
