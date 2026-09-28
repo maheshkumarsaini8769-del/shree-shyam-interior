@@ -12,15 +12,38 @@
   }
 
   body {
-    background-color: #F5F1E8;
+    --hex-w: 56px;
+    --hex-h: 97px; /* 56 * sqrt(3) ~ 96.99px */
+    --hex-color: rgba(0, 0, 0, 0.13);
+    --hex-bg: #F4F5F7;
+
+    background-color: var(--hex-bg);
+    background-image:
+      linear-gradient(30deg, var(--hex-color) 12%, transparent 12.5%, transparent 87%, var(--hex-color) 87.5%, var(--hex-color)),
+      linear-gradient(150deg, var(--hex-color) 12%, transparent 12.5%, transparent 87%, var(--hex-color) 87.5%, var(--hex-color)),
+      linear-gradient(30deg, var(--hex-color) 12%, transparent 12.5%, transparent 87%, var(--hex-color) 87.5%, var(--hex-color)),
+      linear-gradient(150deg, var(--hex-color) 12%, transparent 12.5%, transparent 87%, var(--hex-color) 87.5%, var(--hex-color)),
+      linear-gradient(60deg, var(--hex-color) 25%, transparent 25.5%, transparent 75%, var(--hex-color) 75%, var(--hex-color)),
+      linear-gradient(60deg, var(--hex-color) 25%, transparent 25.5%, transparent 75%, var(--hex-color) 75%, var(--hex-color));
+    background-size: var(--hex-w) var(--hex-h);
+    background-position:
+      0 0,
+      0 0,
+      calc(var(--hex-w) / 2) calc(var(--hex-h) / 2),
+      calc(var(--hex-w) / 2) calc(var(--hex-h) / 2),
+      0 0,
+      calc(var(--hex-w) / 2) calc(var(--hex-h) / 2);
     color: #1B2026;
     font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     overflow-x: hidden;
     letter-spacing: -0.012em;
+    transition: background-color 0.25s ease;
   }
 
   .dark body {
-    background-color: #0B0F15;
+    --hex-color: rgba(212, 175, 55, 0.12);
+    --hex-bg: #0A0B0E;
+    background-color: var(--hex-bg);
     color: #FAF8F5;
   }
 
