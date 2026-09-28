@@ -202,7 +202,7 @@ const AppContent: React.FC = () => {
 
       <Header />
 
-      <main className="flex-1">
+      <main className="flex-1 honeycomb-grid">
         <ChunkErrorBoundary>
           <Suspense fallback={<PageSkeleton />}>
             <Routes>
