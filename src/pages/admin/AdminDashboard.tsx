@@ -16,10 +16,13 @@ import {
   Clock,
   Sparkles,
   ExternalLink,
-  DollarSign
+  DollarSign,
+  Eye
 } from 'lucide-react';
 import { apiService, Lead, QuoteRequest, WhatsAppOrder } from '../../services/apiService';
 import { useToast } from '../../context/ToastContext';
+import { OrderDetailsModal, RequestDetailsData } from '../../components/common/OrderDetailsModal';
+import { QuotationPDFModal } from '../../components/common/QuotationPDFModal';
 
 export const AdminDashboard: React.FC = () => {
   const [stats, setStats] = useState({
@@ -41,6 +44,8 @@ export const AdminDashboard: React.FC = () => {
   const [allWhatsAppOrders, setAllWhatsAppOrders] = useState<WhatsAppOrder[]>([]);
   const [rowLimit, setRowLimit] = useState<'all' | 5 | 10>('all');
   const [loading, setLoading] = useState(true);
+  const [selectedRequestForDetails, setSelectedRequestForDetails] = useState<RequestDetailsData | null>(null);
+  const [selectedRequestForPdf, setSelectedRequestForPdf] = useState<RequestDetailsData | null>(null);
   const { showToast } = useToast();
 
   useEffect(() => {
@@ -352,7 +357,32 @@ export const AdminDashboard: React.FC = () => {
                             </select>
                           </td>
                           <td className="py-3.5 text-right">
-                            <div className="inline-flex items-center gap-2">
+                            <div className="inline-flex items-center gap-1.5">
+                              <button
+                                onClick={() =>
+                                  setSelectedRequestForDetails({
+                                    type: 'lead',
+                                    id: lead.id,
+                                    customerName: lead.name,
+                                    phone: lead.phone,
+                                    email: lead.email,
+                                    address: lead.address,
+                                    createdAt: lead.createdAt,
+                                    status: lead.status,
+                                    date: lead.date,
+                                    slot: lead.slot,
+                                    roomType: lead.roomType,
+                                    budget: lead.budget,
+                                    notes: lead.notes
+                                  })
+                                }
+                                className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-copper-500/10 hover:bg-copper-500 text-copper-600 dark:text-copper-400 hover:text-white text-xs font-bold transition-all shadow-sm cursor-pointer"
+                                title="Check Request Details"
+                              >
+                                <Eye className="w-3.5 h-3.5" />
+                                <span>Details</span>
+                              </button>
+
                               <a
                                 href={`https://wa.me/91${lead.phone.replace(/[^0-9]/g, '')}?text=Namaste%20${encodeURIComponent(lead.name)},%20this%20is%20Shree%20Shyam%20Interior%20team%20regarding%20your%20site%20visit%20request.`}
                                 target="_blank"
@@ -453,7 +483,30 @@ export const AdminDashboard: React.FC = () => {
                             </span>
                           </td>
                           <td className="py-3.5 text-right">
-                            <div className="inline-flex items-center gap-2">
+                            <div className="inline-flex items-center gap-1.5">
+                              <button
+                                onClick={() =>
+                                  setSelectedRequestForDetails({
+                                    type: 'quote',
+                                    id: q.id,
+                                    customerName: q.customerName,
+                                    phone: q.phone,
+                                    email: q.email,
+                                    city: q.city,
+                                    createdAt: q.createdAt,
+                                    status: q.status || 'New',
+                                    totalAmount: q.totalAmount,
+                                    items: q.items || [],
+                                    notes: q.notes
+                                  })
+                                }
+                                className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-copper-500/10 hover:bg-copper-500 text-copper-600 dark:text-copper-400 hover:text-white text-xs font-bold transition-all shadow-sm cursor-pointer"
+                                title="Check Ordered Materials"
+                              >
+                                <Eye className="w-3.5 h-3.5" />
+                                <span>Details</span>
+                              </button>
+
                               {q.phone && (
                                 <a
                                   href={`tel:${q.phone}`}
@@ -559,7 +612,31 @@ export const AdminDashboard: React.FC = () => {
                               </span>
                             </td>
                             <td className="py-3.5 text-right">
-                              <div className="inline-flex items-center gap-2">
+                              <div className="inline-flex items-center gap-1.5">
+                                <button
+                                  onClick={() =>
+                                    setSelectedRequestForDetails({
+                                      type: 'whatsapp',
+                                      id: o.id,
+                                      customerName: o.customerName,
+                                      phone: o.phone,
+                                      city: o.city,
+                                      createdAt: o.createdAt,
+                                      status: o.status,
+                                      totalAmount: o.totalAmount,
+                                      items: o.items || [],
+                                      message: o.message,
+                                      orderType: o.orderType,
+                                      notes: o.notes
+                                    })
+                                  }
+                                  className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-[#25D366]/10 hover:bg-[#25D366] text-[#25D366] hover:text-white text-xs font-bold transition-all shadow-sm cursor-pointer"
+                                  title="Check Order Details"
+                                >
+                                  <Eye className="w-3.5 h-3.5" />
+                                  <span>Details</span>
+                                </button>
+
                                 {waLink && (
                                   <a
                                     href={waLink}
@@ -616,6 +693,38 @@ export const AdminDashboard: React.FC = () => {
           </div>
         )}
       </div>
+      {/* Order / Request Details Modal */}
+      {selectedRequestForDetails && (
+        <OrderDetailsModal
+          isOpen={!!selectedRequestForDetails}
+          onClose={() => setSelectedRequestForDetails(null)}
+          data={selectedRequestForDetails}
+          onOpenPdf={
+            selectedRequestForDetails.items && selectedRequestForDetails.items.length > 0
+              ? () => {
+                  setSelectedRequestForPdf(selectedRequestForDetails);
+                  setSelectedRequestForDetails(null);
+                }
+              : undefined
+          }
+        />
+      )}
+
+      {/* Official PDF Letterhead Quotation Modal */}
+      {selectedRequestForPdf && (
+        <QuotationPDFModal
+          isOpen={!!selectedRequestForPdf}
+          onClose={() => setSelectedRequestForPdf(null)}
+          quoteId={selectedRequestForPdf.id}
+          customerName={selectedRequestForPdf.customerName}
+          customerPhone={selectedRequestForPdf.phone}
+          customerCity={selectedRequestForPdf.city || 'Sikar, Rajasthan'}
+          items={selectedRequestForPdf.items || []}
+          subtotal={Math.round((selectedRequestForPdf.totalAmount || 0) / 1.18)}
+          gstAmount={Math.round((selectedRequestForPdf.totalAmount || 0) - ((selectedRequestForPdf.totalAmount || 0) / 1.18))}
+          grandTotal={selectedRequestForPdf.totalAmount || 0}
+        />
+      )}
     </div>
   );
 };

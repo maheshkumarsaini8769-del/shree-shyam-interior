@@ -11,11 +11,13 @@ import {
   Clock,
   CheckCircle2,
   Printer,
-  MessageSquare
+  MessageSquare,
+  Eye
 } from 'lucide-react';
 import { apiService, QuoteRequest } from '../../services/apiService';
 import { useToast } from '../../context/ToastContext';
 import { QuotationPDFModal } from '../../components/common/QuotationPDFModal';
+import { OrderDetailsModal } from '../../components/common/OrderDetailsModal';
 
 export const AdminQuotes: React.FC = () => {
   const [quotes, setQuotes] = useState<QuoteRequest[]>([]);
@@ -23,6 +25,7 @@ export const AdminQuotes: React.FC = () => {
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [search, setSearch] = useState('');
   const [selectedQuoteForPdf, setSelectedQuoteForPdf] = useState<QuoteRequest | null>(null);
+  const [selectedQuoteForDetails, setSelectedQuoteForDetails] = useState<QuoteRequest | null>(null);
   const { showToast } = useToast();
 
   useEffect(() => {
@@ -241,6 +244,16 @@ export const AdminQuotes: React.FC = () => {
                       ₹{q.totalAmount?.toLocaleString('en-IN') || '0'}
                     </span>
 
+                    {/* View Full Order Details Button */}
+                    <button
+                      onClick={() => setSelectedQuoteForDetails(q)}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-copper-500/10 hover:bg-copper-500 text-copper-600 dark:text-copper-400 hover:text-white text-xs font-bold transition-all shadow-sm cursor-pointer"
+                      title="Check full order materials & details"
+                    >
+                      <Eye className="w-3.5 h-3.5" />
+                      <span>Details</span>
+                    </button>
+
                     {/* Official Branded PDF / Print Quote */}
                     <button
                       onClick={() => setSelectedQuoteForPdf(q)}
@@ -348,6 +361,31 @@ export const AdminQuotes: React.FC = () => {
           subtotal={Math.round((selectedQuoteForPdf.totalAmount || 0) / 1.18)}
           gstAmount={Math.round((selectedQuoteForPdf.totalAmount || 0) - ((selectedQuoteForPdf.totalAmount || 0) / 1.18))}
           grandTotal={selectedQuoteForPdf.totalAmount || 0}
+        />
+      )}
+
+      {/* Order Details Modal */}
+      {selectedQuoteForDetails && (
+        <OrderDetailsModal
+          isOpen={!!selectedQuoteForDetails}
+          onClose={() => setSelectedQuoteForDetails(null)}
+          data={{
+            type: 'quote',
+            id: selectedQuoteForDetails.id,
+            customerName: selectedQuoteForDetails.customerName,
+            phone: selectedQuoteForDetails.phone,
+            email: selectedQuoteForDetails.email,
+            city: selectedQuoteForDetails.city,
+            createdAt: selectedQuoteForDetails.createdAt,
+            status: selectedQuoteForDetails.status || 'New',
+            totalAmount: selectedQuoteForDetails.totalAmount,
+            items: selectedQuoteForDetails.items || [],
+            notes: selectedQuoteForDetails.notes
+          }}
+          onOpenPdf={() => {
+            setSelectedQuoteForPdf(selectedQuoteForDetails);
+            setSelectedQuoteForDetails(null);
+          }}
         />
       )}
     </div>

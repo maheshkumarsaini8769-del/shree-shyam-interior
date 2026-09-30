@@ -11,16 +11,21 @@ import {
   Clock,
   Filter,
   DollarSign,
-  User
+  User,
+  Eye
 } from 'lucide-react';
 import { apiService, WhatsAppOrder } from '../../services/apiService';
 import { useToast } from '../../context/ToastContext';
+import { OrderDetailsModal } from '../../components/common/OrderDetailsModal';
+import { QuotationPDFModal } from '../../components/common/QuotationPDFModal';
 
 export const AdminWhatsAppOrders: React.FC = () => {
   const [orders, setOrders] = useState<WhatsAppOrder[]>([]);
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [search, setSearch] = useState('');
+  const [selectedOrderForDetails, setSelectedOrderForDetails] = useState<WhatsAppOrder | null>(null);
+  const [selectedOrderForPdf, setSelectedOrderForPdf] = useState<WhatsAppOrder | null>(null);
   const { showToast } = useToast();
 
   useEffect(() => {
@@ -232,6 +237,16 @@ export const AdminWhatsAppOrders: React.FC = () => {
                       </span>
                     ) : null}
 
+                    {/* View Full Order Details Button */}
+                    <button
+                      onClick={() => setSelectedOrderForDetails(order)}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#25D366]/10 hover:bg-[#25D366] text-[#25D366] hover:text-white text-xs font-bold transition-all shadow-sm cursor-pointer"
+                      title="Check full order materials & details"
+                    >
+                      <Eye className="w-3.5 h-3.5" />
+                      <span>Details</span>
+                    </button>
+
                     {/* Quick Call */}
                     {order.phone && (
                       <a
@@ -339,6 +354,51 @@ export const AdminWhatsAppOrders: React.FC = () => {
             );
           })}
         </div>
+      )}
+      {/* Order Details Modal */}
+      {selectedOrderForDetails && (
+        <OrderDetailsModal
+          isOpen={!!selectedOrderForDetails}
+          onClose={() => setSelectedOrderForDetails(null)}
+          data={{
+            type: 'whatsapp',
+            id: selectedOrderForDetails.id,
+            customerName: selectedOrderForDetails.customerName,
+            phone: selectedOrderForDetails.phone,
+            city: selectedOrderForDetails.city,
+            createdAt: selectedOrderForDetails.createdAt,
+            status: selectedOrderForDetails.status,
+            totalAmount: selectedOrderForDetails.totalAmount,
+            items: selectedOrderForDetails.items || [],
+            message: selectedOrderForDetails.message,
+            orderType: selectedOrderForDetails.orderType,
+            notes: selectedOrderForDetails.notes
+          }}
+          onOpenPdf={
+            selectedOrderForDetails.items && selectedOrderForDetails.items.length > 0
+              ? () => {
+                  setSelectedOrderForPdf(selectedOrderForDetails);
+                  setSelectedOrderForDetails(null);
+                }
+              : undefined
+          }
+        />
+      )}
+
+      {/* Official PDF Letterhead Quotation Modal */}
+      {selectedOrderForPdf && (
+        <QuotationPDFModal
+          isOpen={!!selectedOrderForPdf}
+          onClose={() => setSelectedOrderForPdf(null)}
+          quoteId={selectedOrderForPdf.id}
+          customerName={selectedOrderForPdf.customerName}
+          customerPhone={selectedOrderForPdf.phone}
+          customerCity={selectedOrderForPdf.city || 'Sikar, Rajasthan'}
+          items={selectedOrderForPdf.items || []}
+          subtotal={Math.round((selectedOrderForPdf.totalAmount || 0) / 1.18)}
+          gstAmount={Math.round((selectedOrderForPdf.totalAmount || 0) - ((selectedOrderForPdf.totalAmount || 0) / 1.18))}
+          grandTotal={selectedOrderForPdf.totalAmount || 0}
+        />
       )}
     </div>
   );

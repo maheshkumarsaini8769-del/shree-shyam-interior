@@ -9,16 +9,19 @@ import {
   Search,
   Filter,
   CheckCircle2,
-  AlertCircle
+  AlertCircle,
+  Eye
 } from 'lucide-react';
 import { apiService, Lead } from '../../services/apiService';
 import { useToast } from '../../context/ToastContext';
+import { OrderDetailsModal } from '../../components/common/OrderDetailsModal';
 
 export const AdminLeads: React.FC = () => {
   const [leads, setLeads] = useState<Lead[]>([]);
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [search, setSearch] = useState('');
+  const [selectedLeadForDetails, setSelectedLeadForDetails] = useState<Lead | null>(null);
   const { showToast } = useToast();
 
   useEffect(() => {
@@ -220,6 +223,16 @@ export const AdminLeads: React.FC = () => {
                 </select>
 
                 <div className="flex items-center gap-2">
+                  {/* View Details Button */}
+                  <button
+                    onClick={() => setSelectedLeadForDetails(lead)}
+                    className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-copper-500/10 hover:bg-copper-500 text-copper-600 dark:text-copper-400 hover:text-white text-xs font-bold transition-all shadow-sm cursor-pointer"
+                    title="Check site visit request details"
+                  >
+                    <Eye className="w-3.5 h-3.5" />
+                    <span>Details</span>
+                  </button>
+
                   <a
                     href={`tel:${lead.phone}`}
                     className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-copper-500/10 text-copper-600 hover:bg-copper-500 hover:text-white text-xs font-bold transition-colors shadow-sm"
@@ -250,6 +263,29 @@ export const AdminLeads: React.FC = () => {
             </div>
           ))}
         </div>
+      )}
+
+      {/* Request Details Modal */}
+      {selectedLeadForDetails && (
+        <OrderDetailsModal
+          isOpen={!!selectedLeadForDetails}
+          onClose={() => setSelectedLeadForDetails(null)}
+          data={{
+            type: 'lead',
+            id: selectedLeadForDetails.id,
+            customerName: selectedLeadForDetails.name,
+            phone: selectedLeadForDetails.phone,
+            email: selectedLeadForDetails.email,
+            address: selectedLeadForDetails.address,
+            createdAt: selectedLeadForDetails.createdAt,
+            status: selectedLeadForDetails.status,
+            date: selectedLeadForDetails.date,
+            slot: selectedLeadForDetails.slot,
+            roomType: selectedLeadForDetails.roomType,
+            budget: selectedLeadForDetails.budget,
+            notes: selectedLeadForDetails.notes
+          }}
+        />
       )}
     </div>
   );
