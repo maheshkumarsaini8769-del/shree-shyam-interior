@@ -2136,6 +2136,18 @@ export const apiService = {
     } catch {
       return payload;
     }
+  },
+
+  // Website Visitor & Click Analytics
+  async getAnalytics(): Promise<import('./analyticsService').AnalyticsData> {
+    const { analyticsService } = await import('./analyticsService');
+    return analyticsService.getAnalytics();
+  },
+
+  async trackAnalytics(event: import('./analyticsService').AnalyticsEvent): Promise<void> {
+    const { analyticsService } = await import('./analyticsService');
+    analyticsService.sendEventToBackend(event);
   }
 };
+
 

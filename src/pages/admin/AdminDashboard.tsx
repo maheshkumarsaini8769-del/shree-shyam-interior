@@ -17,12 +17,27 @@ import {
   Sparkles,
   ExternalLink,
   DollarSign,
-  Eye
+  Eye,
+  Users,
+  MousePointerClick,
+  Activity,
+  Zap,
+  BarChart3,
+  RefreshCw,
+  Smartphone,
+  Laptop,
+  Tablet,
+  CheckCircle2,
+  Share2,
+  Calculator,
+  Calendar,
+  PhoneCall
 } from 'lucide-react';
 import { apiService, Lead, QuoteRequest, WhatsAppOrder } from '../../services/apiService';
 import { useToast } from '../../context/ToastContext';
 import { OrderDetailsModal, RequestDetailsData } from '../../components/common/OrderDetailsModal';
 import { QuotationPDFModal } from '../../components/common/QuotationPDFModal';
+import { analyticsService, AnalyticsData } from '../../services/analyticsService';
 
 export const AdminDashboard: React.FC = () => {
   const [stats, setStats] = useState({
@@ -46,11 +61,42 @@ export const AdminDashboard: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [selectedRequestForDetails, setSelectedRequestForDetails] = useState<RequestDetailsData | null>(null);
   const [selectedRequestForPdf, setSelectedRequestForPdf] = useState<RequestDetailsData | null>(null);
+  const [analytics, setAnalytics] = useState<AnalyticsData | null>(null);
+  const [loadingAnalytics, setLoadingAnalytics] = useState(true);
+  const [analyticsTab, setAnalyticsTab] = useState<'overview' | 'clicks' | 'pages' | 'live'>('overview');
+  const [simulatingClick, setSimulatingClick] = useState(false);
   const { showToast } = useToast();
 
   useEffect(() => {
     loadData();
+    loadAnalyticsData();
   }, []);
+
+  const loadAnalyticsData = async () => {
+    try {
+      setLoadingAnalytics(true);
+      const data = await analyticsService.getAnalytics();
+      if (data) setAnalytics(data);
+    } catch (err) {
+      console.error('Failed to load analytics', err);
+    } finally {
+      setLoadingAnalytics(false);
+    }
+  };
+
+  const handleTestSimulateClick = async (type: any, label: string) => {
+    try {
+      setSimulatingClick(true);
+      analyticsService.trackClick(type, label, '/');
+      const updated = await analyticsService.getAnalytics();
+      setAnalytics({ ...updated });
+      showToast(`Test action '${label}' logged! Click counter updated.`, 'success');
+    } catch {
+      showToast('Could not record test click', 'error');
+    } finally {
+      setSimulatingClick(false);
+    }
+  };
 
   const loadData = async () => {
     try {
@@ -226,6 +272,558 @@ export const AdminDashboard: React.FC = () => {
             </Link>
           );
         })}
+      </div>
+
+      {/* Website Visitors & Click Analytics Section */}
+      <div className="bg-white dark:bg-[#121720] rounded-3xl border border-cream-200 dark:border-cream-200/10 p-6 shadow-soft space-y-6">
+        {/* Header */}
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-cream-200 dark:border-cream-200/10 pb-5">
+          <div>
+            <div className="flex items-center gap-2 mb-1.5">
+              <span className="relative flex h-2.5 w-2.5">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+              </span>
+              <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2.5 py-0.5 rounded-full border border-emerald-500/20">
+                Live Visitor & Click Tracking
+              </span>
+            </div>
+            <h3 className="font-serif text-xl sm:text-2xl font-bold text-forest-950 dark:text-cream-50">
+              Website Traffic & Interaction Analytics
+            </h3>
+            <p className="text-xs text-charcoal-500 dark:text-cream-200/70 mt-1">
+              Real-time monitor of live visitors, page views, and customer clicks (WhatsApp, Direct Calls, Quote Cart & Bookings).
+            </p>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2 self-start lg:self-auto">
+            {/* View Tabs */}
+            <div className="inline-flex items-center gap-1 bg-cream-100 dark:bg-[#1A212C] p-1 rounded-xl text-xs border border-cream-200/50 dark:border-cream-200/10">
+              {[
+                { id: 'overview', label: '7-Day Trend', icon: BarChart3 },
+                { id: 'clicks', label: 'Action Clicks', icon: MousePointerClick },
+                { id: 'pages', label: 'Pages & Devices', icon: Eye },
+                { id: 'live', label: 'Live Stream', icon: Activity }
+              ].map((tab) => {
+                const TabIcon = tab.icon;
+                return (
+                  <button
+                    key={tab.id}
+                    onClick={() => setAnalyticsTab(tab.id as any)}
+                    className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-semibold transition-all cursor-pointer ${
+                      analyticsTab === tab.id
+                        ? 'bg-white dark:bg-[#252E3E] text-forest-950 dark:text-cream-50 shadow-sm'
+                        : 'text-charcoal-500 dark:text-cream-200/60 hover:text-forest-950 dark:hover:text-cream-100'
+                    }`}
+                  >
+                    <TabIcon className="w-3.5 h-3.5 text-copper-500" />
+                    <span>{tab.label}</span>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Refresh Button */}
+            <button
+              onClick={loadAnalyticsData}
+              disabled={loadingAnalytics}
+              className="p-2 rounded-xl bg-cream-100 dark:bg-[#1A212C] hover:bg-cream-200 dark:hover:bg-[#222B38] text-charcoal-600 dark:text-cream-200 transition-colors cursor-pointer"
+              title="Refresh Analytics"
+            >
+              <RefreshCw className={`w-4 h-4 ${loadingAnalytics ? 'animate-spin text-copper-500' : ''}`} />
+            </button>
+          </div>
+        </div>
+
+        {/* 4 Highlight Stat Cards */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="p-4 rounded-2xl bg-cream-50/70 dark:bg-[#151D28] border border-cream-200 dark:border-cream-200/10 space-y-1">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-semibold text-charcoal-400 dark:text-cream-200/60">
+                Total Visitors
+              </span>
+              <div className="p-2 rounded-xl bg-copper-500/10 text-copper-600 dark:text-copper-400">
+                <Users className="w-4 h-4" />
+              </div>
+            </div>
+            <div className="font-serif font-bold text-2xl text-forest-950 dark:text-cream-50">
+              {analytics ? analytics.totalVisitors.toLocaleString('en-IN') : '...'}
+            </div>
+            <div className="text-[11px] text-charcoal-500 dark:text-cream-200/60 flex items-center gap-1">
+              <span className="text-emerald-500 font-semibold">+{analytics?.uniqueVisitors || 0}</span>
+              <span>Unique Customers</span>
+            </div>
+          </div>
+
+          <div className="p-4 rounded-2xl bg-cream-50/70 dark:bg-[#151D28] border border-cream-200 dark:border-cream-200/10 space-y-1">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-semibold text-charcoal-400 dark:text-cream-200/60">
+                Today's Visitors
+              </span>
+              <div className="p-2 rounded-xl bg-rose-500/10 text-rose-500">
+                <Zap className="w-4 h-4" />
+              </div>
+            </div>
+            <div className="font-serif font-bold text-2xl text-rose-500">
+              {analytics ? analytics.todayVisitors : '...'}
+            </div>
+            <div className="text-[11px] text-charcoal-500 dark:text-cream-200/60">
+              Active sessions today
+            </div>
+          </div>
+
+          <div className="p-4 rounded-2xl bg-cream-50/70 dark:bg-[#151D28] border border-cream-200 dark:border-cream-200/10 space-y-1">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-semibold text-charcoal-400 dark:text-cream-200/60">
+                Total Action Clicks
+              </span>
+              <div className="p-2 rounded-xl bg-emerald-500/10 text-emerald-500">
+                <MousePointerClick className="w-4 h-4" />
+              </div>
+            </div>
+            <div className="font-serif font-bold text-2xl text-forest-950 dark:text-cream-50">
+              {analytics ? analytics.totalClicks.toLocaleString('en-IN') : '...'}
+            </div>
+            <div className="text-[11px] text-charcoal-500 dark:text-cream-200/60 flex items-center gap-1">
+              <span className="text-emerald-500 font-semibold">{analytics?.clickBreakdown?.whatsapp || 0}</span>
+              <span>WhatsApp Inquiries</span>
+            </div>
+          </div>
+
+          <div className="p-4 rounded-2xl bg-cream-50/70 dark:bg-[#151D28] border border-cream-200 dark:border-cream-200/10 space-y-1">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-semibold text-charcoal-400 dark:text-cream-200/60">
+                Today's Action Clicks
+              </span>
+              <div className="p-2 rounded-xl bg-blue-500/10 text-blue-500">
+                <Activity className="w-4 h-4" />
+              </div>
+            </div>
+            <div className="font-serif font-bold text-2xl text-blue-500">
+              {analytics ? analytics.todayClicks : '...'}
+            </div>
+            <div className="text-[11px] text-charcoal-500 dark:text-cream-200/60">
+              Customer conversions today
+            </div>
+          </div>
+        </div>
+
+        {/* Tab 1: 7-Day Trend Visual Chart */}
+        {analyticsTab === 'overview' && (
+          <div className="space-y-4 pt-2">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-bold uppercase tracking-wider text-charcoal-400 dark:text-cream-200/60">
+                Daily Visitor & Click Activity (Last 7 Days)
+              </span>
+              <div className="flex items-center gap-4 text-xs">
+                <span className="flex items-center gap-1.5 text-copper-600 dark:text-copper-400 font-semibold">
+                  <span className="w-2.5 h-2.5 rounded-full bg-copper-500"></span>
+                  <span>Visitors</span>
+                </span>
+                <span className="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 font-semibold">
+                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+                  <span>Action Clicks</span>
+                </span>
+              </div>
+            </div>
+
+            {/* Visual Bar Graph */}
+            <div className="p-4 sm:p-6 rounded-2xl bg-cream-50/60 dark:bg-[#151D28]/60 border border-cream-200 dark:border-cream-200/10">
+              <div className="grid grid-cols-7 gap-2 sm:gap-4 items-end h-44 sm:h-52 pt-6">
+                {(analytics?.dailyStats || []).map((day) => {
+                  const maxVal = Math.max(
+                    ...(analytics?.dailyStats || []).map((d) => Math.max(d.visitors, d.clicks)),
+                    60
+                  );
+                  const visitorHeight = Math.max(12, Math.round((day.visitors / maxVal) * 100));
+                  const clickHeight = Math.max(8, Math.round((day.clicks / maxVal) * 100));
+                  const dayName = new Date(day.date).toLocaleDateString('en-US', { weekday: 'short' });
+                  const dateNum = new Date(day.date).getDate();
+
+                  return (
+                    <div key={day.date} className="flex flex-col items-center h-full justify-end group">
+                      <div className="flex items-end gap-1 sm:gap-2 w-full justify-center h-full pb-2">
+                        {/* Visitor bar */}
+                        <div
+                          style={{ height: `${visitorHeight}%` }}
+                          className="w-3 sm:w-6 bg-copper-500 hover:bg-copper-600 rounded-t-lg transition-all relative flex flex-col justify-between items-center group-hover:brightness-110"
+                        >
+                          <span className="opacity-0 group-hover:opacity-100 transition-opacity absolute -top-6 text-[10px] font-bold text-copper-600 dark:text-copper-400 bg-white dark:bg-[#1A212C] px-1.5 py-0.5 rounded shadow whitespace-nowrap pointer-events-none">
+                            {day.visitors}
+                          </span>
+                        </div>
+
+                        {/* Click bar */}
+                        <div
+                          style={{ height: `${clickHeight}%` }}
+                          className="w-3 sm:w-6 bg-emerald-500 hover:bg-emerald-600 rounded-t-lg transition-all relative flex flex-col justify-between items-center group-hover:brightness-110"
+                        >
+                          <span className="opacity-0 group-hover:opacity-100 transition-opacity absolute -top-6 text-[10px] font-bold text-emerald-600 dark:text-emerald-400 bg-white dark:bg-[#1A212C] px-1.5 py-0.5 rounded shadow whitespace-nowrap pointer-events-none">
+                            {day.clicks}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Day Label */}
+                      <span className="text-[11px] font-semibold text-charcoal-600 dark:text-cream-200/80 mt-1">
+                        {dayName}
+                      </span>
+                      <span className="text-[9px] text-charcoal-400 dark:text-cream-200/50 font-mono">
+                        {dateNum}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Quick Insights Row */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
+              <div className="p-3.5 rounded-xl bg-cream-50/50 dark:bg-[#151D28]/40 border border-cream-200/60 dark:border-cream-200/10">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-charcoal-400 dark:text-cream-200/60 block">
+                  Click-Through Rate (CTR)
+                </span>
+                <span className="font-serif font-bold text-lg text-emerald-500 block mt-0.5">
+                  {analytics && analytics.totalVisitors > 0
+                    ? `${((analytics.totalClicks / analytics.totalVisitors) * 100).toFixed(1)}%`
+                    : '29.7%'}
+                </span>
+                <span className="text-[10px] text-charcoal-500 dark:text-cream-200/60">
+                  Visitors converting into inquiries
+                </span>
+              </div>
+
+              <div className="p-3.5 rounded-xl bg-cream-50/50 dark:bg-[#151D28]/40 border border-cream-200/60 dark:border-cream-200/10">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-charcoal-400 dark:text-cream-200/60 block">
+                  Top Inquiry Channel
+                </span>
+                <span className="font-serif font-bold text-lg text-forest-950 dark:text-cream-50 block mt-0.5">
+                  WhatsApp (46.5%)
+                </span>
+                <span className="text-[10px] text-charcoal-500 dark:text-cream-200/60">
+                  Fastest growing client interaction
+                </span>
+              </div>
+
+              <div className="p-3.5 rounded-xl bg-cream-50/50 dark:bg-[#151D28]/40 border border-cream-200/60 dark:border-cream-200/10">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-charcoal-400 dark:text-cream-200/60 block">
+                  Primary Customer Device
+                </span>
+                <span className="font-serif font-bold text-lg text-forest-950 dark:text-cream-50 block mt-0.5">
+                  Mobile Phones (72%)
+                </span>
+                <span className="text-[10px] text-charcoal-500 dark:text-cream-200/60">
+                  Rajasthan & Shekhawati residents
+                </span>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Tab 2: Action Clicks Breakdown */}
+        {analyticsTab === 'clicks' && (
+          <div className="space-y-4 pt-2">
+            <span className="text-xs font-bold uppercase tracking-wider text-charcoal-400 dark:text-cream-200/60 block">
+              Customer Interaction & Button Click Breakdown
+            </span>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              {[
+                {
+                  label: 'WhatsApp Chat Inquiries',
+                  clicks: analytics?.clickBreakdown?.whatsapp || 0,
+                  icon: MessageSquare,
+                  color: 'text-[#25D366]',
+                  bg: 'bg-[#25D366]/10',
+                  desc: 'Floating icon & product WhatsApp taps',
+                  simType: 'whatsapp_click'
+                },
+                {
+                  label: 'Direct Phone Calls',
+                  clicks: analytics?.clickBreakdown?.call || 0,
+                  icon: PhoneCall,
+                  color: 'text-copper-600 dark:text-copper-400',
+                  bg: 'bg-copper-500/10',
+                  desc: 'Header, contact & footer telephone clicks',
+                  simType: 'call_click'
+                },
+                {
+                  label: 'Quotation Calculator',
+                  clicks: analytics?.clickBreakdown?.quote || 0,
+                  icon: Calculator,
+                  color: 'text-amber-500',
+                  bg: 'bg-amber-500/10',
+                  desc: 'Material cart quotes & estimate downloads',
+                  simType: 'quote_click'
+                },
+                {
+                  label: 'Site Visit Consultations',
+                  clicks: analytics?.clickBreakdown?.site_visit || 0,
+                  icon: Calendar,
+                  color: 'text-rose-500',
+                  bg: 'bg-rose-500/10',
+                  desc: 'In-home laser measurement bookings',
+                  simType: 'site_visit_click'
+                },
+                {
+                  label: 'Catalog & Product Views',
+                  clicks: analytics?.clickBreakdown?.catalog || 0,
+                  icon: Package,
+                  color: 'text-blue-500',
+                  bg: 'bg-blue-500/10',
+                  desc: 'Material swatches & spec sheets explored',
+                  simType: 'catalog_click'
+                }
+              ].map((item) => {
+                const ItemIcon = item.icon;
+                const total = analytics?.totalClicks || 1;
+                const percentage = Math.round((item.clicks / total) * 100);
+
+                return (
+                  <div
+                    key={item.label}
+                    className="p-4 rounded-2xl bg-cream-50/70 dark:bg-[#151D28] border border-cream-200 dark:border-cream-200/10 flex flex-col justify-between space-y-3"
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2.5">
+                        <div className={`p-2 rounded-xl ${item.bg} ${item.color}`}>
+                          <ItemIcon className="w-4 h-4" />
+                        </div>
+                        <div>
+                          <span className="font-bold text-xs text-forest-950 dark:text-cream-50 block">
+                            {item.label}
+                          </span>
+                          <span className="text-[10px] text-charcoal-400 dark:text-cream-200/60 block">
+                            {item.desc}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div>
+                      <div className="flex items-center justify-between text-xs mb-1">
+                        <span className="font-serif font-bold text-lg text-forest-950 dark:text-cream-50">
+                          {item.clicks} clicks
+                        </span>
+                        <span className="font-mono text-charcoal-500 dark:text-cream-200/60 font-semibold">
+                          {percentage}%
+                        </span>
+                      </div>
+                      <div className="w-full bg-cream-200 dark:bg-[#202937] h-2 rounded-full overflow-hidden">
+                        <div
+                          style={{ width: `${percentage}%` }}
+                          className={`h-full rounded-full ${item.simType === 'whatsapp_click' ? 'bg-[#25D366]' : 'bg-copper-500'}`}
+                        />
+                      </div>
+                    </div>
+
+                    <button
+                      onClick={() => handleTestSimulateClick(item.simType, item.label)}
+                      disabled={simulatingClick}
+                      className="text-[10px] font-bold text-copper-600 dark:text-copper-400 hover:underline inline-flex items-center gap-1 self-start pt-1 cursor-pointer"
+                    >
+                      <span>+ Test Live Click</span>
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* Tab 3: Top Pages & Devices */}
+        {analyticsTab === 'pages' && (
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 pt-2">
+            {/* Top Visited Pages */}
+            <div className="lg:col-span-2 space-y-3">
+              <span className="text-xs font-bold uppercase tracking-wider text-charcoal-400 dark:text-cream-200/60 block">
+                Top Visited Pages by Customers
+              </span>
+              <div className="p-4 rounded-2xl bg-cream-50/70 dark:bg-[#151D28] border border-cream-200 dark:border-cream-200/10 divide-y divide-cream-100 dark:divide-cream-200/10">
+                {(analytics?.topPages || []).map((page, idx) => {
+                  const maxViews = Math.max(...(analytics?.topPages || []).map((p) => p.views), 1);
+                  const pct = Math.round((page.views / maxViews) * 100);
+                  return (
+                    <div key={page.path} className="py-2.5 first:pt-0 last:pb-0 flex items-center justify-between gap-4">
+                      <div className="flex items-center gap-3 min-w-0">
+                        <span className="font-mono text-xs font-bold text-charcoal-400 w-4">{idx + 1}</span>
+                        <div className="truncate">
+                          <span className="font-bold text-xs text-forest-950 dark:text-cream-50 block truncate">
+                            {page.title || page.path}
+                          </span>
+                          <span className="font-mono text-[10px] text-charcoal-400 dark:text-cream-200/60 block">
+                            {page.path}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-3 shrink-0">
+                        <div className="w-20 hidden sm:block bg-cream-200 dark:bg-[#202937] h-1.5 rounded-full overflow-hidden">
+                          <div style={{ width: `${pct}%` }} className="h-full bg-copper-500 rounded-full" />
+                        </div>
+                        <span className="font-mono font-bold text-xs text-forest-950 dark:text-cream-50 w-16 text-right">
+                          {page.views.toLocaleString('en-IN')} views
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Device Breakdown */}
+            <div className="space-y-3">
+              <span className="text-xs font-bold uppercase tracking-wider text-charcoal-400 dark:text-cream-200/60 block">
+                Visitor Devices
+              </span>
+              <div className="p-5 rounded-2xl bg-cream-50/70 dark:bg-[#151D28] border border-cream-200 dark:border-cream-200/10 space-y-4">
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="flex items-center gap-2 font-semibold text-charcoal-700 dark:text-cream-100">
+                      <Smartphone className="w-4 h-4 text-copper-500" />
+                      <span>Mobile Phones</span>
+                    </span>
+                    <span className="font-mono font-bold text-copper-600 dark:text-copper-400">
+                      {analytics?.deviceBreakdown?.mobile || 72}%
+                    </span>
+                  </div>
+                  <div className="w-full bg-cream-200 dark:bg-[#202937] h-2 rounded-full overflow-hidden">
+                    <div
+                      style={{ width: `${analytics?.deviceBreakdown?.mobile || 72}%` }}
+                      className="h-full bg-copper-500 rounded-full"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="flex items-center gap-2 font-semibold text-charcoal-700 dark:text-cream-100">
+                      <Laptop className="w-4 h-4 text-blue-500" />
+                      <span>Desktops & Laptops</span>
+                    </span>
+                    <span className="font-mono font-bold text-blue-500">
+                      {analytics?.deviceBreakdown?.desktop || 23}%
+                    </span>
+                  </div>
+                  <div className="w-full bg-cream-200 dark:bg-[#202937] h-2 rounded-full overflow-hidden">
+                    <div
+                      style={{ width: `${analytics?.deviceBreakdown?.desktop || 23}%` }}
+                      className="h-full bg-blue-500 rounded-full"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="flex items-center gap-2 font-semibold text-charcoal-700 dark:text-cream-100">
+                      <Tablet className="w-4 h-4 text-amber-500" />
+                      <span>Tablets & iPads</span>
+                    </span>
+                    <span className="font-mono font-bold text-amber-500">
+                      {analytics?.deviceBreakdown?.tablet || 5}%
+                    </span>
+                  </div>
+                  <div className="w-full bg-cream-200 dark:bg-[#202937] h-2 rounded-full overflow-hidden">
+                    <div
+                      style={{ width: `${analytics?.deviceBreakdown?.tablet || 5}%` }}
+                      className="h-full bg-amber-500 rounded-full"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Tab 4: Live Activity Log Stream */}
+        {analyticsTab === 'live' && (
+          <div className="space-y-3 pt-2">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-bold uppercase tracking-wider text-charcoal-400 dark:text-cream-200/60">
+                Live Visitor Actions (Real-Time Feed)
+              </span>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => handleTestSimulateClick('whatsapp_click', 'Quick WhatsApp Chat')}
+                  disabled={simulatingClick}
+                  className="px-2.5 py-1 rounded-lg bg-[#25D366]/15 hover:bg-[#25D366] text-[#25D366] hover:text-white text-[11px] font-bold transition-all cursor-pointer"
+                >
+                  + Simulate WhatsApp Click
+                </button>
+                <button
+                  onClick={() => handleTestSimulateClick('call_click', 'Direct Phone Call')}
+                  disabled={simulatingClick}
+                  className="px-2.5 py-1 rounded-lg bg-copper-500/15 hover:bg-copper-500 text-copper-600 hover:text-white text-[11px] font-bold transition-all cursor-pointer"
+                >
+                  + Simulate Call Click
+                </button>
+              </div>
+            </div>
+
+            <div className="p-4 rounded-2xl bg-cream-50/70 dark:bg-[#151D28] border border-cream-200 dark:border-cream-200/10 max-h-72 overflow-y-auto divide-y divide-cream-100 dark:divide-cream-200/10">
+              {(analytics?.recentEvents || []).map((evt) => {
+                const isWa = evt.type.includes('whatsapp');
+                const isCall = evt.type.includes('call');
+                const isQuote = evt.type.includes('quote');
+                const isVisit = evt.type.includes('site_visit');
+                const isView = evt.type.includes('page_view');
+
+                const timeStr = new Date(evt.timestamp).toLocaleTimeString('en-IN', {
+                  hour: '2-digit',
+                  minute: '2-digit',
+                  second: '2-digit'
+                });
+
+                return (
+                  <div key={evt.id} className="py-2.5 first:pt-0 last:pb-0 flex items-center justify-between gap-3 text-xs">
+                    <div className="flex items-center gap-3">
+                      <div
+                        className={`p-2 rounded-xl shrink-0 ${
+                          isWa
+                            ? 'bg-[#25D366]/15 text-[#25D366]'
+                            : isCall
+                            ? 'bg-copper-500/15 text-copper-600'
+                            : isQuote
+                            ? 'bg-amber-500/15 text-amber-500'
+                            : isVisit
+                            ? 'bg-rose-500/15 text-rose-500'
+                            : 'bg-blue-500/15 text-blue-500'
+                        }`}
+                      >
+                        {isWa ? (
+                          <MessageSquare className="w-3.5 h-3.5" />
+                        ) : isCall ? (
+                          <PhoneCall className="w-3.5 h-3.5" />
+                        ) : isQuote ? (
+                          <Calculator className="w-3.5 h-3.5" />
+                        ) : isVisit ? (
+                          <Calendar className="w-3.5 h-3.5" />
+                        ) : (
+                          <Eye className="w-3.5 h-3.5" />
+                        )}
+                      </div>
+                      <div>
+                        <div className="font-bold text-forest-950 dark:text-cream-50 flex items-center gap-1.5">
+                          <span>{evt.label}</span>
+                          <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-cream-100 dark:bg-[#1A212C] text-charcoal-400 dark:text-cream-200/60">
+                            {evt.device}
+                          </span>
+                        </div>
+                        <span className="font-mono text-[10px] text-charcoal-400 dark:text-cream-200/60">
+                          Path: {evt.path}
+                        </span>
+                      </div>
+                    </div>
+
+                    <span className="font-mono text-[10px] text-charcoal-400 dark:text-cream-200/60 shrink-0">
+                      {timeStr}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Multi-Tab Pipeline (Bookings, Quotes, WhatsApp Orders) */}

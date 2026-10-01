@@ -99,6 +99,68 @@ const ScrollToTop: React.FC = () => {
   return null;
 };
 
+// Automatic Visitor & Action Click Tracker for Website Analytics
+const WebsiteAnalyticsTracker: React.FC = () => {
+  const location = useLocation();
+
+  // 1. Track route changes (page views)
+  useEffect(() => {
+    if (!location.pathname.startsWith('/admin')) {
+      import('./services/analyticsService').then(({ analyticsService }) => {
+        analyticsService.trackPageView(location.pathname);
+      }).catch(() => null);
+    }
+  }, [location.pathname]);
+
+  // 2. Global event listener for click interactions (WhatsApp, Call, Quote, Site-Visit, Catalog)
+  useEffect(() => {
+    const handleGlobalClick = (e: MouseEvent) => {
+      const target = (e.target as HTMLElement)?.closest('a, button');
+      if (!target) return;
+
+      const href = (target as HTMLAnchorElement).href || '';
+      const text = (target.textContent || '').trim().replace(/\s+/g, ' ').slice(0, 45);
+
+      import('./services/analyticsService').then(({ analyticsService }) => {
+        // WhatsApp clicks
+        if (href.includes('wa.me') || href.includes('whatsapp.com')) {
+          analyticsService.trackClick('whatsapp_click', text || 'WhatsApp Inquiry', location.pathname);
+          return;
+        }
+
+        // Phone call clicks
+        if (href.startsWith('tel:')) {
+          analyticsService.trackClick('call_click', text || 'Direct Call', location.pathname);
+          return;
+        }
+
+        // Quote / Cost Estimator clicks
+        if (href.includes('/quote') || target.getAttribute('data-track') === 'quote') {
+          analyticsService.trackClick('quote_click', text || 'Quotation Calculator', location.pathname);
+          return;
+        }
+
+        // Site Visit consultation clicks
+        if (href.includes('/site-visit') || target.getAttribute('data-track') === 'site_visit') {
+          analyticsService.trackClick('site_visit_click', text || 'Site Visit Booking', location.pathname);
+          return;
+        }
+
+        // Catalog / Products clicks
+        if (href.includes('/products') || target.getAttribute('data-track') === 'catalog') {
+          analyticsService.trackClick('catalog_click', text || 'Catalog Material View', location.pathname);
+          return;
+        }
+      }).catch(() => null);
+    };
+
+    window.addEventListener('click', handleGlobalClick, { capture: true });
+    return () => window.removeEventListener('click', handleGlobalClick, { capture: true });
+  }, [location.pathname]);
+
+  return null;
+};
+
 // Subtle, non-flashing smooth chunk loader
 const PageSkeleton: React.FC = () => (
   <div className="min-h-[40vh] flex items-center justify-center py-24">
@@ -195,6 +257,7 @@ const AppContent: React.FC = () => {
   return (
     <div className="flex flex-col min-h-screen">
       <ScrollToTop />
+      <WebsiteAnalyticsTracker />
       <ScrollProgress />
       <Suspense fallback={null}>
         <FestiveEffects />
