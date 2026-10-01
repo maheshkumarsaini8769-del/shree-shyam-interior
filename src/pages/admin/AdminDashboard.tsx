@@ -31,8 +31,7 @@ import {
   Share2,
   Calculator,
   Calendar,
-  PhoneCall,
-  RotateCcw
+  PhoneCall
 } from 'lucide-react';
 import { apiService, Lead, QuoteRequest, WhatsAppOrder } from '../../services/apiService';
 import { useToast } from '../../context/ToastContext';
@@ -99,16 +98,6 @@ export const AdminDashboard: React.FC = () => {
     }
   };
 
-  const handleResetAnalytics = async () => {
-    if (!window.confirm('Reset all website visitor and click counters back to 0?')) return;
-    try {
-      const clean = await analyticsService.resetAnalytics();
-      setAnalytics({ ...clean });
-      showToast('All counters reset to 0! Only new real visitors will now be counted.', 'success');
-    } catch {
-      showToast('Failed to reset analytics', 'error');
-    }
-  };
 
   const loadData = async () => {
     try {
@@ -205,6 +194,9 @@ export const AdminDashboard: React.FC = () => {
   };
 
   const normalized7Days = getNormalized7Days(analytics?.dailyStats || []);
+  const sevenDaysTotalVisitors = normalized7Days.reduce((acc, d) => acc + (Number(d.visitors) || 0), 0);
+  const sevenDaysTotalClicks = normalized7Days.reduce((acc, d) => acc + (Number(d.clicks) || 0), 0);
+  const sevenDaysTotalViews = normalized7Days.reduce((acc, d) => acc + (Number(d.pageViews) || 0), 0);
 
   return (
     <div className="space-y-8">
@@ -347,7 +339,7 @@ export const AdminDashboard: React.FC = () => {
             <div className="inline-flex items-center gap-1 bg-cream-100 dark:bg-[#1A212C] p-1 rounded-xl text-xs border border-cream-200/50 dark:border-cream-200/10">
               {[
                 { id: '24h', label: 'Last 24 Hours (24 घंटे)', icon: Clock },
-                { id: 'overview', label: '7-Day Trend', icon: BarChart3 },
+                { id: 'overview', label: '7-Day Trend (7 दिन)', icon: BarChart3 },
                 { id: 'clicks', label: 'Action Clicks', icon: MousePointerClick },
                 { id: 'pages', label: 'Pages & Devices', icon: Eye },
                 { id: 'live', label: 'Live Stream', icon: Activity }
@@ -370,16 +362,6 @@ export const AdminDashboard: React.FC = () => {
               })}
             </div>
 
-            {/* Reset to 0 Button */}
-            <button
-              onClick={handleResetAnalytics}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 text-xs font-bold transition-all cursor-pointer border border-rose-500/20"
-              title="Reset all counters back to clean 0"
-            >
-              <RotateCcw className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Reset to 0</span>
-            </button>
-
             {/* Refresh Button */}
             <button
               onClick={loadAnalyticsData}
@@ -392,8 +374,32 @@ export const AdminDashboard: React.FC = () => {
           </div>
         </div>
 
-        {/* 4 Highlight Stat Cards */}
+        {/* Active Filter Indicator */}
+        <div className="flex items-center justify-between text-xs text-charcoal-500 dark:text-cream-200/60 pb-1">
+          <div className="flex items-center gap-2">
+            <span className="font-semibold text-charcoal-700 dark:text-cream-100">Filter Mode:</span>
+            <span className="px-2.5 py-0.5 rounded-md bg-copper-500/10 text-copper-600 dark:text-copper-400 font-bold border border-copper-500/20">
+              {analyticsTab === 'overview'
+                ? '📅 7-Day Filter Active (7 दिन का पूरा डेटा)'
+                : analyticsTab === '24h'
+                ? '🕒 24-Hour & Today Active (आज / 24 घंटे का डेटा)'
+                : analyticsTab === 'clicks'
+                ? '🎯 Action Clicks Breakdown'
+                : analyticsTab === 'pages'
+                ? '📄 Top Visited Pages'
+                : '⚡ Live Stream Log'}
+            </span>
+          </div>
+          {analyticsTab === 'overview' && (
+            <span className="hidden sm:inline text-[11px] text-copper-600 dark:text-copper-400 font-semibold">
+              Total 7-Day Visitors: <span className="underline decoration-copper-500 font-bold">{sevenDaysTotalVisitors}</span>
+            </span>
+          )}
+        </div>
+
+        {/* 4 Highlight Stat Cards (Dynamically adapts to 24h / 7-Day Filter) */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          {/* Card 1: Total Lifetime Visitors */}
           <div className="p-4 rounded-2xl bg-cream-50/70 dark:bg-[#151D28] border border-cream-200 dark:border-cream-200/10 space-y-1">
             <div className="flex items-center justify-between">
               <span className="text-xs font-semibold text-charcoal-400 dark:text-cream-200/60">
@@ -412,57 +418,107 @@ export const AdminDashboard: React.FC = () => {
             </div>
           </div>
 
+          {/* Card 2: Last 24h Visitors OR 7-Day Action Clicks */}
           <div className="p-4 rounded-2xl bg-cream-50/70 dark:bg-[#151D28] border border-cream-200 dark:border-cream-200/10 space-y-1">
             <div className="flex items-center justify-between">
               <span className="text-xs font-semibold text-copper-600 dark:text-copper-400 font-bold">
-                Last 24h Visitors
+                {analyticsTab === 'overview' ? '7-Day Action Clicks' : 'Last 24h Visitors'}
               </span>
               <div className="p-2 rounded-xl bg-copper-500/15 text-copper-600 dark:text-copper-400">
-                <Clock className="w-4 h-4" />
+                {analyticsTab === 'overview' ? <MousePointerClick className="w-4 h-4" /> : <Clock className="w-4 h-4" />}
               </div>
             </div>
             <div className="font-serif font-bold text-2xl text-copper-600 dark:text-copper-400">
-              {analytics ? analytics.last24hVisitors : '...'}
+              {analyticsTab === 'overview'
+                ? sevenDaysTotalClicks
+                : (analytics ? analytics.last24hVisitors : '...')}
             </div>
             <div className="text-[11px] text-charcoal-500 dark:text-cream-200/60 flex items-center gap-1">
-              <span className="text-emerald-500 font-semibold">{analytics?.last24hClicks || 0}</span>
-              <span>Clicks in last 24h</span>
+              <span className="text-emerald-500 font-semibold">
+                {analyticsTab === 'overview'
+                  ? `${((sevenDaysTotalClicks / (sevenDaysTotalVisitors || 1)) * 100).toFixed(0)}% CTR`
+                  : `${analytics?.last24hClicks || 0}`}
+              </span>
+              <span>
+                {analyticsTab === 'overview'
+                  ? '7-Day conversion rate'
+                  : 'Clicks in last 24h'}
+              </span>
             </div>
           </div>
 
-          <div className="p-4 rounded-2xl bg-cream-50/70 dark:bg-[#151D28] border border-cream-200 dark:border-cream-200/10 space-y-1">
+          {/* Card 3: Today's Visitors OR 7-Day Visitors (Dynamic based on selected filter!) */}
+          <div className="p-4 rounded-2xl bg-cream-50/70 dark:bg-[#151D28] border border-rose-500/20 dark:border-rose-500/10 space-y-1">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold text-charcoal-400 dark:text-cream-200/60">
-                Today's Visitors
+              <span className="text-xs font-semibold text-rose-600 dark:text-rose-400 font-bold flex items-center gap-1.5">
+                {analyticsTab === 'overview' ? (
+                  <>
+                    <span>7-Day Visitors (7 दिन)</span>
+                    <span className="text-[9px] px-1 py-0.2 rounded bg-rose-500 text-white font-bold uppercase">
+                      7 Days
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    <span>Today's Visitors (आज)</span>
+                    <span className="text-[9px] px-1 py-0.2 rounded bg-rose-500 text-white font-bold uppercase">
+                      Today
+                    </span>
+                  </>
+                )}
               </span>
               <div className="p-2 rounded-xl bg-rose-500/10 text-rose-500">
-                <Zap className="w-4 h-4" />
+                {analyticsTab === 'overview' ? <BarChart3 className="w-4 h-4" /> : <Zap className="w-4 h-4" />}
               </div>
             </div>
             <div className="font-serif font-bold text-2xl text-rose-500">
-              {analytics ? analytics.todayVisitors : '...'}
+              {analyticsTab === 'overview'
+                ? sevenDaysTotalVisitors
+                : (analytics ? analytics.todayVisitors : '...')}
             </div>
             <div className="text-[11px] text-charcoal-500 dark:text-cream-200/60 flex items-center gap-1">
-              <span className="text-blue-500 font-semibold">{analytics?.todayClicks || 0}</span>
-              <span>Clicks today</span>
+              {analyticsTab === 'overview' ? (
+                <>
+                  <span className="text-copper-600 dark:text-copper-400 font-semibold">
+                    {analytics?.todayVisitors || 0} today
+                  </span>
+                  <span>• {Math.round(sevenDaysTotalVisitors / 7)} avg/day</span>
+                </>
+              ) : (
+                <>
+                  <span className="text-blue-500 font-semibold">{analytics?.todayClicks || 0}</span>
+                  <span>Clicks today</span>
+                </>
+              )}
             </div>
           </div>
 
+          {/* Card 4: Total Action Clicks OR 7-Day Total Views */}
           <div className="p-4 rounded-2xl bg-cream-50/70 dark:bg-[#151D28] border border-cream-200 dark:border-cream-200/10 space-y-1">
             <div className="flex items-center justify-between">
               <span className="text-xs font-semibold text-charcoal-400 dark:text-cream-200/60">
-                Total Action Clicks
+                {analyticsTab === 'overview' ? '7-Day Page Views' : 'Total Action Clicks'}
               </span>
               <div className="p-2 rounded-xl bg-emerald-500/10 text-emerald-500">
-                <MousePointerClick className="w-4 h-4" />
+                {analyticsTab === 'overview' ? <Eye className="w-4 h-4" /> : <MousePointerClick className="w-4 h-4" />}
               </div>
             </div>
             <div className="font-serif font-bold text-2xl text-forest-950 dark:text-cream-50">
-              {analytics ? analytics.totalClicks.toLocaleString('en-IN') : '...'}
+              {analyticsTab === 'overview'
+                ? sevenDaysTotalViews
+                : (analytics ? analytics.totalClicks.toLocaleString('en-IN') : '...')}
             </div>
             <div className="text-[11px] text-charcoal-500 dark:text-cream-200/60 flex items-center gap-1">
-              <span className="text-emerald-500 font-semibold">{analytics?.clickBreakdown?.whatsapp || 0}</span>
-              <span>WhatsApp Inquiries</span>
+              <span className="text-emerald-500 font-semibold">
+                {analyticsTab === 'overview'
+                  ? `${sevenDaysTotalClicks} inquiries`
+                  : `${analytics?.clickBreakdown?.whatsapp || 0}`}
+              </span>
+              <span>
+                {analyticsTab === 'overview'
+                  ? 'in 7 days'
+                  : 'WhatsApp Inquiries'}
+              </span>
             </div>
           </div>
         </div>
