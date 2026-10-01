@@ -31,7 +31,8 @@ import {
   Share2,
   Calculator,
   Calendar,
-  PhoneCall
+  PhoneCall,
+  RotateCcw
 } from 'lucide-react';
 import { apiService, Lead, QuoteRequest, WhatsAppOrder } from '../../services/apiService';
 import { useToast } from '../../context/ToastContext';
@@ -95,6 +96,17 @@ export const AdminDashboard: React.FC = () => {
       showToast('Could not record test click', 'error');
     } finally {
       setSimulatingClick(false);
+    }
+  };
+
+  const handleResetAnalytics = async () => {
+    if (!window.confirm('Reset all website visitor and click counters back to 0?')) return;
+    try {
+      const clean = await analyticsService.resetAnalytics();
+      setAnalytics({ ...clean });
+      showToast('All counters reset to 0! Only new real visitors will now be counted.', 'success');
+    } catch {
+      showToast('Failed to reset analytics', 'error');
     }
   };
 
@@ -322,6 +334,16 @@ export const AdminDashboard: React.FC = () => {
                 );
               })}
             </div>
+
+            {/* Reset to 0 Button */}
+            <button
+              onClick={handleResetAnalytics}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 text-xs font-bold transition-all cursor-pointer border border-rose-500/20"
+              title="Reset all counters back to clean 0"
+            >
+              <RotateCcw className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Reset to 0</span>
+            </button>
 
             {/* Refresh Button */}
             <button

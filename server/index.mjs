@@ -1532,6 +1532,30 @@ app.post('/api/analytics/track', async (req, res) => {
   }
 });
 
+app.post('/api/analytics/reset', async (req, res) => {
+  try {
+    const todayStr = new Date().toISOString().split('T')[0];
+    const cleanData = {
+      totalVisitors: 0,
+      uniqueVisitors: 0,
+      todayVisitors: 0,
+      totalClicks: 0,
+      todayClicks: 0,
+      lastUpdated: new Date().toISOString(),
+      clickBreakdown: { whatsapp: 0, call: 0, quote: 0, site_visit: 0, catalog: 0 },
+      topPages: [],
+      deviceBreakdown: { mobile: 100, desktop: 0, tablet: 0 },
+      dailyStats: [{ date: todayStr, visitors: 0, pageViews: 0, clicks: 0 }],
+      recentEvents: []
+    };
+    await writeData('analytics.json', cleanData);
+    res.json({ success: true, data: cleanData });
+  } catch (err) {
+    console.error('Analytics reset error:', err);
+    res.status(500).json({ error: 'Failed to reset analytics' });
+  }
+});
+
 // -------------------------------------------------------------
 // 3D Studio Configurator Data
 // -------------------------------------------------------------

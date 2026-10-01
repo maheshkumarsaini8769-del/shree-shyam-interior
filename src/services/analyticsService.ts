@@ -52,83 +52,29 @@ const STORAGE_KEY = 'ssi_analytics_cache';
 const VISITOR_ID_KEY = 'ssi_visitor_id';
 
 const DEFAULT_ANALYTICS: AnalyticsData = {
-  totalVisitors: 1284,
-  uniqueVisitors: 946,
-  todayVisitors: 48,
-  totalClicks: 382,
-  todayClicks: 19,
+  totalVisitors: 0,
+  uniqueVisitors: 0,
+  todayVisitors: 0,
+  totalClicks: 0,
+  todayClicks: 0,
   lastUpdated: new Date().toISOString(),
   clickBreakdown: {
-    whatsapp: 178,
-    call: 92,
-    quote: 64,
-    site_visit: 36,
-    catalog: 12
+    whatsapp: 0,
+    call: 0,
+    quote: 0,
+    site_visit: 0,
+    catalog: 0
   },
-  topPages: [
-    { path: '/', title: 'Home Page', views: 842 },
-    { path: '/products', title: 'Catalog & Materials', views: 418 },
-    { path: '/quote', title: 'Quotation & Estimation', views: 276 },
-    { path: '/site-visit', title: 'Book Consultation Visit', views: 184 },
-    { path: '/projects', title: 'Portfolio & Case Studies', views: 165 },
-    { path: '/3d-studio', title: '3D Room Visualizer', views: 98 }
-  ],
+  topPages: [],
   deviceBreakdown: {
-    mobile: 72,
-    desktop: 23,
-    tablet: 5
+    mobile: 100,
+    desktop: 0,
+    tablet: 0
   },
   dailyStats: [
-    { date: '2026-09-25', visitors: 38, pageViews: 76, clicks: 14 },
-    { date: '2026-09-26', visitors: 44, pageViews: 92, clicks: 18 },
-    { date: '2026-09-27', visitors: 52, pageViews: 115, clicks: 22 },
-    { date: '2026-09-28', visitors: 41, pageViews: 85, clicks: 16 },
-    { date: '2026-09-29', visitors: 49, pageViews: 104, clicks: 21 },
-    { date: '2026-09-30', visitors: 58, pageViews: 128, clicks: 27 },
-    { date: '2026-10-01', visitors: 48, pageViews: 96, clicks: 19 }
+    { date: new Date().toISOString().split('T')[0], visitors: 0, pageViews: 0, clicks: 0 }
   ],
-  recentEvents: [
-    {
-      id: 'evt-101',
-      type: 'whatsapp_click',
-      label: 'Floating WhatsApp Contact',
-      path: '/',
-      device: 'Mobile',
-      timestamp: new Date(Date.now() - 15 * 60 * 1000).toISOString()
-    },
-    {
-      id: 'evt-102',
-      type: 'page_view',
-      label: 'Products Catalog',
-      path: '/products',
-      device: 'Desktop',
-      timestamp: new Date(Date.now() - 25 * 60 * 1000).toISOString()
-    },
-    {
-      id: 'evt-103',
-      type: 'quote_click',
-      label: 'Material Cart Quotation',
-      path: '/quote',
-      device: 'Mobile',
-      timestamp: new Date(Date.now() - 40 * 60 * 1000).toISOString()
-    },
-    {
-      id: 'evt-104',
-      type: 'call_click',
-      label: 'Header Direct Call',
-      path: '/',
-      device: 'Mobile',
-      timestamp: new Date(Date.now() - 75 * 60 * 1000).toISOString()
-    },
-    {
-      id: 'evt-105',
-      type: 'site_visit_click',
-      label: 'Book Free Site Measurement',
-      path: '/site-visit',
-      device: 'Mobile',
-      timestamp: new Date(Date.now() - 110 * 60 * 1000).toISOString()
-    }
-  ]
+  recentEvents: []
 };
 
 function getVisitorId(): string {
@@ -324,5 +270,19 @@ export const analyticsService = {
         }).catch(() => null);
       }
     } catch (_) {}
+  },
+
+  // Reset analytics data back to pure zero
+  async resetAnalytics(): Promise<AnalyticsData> {
+    const clean: AnalyticsData = {
+      ...DEFAULT_ANALYTICS,
+      lastUpdated: new Date().toISOString()
+    };
+    saveLocalAnalytics(clean);
+    try {
+      await fetch('/api/analytics/reset', { method: 'POST' });
+    } catch (_) {}
+    return clean;
   }
 };
+
