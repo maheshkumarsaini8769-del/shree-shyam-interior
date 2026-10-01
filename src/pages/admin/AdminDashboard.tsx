@@ -338,8 +338,8 @@ export const AdminDashboard: React.FC = () => {
             {/* View Tabs */}
             <div className="inline-flex items-center gap-1 bg-cream-100 dark:bg-[#1A212C] p-1 rounded-xl text-xs border border-cream-200/50 dark:border-cream-200/10">
               {[
-                { id: '24h', label: 'Last 24 Hours (24 घंटे)', icon: Clock },
-                { id: 'overview', label: '7-Day Trend (7 दिन)', icon: BarChart3 },
+                { id: '24h', label: 'Last 24 Hours', icon: Clock },
+                { id: 'overview', label: '7-Day Trend', icon: BarChart3 },
                 { id: 'clicks', label: 'Action Clicks', icon: MousePointerClick },
                 { id: 'pages', label: 'Pages & Devices', icon: Eye },
                 { id: 'live', label: 'Live Stream', icon: Activity }
@@ -380,14 +380,14 @@ export const AdminDashboard: React.FC = () => {
             <span className="font-semibold text-charcoal-700 dark:text-cream-100">Filter Mode:</span>
             <span className="px-2.5 py-0.5 rounded-md bg-copper-500/10 text-copper-600 dark:text-copper-400 font-bold border border-copper-500/20">
               {analyticsTab === 'overview'
-                ? '📅 7-Day Filter Active (7 दिन का पूरा डेटा)'
+                ? '7-Day Filter Active'
                 : analyticsTab === '24h'
-                ? '🕒 24-Hour & Today Active (आज / 24 घंटे का डेटा)'
+                ? 'Last 24 Hours & Today'
                 : analyticsTab === 'clicks'
-                ? '🎯 Action Clicks Breakdown'
+                ? 'Action Clicks Breakdown'
                 : analyticsTab === 'pages'
-                ? '📄 Top Visited Pages'
-                : '⚡ Live Stream Log'}
+                ? 'Top Visited Pages'
+                : 'Live Stream Log'}
             </span>
           </div>
           {analyticsTab === 'overview' && (
@@ -453,14 +453,14 @@ export const AdminDashboard: React.FC = () => {
               <span className="text-xs font-semibold text-rose-600 dark:text-rose-400 font-bold flex items-center gap-1.5">
                 {analyticsTab === 'overview' ? (
                   <>
-                    <span>7-Day Visitors (7 दिन)</span>
+                    <span>7-Day Visitors</span>
                     <span className="text-[9px] px-1 py-0.2 rounded bg-rose-500 text-white font-bold uppercase">
                       7 Days
                     </span>
                   </>
                 ) : (
                   <>
-                    <span>Today's Visitors (आज)</span>
+                    <span>Today's Visitors</span>
                     <span className="text-[9px] px-1 py-0.2 rounded bg-rose-500 text-white font-bold uppercase">
                       Today
                     </span>
@@ -529,7 +529,7 @@ export const AdminDashboard: React.FC = () => {
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
               <div>
                 <span className="text-xs font-bold uppercase tracking-wider text-charcoal-400 dark:text-cream-200/60 block">
-                  Last 24 Hours Traffic (पिछले 24 घंटे का विज़िटर डेटा)
+                  Last 24 Hours Traffic Breakdown
                 </span>
                 <p className="text-[11px] text-charcoal-500 dark:text-cream-200/60">
                   Hour-by-hour customer visits and button clicks across the last 24 hours.
@@ -711,7 +711,7 @@ export const AdminDashboard: React.FC = () => {
             <div className="rounded-2xl border border-cream-200 dark:border-cream-200/10 overflow-hidden bg-white dark:bg-[#121820]">
               <div className="px-4 py-3 bg-cream-100/60 dark:bg-[#151D28] border-b border-cream-200 dark:border-cream-200/10 flex items-center justify-between">
                 <span className="text-xs font-bold text-forest-950 dark:text-cream-50 uppercase tracking-wider">
-                  Daily Visitor & Click Breakdown (Har Din Ka Data)
+                  Daily Visitor & Click Breakdown
                 </span>
                 <span className="text-[11px] text-charcoal-500 dark:text-cream-200/60 font-medium">
                   Last 7 Consecutive Days
