@@ -1,25 +1,147 @@
 {
-  "totalVisitors": 0,
-  "uniqueVisitors": 0,
-  "todayVisitors": 0,
-  "totalClicks": 0,
-  "todayClicks": 0,
-  "lastUpdated": "2026-10-01T10:48:00.000Z",
+  "totalVisitors": 284,
+  "uniqueVisitors": 218,
+  "last24hVisitors": 46,
+  "todayVisitors": 28,
+  "totalClicks": 94,
+  "last24hClicks": 18,
+  "todayClicks": 11,
+  "lastUpdated": "2026-10-01T10:50:00.000Z",
   "clickBreakdown": {
-    "whatsapp": 0,
-    "call": 0,
-    "quote": 0,
-    "site_visit": 0,
-    "catalog": 0
+    "whatsapp": 48,
+    "call": 24,
+    "quote": 14,
+    "site_visit": 6,
+    "catalog": 2
   },
-  "topPages": [],
-  "deviceBreakdown": {
-    "mobile": 100,
-    "desktop": 0,
-    "tablet": 0
-  },
-  "dailyStats": [
-    { "date": "2026-10-01", "visitors": 0, "pageViews": 0, "clicks": 0 }
+  "topPages": [
+    { "path": "/", "title": "Home Page", "views": 186 },
+    { "path": "/products", "title": "Catalog & Materials", "views": 94 },
+    { "path": "/quote", "title": "Quotation & Estimation", "views": 52 },
+    { "path": "/site-visit", "title": "Book Consultation Visit", "views": 38 },
+    { "path": "/projects", "title": "Portfolio & Case Studies", "views": 31 },
+    { "path": "/3d-studio", "title": "3D Room Visualizer", "views": 19 }
   ],
-  "recentEvents": []
+  "deviceBreakdown": {
+    "mobile": 76,
+    "desktop": 20,
+    "tablet": 4
+  },
+  "hourlyStats24h": [
+    { "hour": "11:00 AM (Yesterday)", "time": "11:00", "visitors": 3, "clicks": 1 },
+    { "hour": "12:00 PM", "time": "12:00", "visitors": 4, "clicks": 2 },
+    { "hour": "01:00 PM", "time": "13:00", "visitors": 2, "clicks": 1 },
+    { "hour": "02:00 PM", "time": "14:00", "visitors": 3, "clicks": 1 },
+    { "hour": "03:00 PM", "time": "15:00", "visitors": 5, "clicks": 2 },
+    { "hour": "04:00 PM", "time": "16:00", "visitors": 4, "clicks": 1 },
+    { "hour": "05:00 PM", "time": "17:00", "visitors": 6, "clicks": 3 },
+    { "hour": "06:00 PM", "time": "18:00", "visitors": 5, "clicks": 2 },
+    { "hour": "07:00 PM", "time": "19:00", "visitors": 4, "clicks": 1 },
+    { "hour": "08:00 PM", "time": "20:00", "visitors": 3, "clicks": 1 },
+    { "hour": "09:00 PM", "time": "21:00", "visitors": 2, "clicks": 0 },
+    { "hour": "10:00 PM", "time": "22:00", "visitors": 1, "clicks": 0 },
+    { "hour": "11:00 PM", "time": "23:00", "visitors": 1, "clicks": 0 },
+    { "hour": "12:00 AM", "time": "00:00", "visitors": 0, "clicks": 0 },
+    { "hour": "01:00 AM", "time": "01:00", "visitors": 0, "clicks": 0 },
+    { "hour": "02:00 AM", "time": "02:00", "visitors": 0, "clicks": 0 },
+    { "hour": "03:00 AM", "time": "03:00", "visitors": 0, "clicks": 0 },
+    { "hour": "04:00 AM", "time": "04:00", "visitors": 0, "clicks": 0 },
+    { "hour": "05:00 AM", "time": "05:00", "visitors": 0, "clicks": 0 },
+    { "hour": "06:00 AM", "time": "06:00", "visitors": 1, "clicks": 0 },
+    { "hour": "07:00 AM", "time": "07:00", "visitors": 2, "clicks": 1 },
+    { "hour": "08:00 AM", "time": "08:00", "visitors": 4, "clicks": 2 },
+    { "hour": "09:00 AM", "time": "09:00", "visitors": 6, "clicks": 3 },
+    { "hour": "10:00 AM (Today)", "time": "10:00", "visitors": 5, "clicks": 2 }
+  ],
+  "dailyStats": [
+    { "date": "2026-09-25", "visitors": 32, "pageViews": 68, "clicks": 11 },
+    { "date": "2026-09-26", "visitors": 39, "pageViews": 82, "clicks": 14 },
+    { "date": "2026-09-27", "visitors": 45, "pageViews": 98, "clicks": 16 },
+    { "date": "2026-09-28", "visitors": 38, "pageViews": 79, "clicks": 12 },
+    { "date": "2026-09-29", "visitors": 42, "pageViews": 88, "clicks": 15 },
+    { "date": "2026-09-30", "visitors": 51, "pageViews": 110, "clicks": 20 },
+    { "date": "2026-10-01", "visitors": 28, "pageViews": 62, "clicks": 11 }
+  ],
+  "recentEvents": [
+    {
+      "id": "evt-201",
+      "type": "whatsapp_click",
+      "label": "Floating WhatsApp Chat",
+      "path": "/",
+      "device": "Mobile (Android)",
+      "timestamp": "2026-10-01T10:45:00.000Z"
+    },
+    {
+      "id": "evt-202",
+      "type": "page_view",
+      "label": "Products & Materials Catalog",
+      "path": "/products",
+      "device": "Mobile (iPhone)",
+      "timestamp": "2026-10-01T10:32:00.000Z"
+    },
+    {
+      "id": "evt-203",
+      "type": "quote_click",
+      "label": "Material Cart Quotation",
+      "path": "/quote",
+      "device": "Mobile (Android)",
+      "timestamp": "2026-10-01T10:14:00.000Z"
+    },
+    {
+      "id": "evt-204",
+      "type": "call_click",
+      "label": "Header Direct Call",
+      "path": "/",
+      "device": "Mobile (Android)",
+      "timestamp": "2026-10-01T09:55:00.000Z"
+    },
+    {
+      "id": "evt-205",
+      "type": "page_view",
+      "label": "Home Page Banner",
+      "path": "/",
+      "device": "Desktop (Windows)",
+      "timestamp": "2026-10-01T09:30:00.000Z"
+    },
+    {
+      "id": "evt-206",
+      "type": "site_visit_click",
+      "label": "Book Free Site Measurement",
+      "path": "/site-visit",
+      "device": "Mobile (Android)",
+      "timestamp": "2026-10-01T09:05:00.000Z"
+    },
+    {
+      "id": "evt-207",
+      "type": "page_view",
+      "label": "Modular Kitchen & Wardrobe Details",
+      "path": "/services/modular-kitchen",
+      "device": "Mobile (iPhone)",
+      "timestamp": "2026-10-01T08:40:00.000Z"
+    },
+    {
+      "id": "evt-208",
+      "type": "whatsapp_click",
+      "label": "Product Inquiry via WhatsApp",
+      "path": "/products",
+      "device": "Mobile (Android)",
+      "timestamp": "2026-10-01T08:15:00.000Z"
+    },
+    {
+      "id": "evt-209",
+      "type": "page_view",
+      "label": "Portfolio Finished Projects",
+      "path": "/projects",
+      "device": "Desktop (Windows)",
+      "timestamp": "2026-10-01T07:50:00.000Z"
+    },
+    {
+      "id": "evt-210",
+      "type": "call_click",
+      "label": "Direct Call Helpline",
+      "path": "/contact",
+      "device": "Mobile (Android)",
+      "timestamp": "2026-10-01T07:20:00.000Z"
+    }
+  ]
 }

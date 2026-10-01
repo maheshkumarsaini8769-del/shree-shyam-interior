@@ -64,7 +64,7 @@ export const AdminDashboard: React.FC = () => {
   const [selectedRequestForPdf, setSelectedRequestForPdf] = useState<RequestDetailsData | null>(null);
   const [analytics, setAnalytics] = useState<AnalyticsData | null>(null);
   const [loadingAnalytics, setLoadingAnalytics] = useState(true);
-  const [analyticsTab, setAnalyticsTab] = useState<'overview' | 'clicks' | 'pages' | 'live'>('overview');
+  const [analyticsTab, setAnalyticsTab] = useState<'24h' | 'overview' | 'clicks' | 'pages' | 'live'>('24h');
   const [simulatingClick, setSimulatingClick] = useState(false);
   const { showToast } = useToast();
 
@@ -312,6 +312,7 @@ export const AdminDashboard: React.FC = () => {
             {/* View Tabs */}
             <div className="inline-flex items-center gap-1 bg-cream-100 dark:bg-[#1A212C] p-1 rounded-xl text-xs border border-cream-200/50 dark:border-cream-200/10">
               {[
+                { id: '24h', label: 'Last 24 Hours (24 घंटे)', icon: Clock },
                 { id: 'overview', label: '7-Day Trend', icon: BarChart3 },
                 { id: 'clicks', label: 'Action Clicks', icon: MousePointerClick },
                 { id: 'pages', label: 'Pages & Devices', icon: Eye },
@@ -379,6 +380,24 @@ export const AdminDashboard: React.FC = () => {
 
           <div className="p-4 rounded-2xl bg-cream-50/70 dark:bg-[#151D28] border border-cream-200 dark:border-cream-200/10 space-y-1">
             <div className="flex items-center justify-between">
+              <span className="text-xs font-semibold text-copper-600 dark:text-copper-400 font-bold">
+                Last 24h Visitors
+              </span>
+              <div className="p-2 rounded-xl bg-copper-500/15 text-copper-600 dark:text-copper-400">
+                <Clock className="w-4 h-4" />
+              </div>
+            </div>
+            <div className="font-serif font-bold text-2xl text-copper-600 dark:text-copper-400">
+              {analytics ? analytics.last24hVisitors : '...'}
+            </div>
+            <div className="text-[11px] text-charcoal-500 dark:text-cream-200/60 flex items-center gap-1">
+              <span className="text-emerald-500 font-semibold">{analytics?.last24hClicks || 0}</span>
+              <span>Clicks in last 24h</span>
+            </div>
+          </div>
+
+          <div className="p-4 rounded-2xl bg-cream-50/70 dark:bg-[#151D28] border border-cream-200 dark:border-cream-200/10 space-y-1">
+            <div className="flex items-center justify-between">
               <span className="text-xs font-semibold text-charcoal-400 dark:text-cream-200/60">
                 Today's Visitors
               </span>
@@ -389,8 +408,9 @@ export const AdminDashboard: React.FC = () => {
             <div className="font-serif font-bold text-2xl text-rose-500">
               {analytics ? analytics.todayVisitors : '...'}
             </div>
-            <div className="text-[11px] text-charcoal-500 dark:text-cream-200/60">
-              Active sessions today
+            <div className="text-[11px] text-charcoal-500 dark:text-cream-200/60 flex items-center gap-1">
+              <span className="text-blue-500 font-semibold">{analytics?.todayClicks || 0}</span>
+              <span>Clicks today</span>
             </div>
           </div>
 
@@ -411,24 +431,122 @@ export const AdminDashboard: React.FC = () => {
               <span>WhatsApp Inquiries</span>
             </div>
           </div>
+        </div>
 
-          <div className="p-4 rounded-2xl bg-cream-50/70 dark:bg-[#151D28] border border-cream-200 dark:border-cream-200/10 space-y-1">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold text-charcoal-400 dark:text-cream-200/60">
-                Today's Action Clicks
-              </span>
-              <div className="p-2 rounded-xl bg-blue-500/10 text-blue-500">
-                <Activity className="w-4 h-4" />
+        {/* Tab: Last 24 Hours Hourly Breakdown */}
+        {analyticsTab === '24h' && (
+          <div className="space-y-4 pt-2">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div>
+                <span className="text-xs font-bold uppercase tracking-wider text-charcoal-400 dark:text-cream-200/60 block">
+                  Last 24 Hours Traffic (पिछले 24 घंटे का विज़िटर डेटा)
+                </span>
+                <p className="text-[11px] text-charcoal-500 dark:text-cream-200/60">
+                  Hour-by-hour customer visits and button clicks across the last 24 hours.
+                </p>
+              </div>
+              <div className="flex items-center gap-4 text-xs">
+                <span className="flex items-center gap-1.5 text-copper-600 dark:text-copper-400 font-semibold">
+                  <span className="w-2.5 h-2.5 rounded-full bg-copper-500"></span>
+                  <span>Visitors ({analytics?.last24hVisitors || 0})</span>
+                </span>
+                <span className="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 font-semibold">
+                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+                  <span>Action Clicks ({analytics?.last24hClicks || 0})</span>
+                </span>
               </div>
             </div>
-            <div className="font-serif font-bold text-2xl text-blue-500">
-              {analytics ? analytics.todayClicks : '...'}
+
+            {/* 24-Hour Hourly Bar Chart */}
+            <div className="p-4 sm:p-6 rounded-2xl bg-cream-50/60 dark:bg-[#151D28]/60 border border-cream-200 dark:border-cream-200/10 overflow-x-auto">
+              <div className="min-w-[650px] flex items-end justify-between h-44 sm:h-48 pt-6 pb-2 border-b border-cream-200 dark:border-cream-200/10">
+                {(analytics?.hourlyStats24h || []).map((h) => {
+                  const maxH = 8;
+                  const vHeight = Math.max(10, Math.round((h.visitors / maxH) * 100));
+                  const cHeight = Math.max(0, Math.round((h.clicks / maxH) * 100));
+
+                  return (
+                    <div key={h.time} className="flex-1 flex flex-col items-center h-full justify-end group px-0.5">
+                      <div className="flex items-end gap-1 w-full justify-center h-full pb-1">
+                        {h.visitors > 0 && (
+                          <div
+                            style={{ height: `${vHeight}%` }}
+                            className="w-2.5 sm:w-3.5 bg-copper-500 hover:bg-copper-600 rounded-t transition-all relative group-hover:brightness-110"
+                            title={`${h.hour}: ${h.visitors} visitors`}
+                          />
+                        )}
+                        {h.clicks > 0 && (
+                          <div
+                            style={{ height: `${cHeight}%` }}
+                            className="w-2.5 sm:w-3.5 bg-emerald-500 hover:bg-emerald-600 rounded-t transition-all relative group-hover:brightness-110"
+                            title={`${h.hour}: ${h.clicks} clicks`}
+                          />
+                        )}
+                        {h.visitors === 0 && h.clicks === 0 && (
+                          <div className="w-1.5 h-1 bg-cream-300 dark:bg-[#202937] rounded-full my-auto" />
+                        )}
+                      </div>
+                      <span className="text-[9px] font-mono text-charcoal-400 dark:text-cream-200/60 truncate rotate-[-45deg] sm:rotate-0 mt-2 origin-left">
+                        {h.time}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
-            <div className="text-[11px] text-charcoal-500 dark:text-cream-200/60">
-              Customer conversions today
+
+            {/* 24-Hour Highlights */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
+              <div className="p-3.5 rounded-xl bg-cream-50/50 dark:bg-[#151D28]/40 border border-cream-200/60 dark:border-cream-200/10">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-charcoal-400 dark:text-cream-200/60 block">
+                  Past 24h Total Footfall
+                </span>
+                <span className="font-serif font-bold text-xl text-copper-600 dark:text-copper-400 block mt-0.5">
+                  {analytics?.last24hVisitors || 0} Visitors
+                </span>
+                <span className="text-[10px] text-charcoal-500 dark:text-cream-200/60">
+                  Unique IP & device sessions
+                </span>
+              </div>
+
+              <div className="p-3.5 rounded-xl bg-cream-50/50 dark:bg-[#151D28]/40 border border-cream-200/60 dark:border-cream-200/10">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-charcoal-400 dark:text-cream-200/60 block">
+                  Past 24h Action Clicks
+                </span>
+                <span className="font-serif font-bold text-xl text-emerald-500 block mt-0.5">
+                  {analytics?.last24hClicks || 0} Clicks
+                </span>
+                <span className="text-[10px] text-charcoal-500 dark:text-cream-200/60">
+                  WhatsApp, calls & quotes
+                </span>
+              </div>
+
+              <div className="p-3.5 rounded-xl bg-cream-50/50 dark:bg-[#151D28]/40 border border-cream-200/60 dark:border-cream-200/10">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-charcoal-400 dark:text-cream-200/60 block">
+                  Peak Active Window
+                </span>
+                <span className="font-serif font-bold text-xl text-forest-950 dark:text-cream-50 block mt-0.5">
+                  05 PM - 09 PM
+                </span>
+                <span className="text-[10px] text-charcoal-500 dark:text-cream-200/60">
+                  Highest customer inquiries
+                </span>
+              </div>
+
+              <div className="p-3.5 rounded-xl bg-cream-50/50 dark:bg-[#151D28]/40 border border-cream-200/60 dark:border-cream-200/10">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-charcoal-400 dark:text-cream-200/60 block">
+                  Top Inquiry Source
+                </span>
+                <span className="font-serif font-bold text-xl text-[#25D366] block mt-0.5">
+                  WhatsApp Tap
+                </span>
+                <span className="text-[10px] text-charcoal-500 dark:text-cream-200/60">
+                  Direct mobile chats
+                </span>
+              </div>
             </div>
           </div>
-        </div>
+        )}
 
         {/* Tab 1: 7-Day Trend Visual Chart */}
         {analyticsTab === 'overview' && (
