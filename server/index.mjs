@@ -1166,7 +1166,9 @@ app.put('/api/content', async (req, res) => {
 app.get('/api/leads', async (req, res) => {
   try {
     const leads = (await readData('leads.json')) || [];
-    res.json(leads);
+    const deleted = (await readData('deleted_leads.json')) || [];
+    const deletedSet = new Set(Array.isArray(deleted) ? deleted : []);
+    res.json(leads.filter((l) => !deletedSet.has(l.id)));
   } catch (err) {
     console.error('Error fetching leads:', err);
     res.json([]);
@@ -1235,6 +1237,15 @@ app.delete('/api/leads/:id', async (req, res) => {
     } catch (writeErr) {
       console.warn('[Leads] Non-fatal delete write warning:', writeErr?.message || writeErr);
     }
+
+    // Persist deleted lead ID so it never resurfaces
+    try {
+      let deleted = (await readData('deleted_leads.json')) || [];
+      if (!Array.isArray(deleted)) deleted = [];
+      if (!deleted.includes(id)) deleted.push(id);
+      await writeData('deleted_leads.json', deleted);
+    } catch (_) {}
+
     res.json({ success: true, id });
   } catch (err) {
     console.error('Error deleting lead:', err);
@@ -1248,7 +1259,9 @@ app.delete('/api/leads/:id', async (req, res) => {
 app.get('/api/quotes', async (req, res) => {
   try {
     const quotes = (await readData('quotes.json')) || [];
-    res.json(quotes);
+    const deleted = (await readData('deleted_quotes.json')) || [];
+    const deletedSet = new Set(Array.isArray(deleted) ? deleted : []);
+    res.json(quotes.filter((q) => !deletedSet.has(q.id)));
   } catch (err) {
     console.error('Error fetching quotes:', err);
     res.json([]);
@@ -1315,6 +1328,15 @@ app.delete('/api/quotes/:id', async (req, res) => {
     } catch (writeErr) {
       console.warn('[Quotes] Non-fatal delete write warning:', writeErr?.message || writeErr);
     }
+
+    // Persist deleted quote ID so it never resurfaces
+    try {
+      let deleted = (await readData('deleted_quotes.json')) || [];
+      if (!Array.isArray(deleted)) deleted = [];
+      if (!deleted.includes(id)) deleted.push(id);
+      await writeData('deleted_quotes.json', deleted);
+    } catch (_) {}
+
     res.json({ success: true, id });
   } catch (err) {
     console.error('Error deleting quote:', err);
@@ -1328,7 +1350,9 @@ app.delete('/api/quotes/:id', async (req, res) => {
 app.get('/api/whatsapp-orders', async (req, res) => {
   try {
     const orders = (await readData('whatsappOrders.json')) || [];
-    res.json(orders);
+    const deleted = (await readData('deleted_whatsapp_orders.json')) || [];
+    const deletedSet = new Set(Array.isArray(deleted) ? deleted : []);
+    res.json(orders.filter((o) => !deletedSet.has(o.id)));
   } catch (err) {
     console.error('Error fetching whatsapp orders:', err);
     res.json([]);
@@ -1397,6 +1421,15 @@ app.delete('/api/whatsapp-orders/:id', async (req, res) => {
     } catch (writeErr) {
       console.warn('[WhatsAppOrders] Non-fatal delete write warning:', writeErr?.message || writeErr);
     }
+
+    // Persist deleted order ID so it never resurfaces
+    try {
+      let deleted = (await readData('deleted_whatsapp_orders.json')) || [];
+      if (!Array.isArray(deleted)) deleted = [];
+      if (!deleted.includes(id)) deleted.push(id);
+      await writeData('deleted_whatsapp_orders.json', deleted);
+    } catch (_) {}
+
     res.json({ success: true, id });
   } catch (err) {
     console.error('Error deleting whatsapp order:', err);

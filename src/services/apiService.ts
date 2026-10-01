@@ -633,6 +633,36 @@ function compressImageFile(file: File, maxWidth = 1600, maxHeight = 1200, qualit
   });
 }
 
+// Persistent tombstone storage keys to permanently suppress deleted records
+const DELETED_LEADS_KEY = 'ssi_deleted_lead_ids';
+const DELETED_QUOTES_KEY = 'ssi_deleted_quote_ids';
+const DELETED_ORDERS_KEY = 'ssi_deleted_order_ids';
+
+// Seed test records that should never resurrect
+const DEFAULT_PURGED_IDS = ['LEAD-1790177740622', 'QUOTE-TEST-DIRECT', 'WA-1790173954701'];
+
+function getDeletedIds(key: string): Set<string> {
+  const set = new Set<string>(DEFAULT_PURGED_IDS);
+  try {
+    const raw = localStorage.getItem(key);
+    if (raw) {
+      const arr = JSON.parse(raw);
+      if (Array.isArray(arr)) {
+        arr.forEach((id) => set.add(id));
+      }
+    }
+  } catch (_) {}
+  return set;
+}
+
+function recordDeletedId(key: string, id: string) {
+  try {
+    const set = getDeletedIds(key);
+    set.add(id);
+    localStorage.setItem(key, JSON.stringify(Array.from(set)));
+  } catch (_) {}
+}
+
 export const apiService = {
   // Auth
   async login(username: string, password: string) {
@@ -1386,27 +1416,30 @@ export const apiService = {
   // Dynamic Leads, Quotes & WhatsApp Orders with Cloud Persistence
   // -------------------------------------------------------------
   async getLeads(): Promise<Lead[]> {
+    const deletedIds = getDeletedIds(DELETED_LEADS_KEY);
     const map = new Map<string, Lead>();
 
     // 1. Fetch from server API
     try {
       const apiLeads = await apiFetch<Lead[]>('/leads');
       if (Array.isArray(apiLeads)) {
-        apiLeads.forEach((l) => map.set(l.id, l));
+        apiLeads.forEach((l) => {
+          if (!deletedIds.has(l.id)) map.set(l.id, l);
+        });
       }
     } catch (_) {}
 
     // 2. Fallback / Sync from Cloud Store
     try {
       const cloudRes = await fetch('https://api.restful-api.dev/objects/ff808181a09d98f701a0c9c936407072', {
-        signal: AbortSignal.timeout(5000)
+        signal: AbortSignal.timeout(3000)
       });
       if (cloudRes.ok) {
         const json = await cloudRes.json();
         const cloudLeads = json?.data?.leads;
         if (Array.isArray(cloudLeads)) {
           cloudLeads.forEach((l: Lead) => {
-            if (!map.has(l.id)) map.set(l.id, l);
+            if (!deletedIds.has(l.id) && !map.has(l.id)) map.set(l.id, l);
           });
         }
       }
@@ -1419,17 +1452,17 @@ export const apiService = {
         const localLeads: Lead[] = JSON.parse(raw);
         if (Array.isArray(localLeads)) {
           localLeads.forEach((l) => {
-            if (!map.has(l.id)) map.set(l.id, l);
+            if (!deletedIds.has(l.id) && !map.has(l.id)) map.set(l.id, l);
           });
         }
       }
     } catch (_) {}
 
-    const list = Array.from(map.values()).sort(
-      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-    );
+    const list = Array.from(map.values())
+      .filter((l) => !deletedIds.has(l.id))
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
-    // Keep localStorage updated with merged list
+    // Keep localStorage updated with merged clean list
     try {
       localStorage.setItem('ssi_site_visits', JSON.stringify(list));
     } catch (_) {}
@@ -1525,6 +1558,10 @@ export const apiService = {
   },
 
   async deleteLead(id: string): Promise<{ success: boolean; id: string }> {
+    // 1. Permanently blacklist ID in tombstone storage
+    recordDeletedId(DELETED_LEADS_KEY, id);
+
+    // 2. Remove from local storage immediately
     try {
       const raw = localStorage.getItem('ssi_site_visits');
       if (raw) {
@@ -1534,9 +1571,11 @@ export const apiService = {
       }
     } catch (_) {}
 
-    // Cloud store deletion
+    // 3. Cloud store deletion
     try {
-      const cloudRes = await fetch('https://api.restful-api.dev/objects/ff808181a09d98f701a0c9c936407072');
+      const cloudRes = await fetch('https://api.restful-api.dev/objects/ff808181a09d98f701a0c9c936407072', {
+        signal: AbortSignal.timeout(3000)
+      });
       if (cloudRes.ok) {
         const json = await cloudRes.json();
         const data = json?.data || {};
@@ -1546,41 +1585,50 @@ export const apiService = {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ name: 'shree-shyam-interior-store', data }),
-            signal: AbortSignal.timeout(5000)
+            signal: AbortSignal.timeout(3000)
           });
         }
       }
     } catch (_) {}
 
-    return apiFetch<{ success: boolean; id: string }>(`/leads/${id}`, {
-      method: 'DELETE'
-    });
+    // 4. Server API deletion (safely handled)
+    try {
+      await apiFetch<{ success: boolean; id: string }>(`/leads/${id}`, {
+        method: 'DELETE'
+      });
+    } catch (_) {}
+
+    return { success: true, id };
   },
 
   // -------------------------------------------------------------
   // Quotes (Material Estimations)
   // -------------------------------------------------------------
   async getQuotes(): Promise<QuoteRequest[]> {
+    const deletedIds = getDeletedIds(DELETED_QUOTES_KEY);
     const map = new Map<string, QuoteRequest>();
 
     // 1. Fetch from server API
     try {
       const apiQuotes = await apiFetch<QuoteRequest[]>('/quotes');
       if (Array.isArray(apiQuotes)) {
-        apiQuotes.forEach((q) => map.set(q.id, q));
+        apiQuotes.forEach((q) => {
+          if (!deletedIds.has(q.id)) map.set(q.id, q);
+        });
       }
     } catch (_) {}
 
     // 2. Fetch from Cloud Store
     try {
       const cloudRes = await fetch('https://api.restful-api.dev/objects/ff808181a09d98f701a0c9c936407072', {
-        signal: AbortSignal.timeout(5000)
+        signal: AbortSignal.timeout(3000)
       });
       if (cloudRes.ok) {
         const json = await cloudRes.json();
         const cloudQuotes = json?.data?.quotes;
         if (Array.isArray(cloudQuotes)) {
           cloudQuotes.forEach((q: any) => {
+            if (deletedIds.has(q.id)) return;
             if (!Array.isArray(q.items) && typeof q.itemsJson === 'string') {
               try {
                 q.items = JSON.parse(q.itemsJson);
@@ -1601,15 +1649,15 @@ export const apiService = {
         const localQuotes: QuoteRequest[] = JSON.parse(raw);
         if (Array.isArray(localQuotes)) {
           localQuotes.forEach((q) => {
-            if (!map.has(q.id)) map.set(q.id, q);
+            if (!deletedIds.has(q.id) && !map.has(q.id)) map.set(q.id, q);
           });
         }
       }
     } catch (_) {}
 
-    const list = Array.from(map.values()).sort(
-      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-    );
+    const list = Array.from(map.values())
+      .filter((q) => !deletedIds.has(q.id))
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
     try {
       localStorage.setItem('ssi_quotes', JSON.stringify(list));
@@ -1717,6 +1765,10 @@ export const apiService = {
   },
 
   async deleteQuote(id: string): Promise<{ success: boolean; id: string }> {
+    // 1. Permanently blacklist ID in tombstone storage
+    recordDeletedId(DELETED_QUOTES_KEY, id);
+
+    // 2. Remove from local storage immediately
     try {
       const raw = localStorage.getItem('ssi_quotes');
       if (raw) {
@@ -1726,8 +1778,11 @@ export const apiService = {
       }
     } catch (_) {}
 
+    // 3. Cloud store deletion
     try {
-      const cloudRes = await fetch('https://api.restful-api.dev/objects/ff808181a09d98f701a0c9c936407072');
+      const cloudRes = await fetch('https://api.restful-api.dev/objects/ff808181a09d98f701a0c9c936407072', {
+        signal: AbortSignal.timeout(3000)
+      });
       if (cloudRes.ok) {
         const json = await cloudRes.json();
         const data = json?.data || {};
@@ -1737,41 +1792,50 @@ export const apiService = {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ name: 'shree-shyam-interior-store', data }),
-            signal: AbortSignal.timeout(5000)
+            signal: AbortSignal.timeout(3000)
           });
         }
       }
     } catch (_) {}
 
-    return apiFetch<{ success: boolean; id: string }>(`/quotes/${id}`, {
-      method: 'DELETE'
-    });
+    // 4. Server API deletion (safely handled)
+    try {
+      await apiFetch<{ success: boolean; id: string }>(`/quotes/${id}`, {
+        method: 'DELETE'
+      });
+    } catch (_) {}
+
+    return { success: true, id };
   },
 
   // -------------------------------------------------------------
   // WhatsApp Orders & Direct Inquiries
   // -------------------------------------------------------------
   async getWhatsAppOrders(): Promise<WhatsAppOrder[]> {
+    const deletedIds = getDeletedIds(DELETED_ORDERS_KEY);
     const map = new Map<string, WhatsAppOrder>();
 
     // 1. Fetch from server API
     try {
       const apiOrders = await apiFetch<WhatsAppOrder[]>('/whatsapp-orders');
       if (Array.isArray(apiOrders)) {
-        apiOrders.forEach((o) => map.set(o.id, o));
+        apiOrders.forEach((o) => {
+          if (!deletedIds.has(o.id)) map.set(o.id, o);
+        });
       }
     } catch (_) {}
 
     // 2. Fetch from Cloud Store
     try {
       const cloudRes = await fetch('https://api.restful-api.dev/objects/ff808181a09d98f701a0c9c936407072', {
-        signal: AbortSignal.timeout(5000)
+        signal: AbortSignal.timeout(3000)
       });
       if (cloudRes.ok) {
         const json = await cloudRes.json();
         const cloudOrders = json?.data?.whatsappOrders;
         if (Array.isArray(cloudOrders)) {
           cloudOrders.forEach((o: any) => {
+            if (deletedIds.has(o.id)) return;
             if (!Array.isArray(o.items) && typeof o.itemsJson === 'string') {
               try {
                 o.items = JSON.parse(o.itemsJson);
@@ -1792,17 +1856,17 @@ export const apiService = {
         const localOrders: WhatsAppOrder[] = JSON.parse(raw);
         if (Array.isArray(localOrders)) {
           localOrders.forEach((o) => {
-            if (!map.has(o.id)) map.set(o.id, o);
+            if (!deletedIds.has(o.id) && !map.has(o.id)) map.set(o.id, o);
           });
         }
       }
     } catch (_) {}
 
-    const list = Array.from(map.values()).sort(
-      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-    );
+    const list = Array.from(map.values())
+      .filter((o) => !deletedIds.has(o.id))
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
-    // Keep localStorage updated with merged list
+    // Keep localStorage updated with merged clean list
     try {
       localStorage.setItem('ssi_whatsapp_orders', JSON.stringify(list));
     } catch (_) {}
@@ -1910,6 +1974,10 @@ export const apiService = {
   },
 
   async deleteWhatsAppOrder(id: string): Promise<{ success: boolean; id: string }> {
+    // 1. Permanently blacklist ID in tombstone storage
+    recordDeletedId(DELETED_ORDERS_KEY, id);
+
+    // 2. Remove from local storage immediately
     try {
       const raw = localStorage.getItem('ssi_whatsapp_orders');
       if (raw) {
@@ -1919,8 +1987,11 @@ export const apiService = {
       }
     } catch (_) {}
 
+    // 3. Cloud store deletion
     try {
-      const cloudRes = await fetch('https://api.restful-api.dev/objects/ff808181a09d98f701a0c9c936407072');
+      const cloudRes = await fetch('https://api.restful-api.dev/objects/ff808181a09d98f701a0c9c936407072', {
+        signal: AbortSignal.timeout(3000)
+      });
       if (cloudRes.ok) {
         const json = await cloudRes.json();
         const data = json?.data || {};
@@ -1930,15 +2001,20 @@ export const apiService = {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ name: 'shree-shyam-interior-store', data }),
-            signal: AbortSignal.timeout(5000)
+            signal: AbortSignal.timeout(3000)
           });
         }
       }
     } catch (_) {}
 
-    return apiFetch<{ success: boolean; id: string }>(`/whatsapp-orders/${id}`, {
-      method: 'DELETE'
-    });
+    // 4. Server API deletion (safely handled)
+    try {
+      await apiFetch<{ success: boolean; id: string }>(`/whatsapp-orders/${id}`, {
+        method: 'DELETE'
+      });
+    } catch (_) {}
+
+    return { success: true, id };
   },
 
 

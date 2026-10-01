@@ -31,7 +31,8 @@ import {
   Share2,
   Calculator,
   Calendar,
-  PhoneCall
+  PhoneCall,
+  Trash2
 } from 'lucide-react';
 import { apiService, Lead, QuoteRequest, WhatsAppOrder } from '../../services/apiService';
 import { useToast } from '../../context/ToastContext';
@@ -154,6 +155,63 @@ export const AdminDashboard: React.FC = () => {
       showToast(`Booking status updated to ${newStatus}`, 'success');
     } catch {
       showToast('Failed to update booking status', 'error');
+    }
+  };
+
+  const handleDeleteLead = async (id: string, name: string) => {
+    if (!window.confirm(`Delete booking request from "${name}"?`)) return;
+    try {
+      await apiService.deleteLead(id);
+      setAllLeads((prev) => {
+        const updated = prev.filter((l) => l.id !== id);
+        setStats((prevStats) => ({
+          ...prevStats,
+          leadsCount: updated.length,
+          newLeadsCount: updated.filter((l) => l.status === 'New').length
+        }));
+        return updated;
+      });
+      showToast('Booking deleted', 'success');
+    } catch {
+      showToast('Failed to delete booking', 'error');
+    }
+  };
+
+  const handleDeleteQuote = async (id: string) => {
+    if (!window.confirm('Delete this quotation record?')) return;
+    try {
+      await apiService.deleteQuote(id);
+      setAllQuotes((prev) => {
+        const updated = prev.filter((q) => q.id !== id);
+        setStats((prevStats) => ({
+          ...prevStats,
+          quotesCount: updated.length,
+          newQuotesCount: updated.filter((q) => !q.status || q.status === 'New').length
+        }));
+        return updated;
+      });
+      showToast('Quote record deleted', 'success');
+    } catch {
+      showToast('Failed to delete quote', 'error');
+    }
+  };
+
+  const handleDeleteWhatsAppOrder = async (id: string, name: string) => {
+    if (!window.confirm(`Delete WhatsApp order record from "${name}"?`)) return;
+    try {
+      await apiService.deleteWhatsAppOrder(id);
+      setAllWhatsAppOrders((prev) => {
+        const updated = prev.filter((o) => o.id !== id);
+        setStats((prevStats) => ({
+          ...prevStats,
+          whatsappOrdersCount: updated.length,
+          newOrdersCount: updated.filter((o) => o.status === 'New').length
+        }));
+        return updated;
+      });
+      showToast('WhatsApp order deleted', 'success');
+    } catch {
+      showToast('Failed to delete order', 'error');
     }
   };
 
@@ -1294,6 +1352,13 @@ export const AdminDashboard: React.FC = () => {
                               >
                                 <Phone className="w-4 h-4" />
                               </a>
+                              <button
+                                onClick={() => handleDeleteLead(lead.id, lead.name)}
+                                className="p-1.5 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-500 transition-colors cursor-pointer"
+                                title="Delete Booking"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
                             </div>
                           </td>
                         </tr>
@@ -1418,6 +1483,13 @@ export const AdminDashboard: React.FC = () => {
                               >
                                 <ExternalLink className="w-4 h-4" />
                               </Link>
+                              <button
+                                onClick={() => handleDeleteQuote(q.id)}
+                                className="p-1.5 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-500 transition-colors cursor-pointer"
+                                title="Delete Quote Record"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
                             </div>
                           </td>
                         </tr>
@@ -1552,6 +1624,13 @@ export const AdminDashboard: React.FC = () => {
                                     <Phone className="w-4 h-4" />
                                   </a>
                                 )}
+                                <button
+                                  onClick={() => handleDeleteWhatsAppOrder(o.id, o.customerName || 'Customer')}
+                                  className="p-1.5 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-500 transition-colors cursor-pointer"
+                                  title="Delete WhatsApp Order"
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </button>
                               </div>
                             </td>
                           </tr>
