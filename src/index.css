@@ -31,6 +31,114 @@
   }
 }
 
+/* ==========================================================================
+   Site-wide Page Wallpaper
+   A single fixed interior texture sits behind every public page, so page and
+   section surfaces stay slightly translucent and the warm wall breathes
+   through while scrolling. Page-wise images live in /public/backgrounds.
+   ========================================================================== */
+
+.site-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+  background-color: #F5F1E8;
+}
+
+.site-bg__photo {
+  position: absolute;
+  inset: -1px;
+  background-position: center 32%;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.site-bg__photo--enter {
+  animation: siteBgFadeIn 900ms ease-out both;
+}
+
+@keyframes siteBgFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.site-bg__veil {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    140% 110% at 50% -10%,
+    rgba(250, 248, 245, 0.06) 0%,
+    rgba(250, 248, 245, 0.20) 45%,
+    rgba(245, 241, 232, 0.34) 100%
+  );
+}
+
+/* Dark theme: keep the same texture, dimmed into a deep ambient glow */
+html.dark .site-bg {
+  background-color: #0B0F15;
+}
+
+html.dark .site-bg__photo {
+  filter: brightness(0.34) saturate(0.72) contrast(1.02);
+}
+
+html.dark .site-bg__veil {
+  background: radial-gradient(
+    140% 110% at 50% -10%,
+    rgba(11, 15, 21, 0.58) 0%,
+    rgba(11, 15, 21, 0.74) 45%,
+    rgba(11, 15, 21, 0.88) 100%
+  );
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-bg__photo--enter {
+    animation: none;
+  }
+}
+
+/* --- Wallpaper-aware surfaces (only while the wallpaper is mounted) --- */
+
+/* Page roots hand the stage to the wallpaper (light theme only — the few
+   always-light pages such as Blog / policy pages keep their own canvas) */
+html:not(.dark) body.has-site-bg #site-main > * {
+  background-color: transparent;
+}
+
+/* Light theme: cream + white page surfaces turn softly translucent */
+html:not(.dark) body.has-site-bg .bg-cream-50 {
+  background-color: rgba(250, 248, 245, 0.72);
+}
+
+html:not(.dark) body.has-site-bg .bg-cream-100 {
+  background-color: rgba(245, 241, 232, 0.52);
+}
+
+html:not(.dark) body.has-site-bg #site-main > .bg-white,
+html:not(.dark) body.has-site-bg #site-main > * > .bg-white {
+  background-color: rgba(255, 255, 255, 0.80);
+}
+
+/* Canvas colour behind the wallpaper (keeps overscroll warm instead of white) */
+body.has-site-bg {
+  background-color: #F5F1E8;
+}
+
+/* Dark theme: forest page surfaces let the dim texture glow through */
+html.dark body.has-site-bg .bg-forest-950 {
+  background-color: rgba(11, 15, 21, 0.72);
+}
+
+html.dark body.has-site-bg .bg-forest-900 {
+  background-color: rgba(18, 23, 32, 0.64);
+}
+
 /* Custom Minimalist Scrollbars */
 ::-webkit-scrollbar {
   width: 6px;
@@ -55,6 +163,20 @@
   body {
     background-color: #FFFFFF !important;
     color: #000000 !important;
+  }
+
+  /* Never print the page wallpaper — keep printed quotes/PDFs clean */
+  .site-bg {
+    display: none !important;
+  }
+
+  html body.has-site-bg #site-main > * {
+    background-color: #FFFFFF !important;
+  }
+
+  html body.has-site-bg .bg-cream-50,
+  html body.has-site-bg .bg-cream-100 {
+    background-color: #FFFFFF !important;
   }
 
   header, footer, aside, .print\:hidden, [role="navigation"] {

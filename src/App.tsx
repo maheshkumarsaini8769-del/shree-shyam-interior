@@ -5,6 +5,7 @@ import { QuoteProvider } from './context/QuoteContext';
 import { ThemeProvider } from './context/ThemeContext';
 import { Header } from './components/common/Header';
 import { Footer } from './components/common/Footer';
+import { PageBackground } from './components/common/PageBackground';
 import { BottomNav } from './components/common/BottomNav';
 import { FloatingActions } from './components/common/FloatingActions';
 import { ScrollProgress } from './components/common/ScrollProgress';
@@ -256,6 +257,7 @@ const AppContent: React.FC = () => {
 
   return (
     <div className="flex flex-col min-h-screen">
+      <PageBackground />
       <ScrollToTop />
       <WebsiteAnalyticsTracker />
       <ScrollProgress />
@@ -265,7 +267,7 @@ const AppContent: React.FC = () => {
 
       <Header />
 
-      <main className="flex-1">
+      <main id="site-main" className="flex-1">
         <ChunkErrorBoundary>
           <Suspense fallback={<PageSkeleton />}>
             <Routes>
